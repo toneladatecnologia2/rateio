@@ -427,7 +427,6 @@
 
           <!-- ABA 4: CADASTRAR PRODUTO MANUALMENTE UM A UM (INSTRUÇÕES VISÍVEIS SOMENTE PARA ADMINS) -->
           <div id="view-products" class="hidden space-y-6">
-            <!-- Guia Exclusivo Admin: Cadastro Individual -->
             <div class="bg-blue-950/35 border border-blue-800/60 rounded-xl p-4 space-y-2 text-xs">
               <div class="flex items-center gap-2 text-blue-300 font-bold">
                 <span>📘 Instruções para Cadastro Manual (Um a Um) — Área Exclusiva Admin</span>
@@ -437,7 +436,7 @@
                 <li><strong>Sinal Fixo (R$):</strong> Informe o valor cobrado na reserva inicial de cada vaga (padrão <code>20</code> para R$ 20,00). Use ponto para centavos (ex: <code>25.50</code>).</li>
                 <li><strong>Valor Cheio (R$):</strong> Informe o preço final total do produto. Quando o Box atingir 10 peças, o sistema calculará automaticamente o restante (<code>Valor Cheio - Sinal</code>).</li>
                 <li><strong>Categoria:</strong> Informe o grupo do produto (ex: <em>Perfumes</em>, <em>Eletrônicos</em>, <em>Moda</em>) para criar filtros automáticos na loja.</li>
-                <li>Clique em <strong>Salvar Produto</strong> — ele aparecerá imediatamente no catálogo da <strong>Nexxus Oficial BR</strong> no <strong>Box #1 (0/10)</strong>.</li>
+                <li>Clique em <strong>Salvar</strong> — ele aparecerá imediatamente no catálogo da <strong>Nexxus Oficial BR</strong> no <strong>Box #1 (0/10)</strong>.</li>
               </ol>
             </div>
 
@@ -482,7 +481,6 @@
 
           <!-- ABA 5: CADASTRO EM LOTE / MASSA (INSTRUÇÕES VISÍVEIS SOMENTE PARA ADMINS) -->
           <div id="view-bulk" class="hidden space-y-4">
-            <!-- Guia Exclusivo Admin: Cadastro em Lote -->
             <div class="bg-emerald-950/30 border border-emerald-800/60 rounded-xl p-4 space-y-2 text-xs">
               <div class="flex items-center gap-2 text-emerald-300 font-bold">
                 <span>📗 Instruções para Cadastro em Lote (+100 Produtos) — Área Exclusiva Admin</span>
@@ -783,14 +781,31 @@
         : "text-sm font-bold text-slate-400 hover:text-white pb-1";
     };
 
-    // --- LOGIN / LOGOUT ADMIN INDIVIDUAL ---
-    window.loginAdmin = function () {
+    // --- LOGIN / LOGOUT ADMIN INDIVIDUAL (COM FALLBACK GARANTIDO) ---
+    window.loginAdmin = async function () {
       const email = document.getElementById("adminEmailInput").value.trim().toLowerCase();
       const pass = document.getElementById("adminPasswordInput").value;
 
-      const found = admins.find(a => (a.email || "").toLowerCase() === email && a.password === pass);
+      let found = admins.find(a => (a.email || "").toLowerCase() === email && a.password === pass);
+
+      if (!found && admins.length === 0 && email === "admin@rateio.com" && pass === "admin123") {
+        try {
+          const docRef = await addDoc(collection(db, "admins"), {
+            name: "Admin Principal",
+            email: "admin@rateio.com",
+            password: "admin123",
+            isMaster: true,
+            createdAtMs: Date.now()
+          });
+          found = { id: docRef.id, name: "Admin Principal", email: "admin@rateio.com", password: "admin123" };
+        } catch (err) {
+          alert("Erro de permissão no Firestore! Verifique se a coleção 'admins' está liberada na aba Regras do Firebase.");
+          return;
+        }
+      }
+
       if (!found) {
-        alert("E-mail ou senha de administrador inválidos!");
+        alert("E-mail ou senha de administrador inválidos! (Verifique se há espaços extras ou se já foi cadastrado outro admin no Firebase).");
         return;
       }
 
@@ -865,13 +880,17 @@
 
     onSnapshot(collection(db, "admins"), async (snapshot) => {
       if (snapshot.empty) {
-        await addDoc(collection(db, "admins"), {
-          name: "Admin Principal",
-          email: "admin@rateio.com",
-          password: storeConfig.adminPass || "admin123",
-          isMaster: true,
-          createdAtMs: Date.now()
-        });
+        try {
+          await addDoc(collection(db, "admins"), {
+            name: "Admin Principal",
+            email: "admin@rateio.com",
+            password: "admin123",
+            isMaster: true,
+            createdAtMs: Date.now()
+          });
+        } catch (e) {
+          console.error("Erro ao criar admin inicial:", e);
+        }
         return;
       }
       admins = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -882,6 +901,8 @@
         updateSiteScheduleLock();
       }
       renderAdminsAndAudit();
+    }, (err) => {
+      console.error("Erro ao ler coleção admins:", err);
     });
 
     onSnapshot(query(collection(db, "audit_logs"), orderBy("createdAtMs", "desc")), (snapshot) => {
@@ -1253,7 +1274,6 @@
         return `
           <div class="bg-slate-900 border border-slate-800 hover:border-blue-500/40 rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-lg transition">
             <div>
-              <!-- Cabeçalho do Card (Tags de Box sem imagem) -->
               <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800/80">
                 <span class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30">
                   Box #${info.activeBoxNumber} Aberto
