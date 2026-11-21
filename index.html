@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RateioPro — Compra Coletiva & Reservas Inteligentes</title>
+    <title>RateioPro — Compra Coletiva em Tempo Real</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter -->
@@ -21,18 +21,15 @@
                         sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        brand: {
-                            50: '#ecfdf5',
-                            100: '#d1fae5',
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#080d1a',
+                        },
+                        emerald: {
                             500: '#10b981',
                             600: '#059669',
                             700: '#047857',
-                            900: '#064e3b',
-                        },
-                        slate: {
-                            850: '#151e2e',
-                            900: '#0f172a',
-                            950: '#020617',
                         }
                     }
                 }
@@ -40,67 +37,59 @@
         }
     </script>
     <style>
-        /* Custom Scrollbar for smooth high-volume catalog browsing */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .progress-stripe {
-            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
             background-size: 1rem 1rem;
         }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
-    <!-- Toast Notification Container (Replaces alert()) -->
-    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
 
     <!-- Header / Navbar -->
-    <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-lg border-b border-slate-800">
+    <header class="bg-navy-950 text-white sticky top-0 z-30 shadow-lg border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Brand Logo -->
                 <div class="flex items-center gap-3 cursor-pointer" onclick="resetFilters()">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-md shadow-emerald-500/20">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/20">
                         <i class="fa-solid fa-layer-group text-white text-lg"></i>
                     </div>
                     <div>
-                        <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
                             Rateio<span class="text-emerald-400">Pro</span>
+                            <span id="live-sync-badge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> AO VIVO
+                            </span>
                         </h1>
-                        <p class="text-[11px] text-slate-400 hidden sm:block">Reserve com sinal fixo • Feche o grupo de 10</p>
+                        <p class="text-[11px] text-slate-400 hidden sm:block">Garanta sua vaga com sinal fixo • Fechou 10/10, liberamos o valor cheio</p>
                     </div>
                 </div>
 
                 <!-- Header Stats & Admin Trigger -->
-                <div class="flex items-center gap-3 sm:gap-5">
-                    <div class="hidden md:flex items-center gap-4 text-xs bg-slate-800/80 px-3.5 py-2 rounded-xl border border-slate-700/80">
+                <div class="flex items-center gap-2.5 sm:gap-4">
+                    <div class="hidden md:flex items-center gap-4 text-xs bg-navy-900 px-3.5 py-2 rounded-xl border border-slate-800">
                         <div class="flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span class="text-slate-300">Grupos Abertos:</span>
+                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                            <span class="text-slate-300">Lotes Abertos:</span>
                             <strong id="header-open-count" class="text-white font-bold">0</strong>
                         </div>
-                        <span class="text-slate-600">|</span>
+                        <span class="text-slate-700">|</span>
                         <div class="flex items-center gap-1.5">
-                            <i class="fa-solid fa-trophy text-amber-400"></i>
-                            <span class="text-slate-300">Metas Batidas:</span>
+                            <i class="fa-solid fa-lock text-amber-400"></i>
+                            <span class="text-slate-300">Fechados (10/10):</span>
                             <strong id="header-closed-count" class="text-amber-400 font-bold">0</strong>
                         </div>
                     </div>
 
-                    <button id="btn-admin-toggle" onclick="handleAdminAccess()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2 shadow-sm">
-                        <i id="admin-icon" class="fa-solid fa-lock text-emerald-400"></i>
+                    <button id="btn-admin-toggle" onclick="handleAdminAccess()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-navy-800 hover:bg-slate-700 text-slate-100 border border-slate-700 transition flex items-center gap-2 shadow-sm">
+                        <i id="admin-icon" class="fa-solid fa-shield-halved text-emerald-400"></i>
                         <span id="admin-btn-text">Painel Admin</span>
                     </button>
                 </div>
@@ -108,173 +97,249 @@
         </div>
     </header>
 
-    <!-- How it Works Banner -->
-    <section class="bg-gradient-to-r from-slate-900 via-slate-850 to-emerald-950 text-white border-b border-slate-800">
+    <!-- Hero Banner -->
+    <section class="bg-gradient-to-br from-navy-950 via-navy-900 to-slate-900 text-white border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div class="max-w-2xl">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 mb-3">
-                        <i class="fa-solid fa-bolt"></i> Compra Coletiva Inteligente
+                        <i class="fa-solid fa-users-line"></i> Vagas Limitadas por Ordem de Reserva
                     </span>
-                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                        Garanta sua peça pagando apenas o sinal da reserva.
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
+                        Reserve com sinal fixo. Os <span class="text-emerald-400">10 primeiros</span> garantem o fechamento!
                     </h2>
-                    <p class="text-sm sm:text-base text-slate-300 mt-2 leading-relaxed">
-                        Escolha os produtos abaixo e reserve sua cota. Assim que o grupo atingir <strong class="text-emerald-400">10 peças reservadas</strong>, o lote é fechado e enviamos a cobrança do valor cheio via WhatsApp!
+                    <p class="text-sm text-slate-300 mt-2 leading-relaxed">
+                        Escolha seu produto e garanta sua vaga pagando apenas o sinal da reserva. Assim que o lote atingir <strong class="text-white">10 peças reservadas</strong>, o lote trava automaticamente e liberamos o pagamento do valor cheio para os 10 primeiros.
                     </p>
                 </div>
 
-                <!-- 3 Step Mini Guide -->
+                <!-- 3 Step Guide -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:max-w-xl w-full">
-                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3.5">
-                        <div class="text-emerald-400 font-bold text-xs uppercase tracking-wider mb-1">Passo 1</div>
-                        <div class="font-semibold text-sm text-white">Pague o Sinal</div>
-                        <p class="text-xs text-slate-400 mt-0.5">Valor fixo baixo para travar sua vaga no rateio.</p>
+                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3.5">
+                        <div class="text-emerald-400 font-extrabold text-[11px] uppercase tracking-wider mb-1">1. Sinal de Reserva</div>
+                        <div class="font-bold text-sm text-white">Trave sua Cota</div>
+                        <p class="text-xs text-slate-400 mt-0.5">Pague apenas o sinal fixo para entrar na fila do lote.</p>
                     </div>
-                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3.5">
-                        <div class="text-emerald-400 font-bold text-xs uppercase tracking-wider mb-1">Passo 2</div>
-                        <div class="font-semibold text-sm text-white">Junte 10 Peças</div>
-                        <p class="text-xs text-slate-400 mt-0.5">Acompanhe a barra de progresso em tempo real.</p>
+                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3.5">
+                        <div class="text-emerald-400 font-extrabold text-[11px] uppercase tracking-wider mb-1">2. Meta de 10 Peças</div>
+                        <div class="font-bold text-sm text-white">Trava Automática</div>
+                        <p class="text-xs text-slate-400 mt-0.5">Bateu 10/10? O lote fecha na hora para os 10 primeiros.</p>
                     </div>
-                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3.5">
-                        <div class="text-amber-400 font-bold text-xs uppercase tracking-wider mb-1">Passo 3</div>
-                        <div class="font-semibold text-sm text-white">Fechamento</div>
-                        <p class="text-xs text-slate-400 mt-0.5">Bateu 10/10? Cobramos o valor total do produto.</p>
+                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-3.5">
+                        <div class="text-amber-400 font-extrabold text-[11px] uppercase tracking-wider mb-1">3. Valor Cheio</div>
+                        <div class="font-bold text-sm text-white">Saldo Restante</div>
+                        <p class="text-xs text-slate-400 mt-0.5">Abatemos seu sinal e cobramos o restante via WhatsApp.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ADMIN PANEL (Hidden by default, unlocked via password) -->
+    <!-- ===================================================================== -->
+    <!-- ADMIN PANEL (Protected by Password, Shared in Real-Time) -->
+    <!-- ===================================================================== -->
     <section id="admin-panel" class="hidden bg-slate-100 border-b-2 border-emerald-500 shadow-inner">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <!-- Admin Header -->
             <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200 mb-6">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow">
-                        <i class="fa-solid fa-sliders"></i>
+                    <div class="w-11 h-11 rounded-2xl bg-navy-900 text-emerald-400 flex items-center justify-center shadow-md">
+                        <i class="fa-solid fa-sliders text-lg"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-bold text-slate-900">Painel de Gestão & Catálogo (+100 Produtos)</h3>
-                        <p class="text-xs text-slate-500">Cadastre em massa, gerencie reservas e exporte seu JSON para o GitHub Pages.</p>
+                        <h3 class="text-lg font-extrabold text-navy-950">Painel Administrativo — Gestão de Lotes & Cobranças</h3>
+                        <p class="text-xs text-slate-500">Todas as alterações são sincronizadas em tempo real para todos os clientes.</p>
                     </div>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
-                    <button onclick="exportJSON()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold flex items-center gap-2 transition shadow-sm">
-                        <i class="fa-solid fa-download text-emerald-400"></i> Exportar JSON (Backup/GitHub)
-                    </button>
-                    <label class="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold flex items-center gap-2 cursor-pointer transition shadow-sm">
-                        <i class="fa-solid fa-upload text-blue-600"></i> Importar JSON
-                        <input type="file" id="import-json-input" accept=".json" class="hidden" onchange="importJSON(event)">
-                    </label>
-                    <button onclick="logoutAdmin()" class="px-3.5 py-2 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-semibold transition">
+                    <button onclick="logoutAdmin()" class="px-4 py-2 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-bold transition flex items-center gap-1.5">
                         <i class="fa-solid fa-right-from-bracket"></i> Sair do Admin
                     </button>
                 </div>
             </div>
 
-            <!-- Admin Tabs -->
+            <!-- Admin Navigation Tabs -->
             <div class="flex flex-wrap gap-2 mb-6">
-                <button onclick="switchAdminTab('single')" id="tab-btn-single" class="admin-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-600 text-white shadow-sm transition">
-                    <i class="fa-solid fa-plus-circle mr-1.5"></i> Cadastrar 1 Produto
+                <button onclick="switchAdminTab('products')" id="tab-btn-products" class="admin-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-navy-900 text-white shadow-sm transition">
+                    <i class="fa-solid fa-box-open mr-1.5 text-emerald-400"></i> Produtos & Lotes
                 </button>
-                <button onclick="switchAdminTab('bulk')" id="tab-btn-bulk" class="admin-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white text-slate-600 hover:bg-slate-200 transition">
-                    <i class="fa-solid fa-table-list mr-1.5"></i> Cadastro em Massa (+100 Itens)
+                <button onclick="switchAdminTab('bulk')" id="tab-btn-bulk" class="admin-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-600 hover:bg-slate-200 transition">
+                    <i class="fa-solid fa-file-import mr-1.5 text-emerald-600"></i> Cadastro em Massa (+100 produtos)
                 </button>
-                <button onclick="switchAdminTab('settings')" id="tab-btn-settings" class="admin-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white text-slate-600 hover:bg-slate-200 transition">
-                    <i class="fa-brands fa-whatsapp mr-1.5"></i> Configurações & WhatsApp
+                <button onclick="switchAdminTab('closures')" id="tab-btn-closures" class="admin-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-600 hover:bg-slate-200 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-trophy text-amber-500"></i> Fechamentos & Cobrança (Os 10 Primeiros)
+                    <span id="admin-closed-badge" class="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-800 font-extrabold">0</span>
+                </button>
+                <button onclick="switchAdminTab('settings')" id="tab-btn-settings" class="admin-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-600 hover:bg-slate-200 transition">
+                    <i class="fa-brands fa-whatsapp mr-1.5 text-emerald-600"></i> Configurações
                 </button>
             </div>
 
-            <!-- Tab 1: Single Product Form -->
-            <div id="admin-tab-single" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                <form id="form-add-product" onsubmit="addSingleProduct(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-                    <div class="lg:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Nome do Produto *</label>
-                        <input type="text" id="prod-name" required placeholder="Ex: Kit Camisetas Oversized Premium" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Categoria / Código</label>
-                        <input type="text" id="prod-category" placeholder="Ex: Vestuário • #104" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Sinal Reserva (R$) *</label>
-                        <input type="number" step="0.01" min="1" id="prod-reserve-price" required value="20.00" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Valor Cheio (R$) *</label>
-                        <input type="number" step="0.01" min="1" id="prod-full-price" required placeholder="189.90" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Meta de Peças *</label>
-                        <input type="number" min="2" max="100" id="prod-goal" required value="10" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
-                    </div>
-                    <div class="sm:col-span-2 lg:col-span-5">
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">URL da Imagem (Opcional)</label>
-                        <input type="url" id="prod-image" placeholder="https://exemplo.com/foto-produto.jpg" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
-                    </div>
-                    <div class="flex items-end">
-                        <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition shadow-sm flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-plus"></i> Adicionar
+            <!-- TAB 1: PRODUCTS & BATCHES -->
+            <div id="admin-tab-products" class="space-y-6">
+                <!-- Add / Edit Form -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 id="product-form-title" class="text-sm font-extrabold text-navy-900 flex items-center gap-2">
+                            <i class="fa-solid fa-plus-circle text-emerald-600"></i> Cadastrar Novo Produto no Catálogo
+                        </h4>
+                        <button type="button" id="btn-cancel-edit" onclick="cancelEditProduct()" class="hidden text-xs text-rose-600 font-bold hover:underline">
+                            Cancelar Edição
                         </button>
                     </div>
-                </form>
+                    <form id="form-product" onsubmit="saveProductForm(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+                        <input type="hidden" id="edit-product-id">
+                        <div class="lg:col-span-2">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Nome do Produto *</label>
+                            <input type="text" id="prod-name" required placeholder="Ex: Perfume Árabe Asad 100ml" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Categoria *</label>
+                            <input type="text" id="prod-category" required placeholder="Ex: Perfumaria" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Sinal Reserva (R$) *</label>
+                            <input type="number" step="0.01" min="0.50" id="prod-reserve-price" required value="20.00" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Valor Cheio (R$) *</label>
+                            <input type="number" step="0.01" min="1" id="prod-full-price" required placeholder="249.90" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Meta Peças / Lote *</label>
+                            <div class="flex gap-2">
+                                <input type="number" min="2" max="100" id="prod-goal" required value="10" title="Meta de peças" class="w-1/2 px-3 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                                <input type="number" min="1" id="prod-batch" required value="1" title="Número do Lote" class="w-1/2 px-3 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            </div>
+                        </div>
+                        <div class="sm:col-span-2 lg:col-span-5">
+                            <label class="block text-xs font-bold text-slate-600 mb-1">URL da Foto do Produto (Opcional)</label>
+                            <input type="url" id="prod-image" placeholder="https://exemplo.com/imagem.jpg" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+                        <div class="flex items-end">
+                            <button type="submit" id="btn-save-product" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition shadow-sm flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-check"></i> Salvar Produto
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Admin Quick Products Management Table -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-600">Gerenciar Produtos Ativos (<span id="admin-table-count">0</span>)</h4>
+                        <input type="text" id="admin-prod-search" oninput="renderAdminProductsTable()" placeholder="Filtrar na tabela..." class="w-full sm:w-64 px-3 py-1.5 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div class="overflow-x-auto max-h-96">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-slate-100 text-slate-600 sticky top-0 z-10">
+                                <tr>
+                                    <th class="py-3 px-4 font-bold">Produto / Categoria</th>
+                                    <th class="py-3 px-4 font-bold">Lote</th>
+                                    <th class="py-3 px-4 font-bold">Sinal / Cheio</th>
+                                    <th class="py-3 px-4 font-bold">Progresso</th>
+                                    <th class="py-3 px-4 font-bold text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-products-tbody" class="divide-y divide-slate-100">
+                                <!-- Rows injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
-            <!-- Tab 2: Bulk Import (CSV / Text) -->
+            <!-- TAB 2: BULK IMPORT (+100 PRODUCTS) -->
             <div id="admin-tab-bulk" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-3">
                     <div>
-                        <h4 class="text-sm font-bold text-slate-800">Importação Rápida de Lista (Cole dezenas ou centenas de produtos)</h4>
-                        <p class="text-xs text-slate-500">Formato por linha: <code class="bg-slate-100 px-1.5 py-0.5 rounded text-emerald-700 font-mono">Nome do Produto; Valor Reserva; Valor Cheio; Categoria; URL Imagem</code></p>
+                        <h4 class="text-sm font-extrabold text-navy-900">Importação em Massa (+100 Produtos de uma vez)</h4>
+                        <p class="text-xs text-slate-500 mt-0.5">Cole uma linha por produto no formato: <code class="bg-slate-100 px-1.5 py-0.5 rounded text-emerald-700 font-mono font-bold">Nome; Sinal; Valor Cheio; Categoria; URL_Imagem</code></p>
                     </div>
-                    <button onclick="fillBulkExample()" class="text-xs text-emerald-600 hover:underline font-medium">
-                        Preencher exemplo de 5 produtos
+                    <button type="button" onclick="fillBulkExample()" class="text-xs text-emerald-600 hover:underline font-bold">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Inserir exemplo de 5 produtos
                     </button>
                 </div>
-                <textarea id="bulk-textarea" rows="5" placeholder="Perfume Importado 100ml; 25.00; 349.90; Perfumaria; https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&#10;Fone Bluetooth ANC Pro; 15.00; 189.00; Eletrônicos; " class="w-full p-3.5 rounded-xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
-                <div class="flex justify-end gap-3 mt-3">
-                    <button onclick="processBulkImport()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold shadow-sm transition flex items-center gap-2">
-                        <i class="fa-solid fa-bolt"></i> Importar Todos os Produtos
+                <textarea id="bulk-textarea" rows="7" placeholder="Perfume Lattafa Asad 100ml; 20.00; 249.90; Perfumaria; https://images.unsplash.com/photo-1594035910387-fea47794261f?w=500&#10;Fone Bluetooth ANC Pro; 15.00; 189.00; Eletrônicos; https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500" class="w-full p-3.5 rounded-xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+                <div class="flex justify-between items-center mt-3">
+                    <span class="text-[11px] text-slate-400">Todos os produtos importados iniciam no <strong>Lote 1</strong> com meta de <strong>10 peças</strong>.</span>
+                    <button type="button" onclick="processBulkImport()" id="btn-bulk-submit" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> Importar Todos para o Banco
                     </button>
                 </div>
             </div>
 
-            <!-- Tab 3: Settings & GitHub Pages Guide -->
-            <div id="admin-tab-settings" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h4 class="text-sm font-bold text-slate-800 mb-3">Configurações do Administrador</h4>
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">WhatsApp do Administrador (com DDD, apenas números)</label>
-                                <input type="text" id="setting-whatsapp" placeholder="5511999999999" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">Chave PIX para receber o Sinal da Reserva</label>
-                                <input type="text" id="setting-pix" placeholder="CPF, E-mail ou Chave Aleatória" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-600 mb-1">Alterar Senha do Painel Admin</label>
-                                <input type="text" id="setting-password" placeholder="admin123" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm">
-                            </div>
-                            <button onclick="saveSettings()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition">
-                                Salvar Configurações
-                            </button>
+            <!-- TAB 3: CLOSURES & BILLING (THE TOP 10) -->
+            <div id="admin-tab-closures" class="hidden space-y-5">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Left Column: Products List (Closed 10/10 Highlighted first) -->
+                    <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                        <div class="p-4 bg-navy-900 text-white flex justify-between items-center">
+                            <h4 class="text-xs font-extrabold uppercase tracking-wider">Selecione um Produto / Lote</h4>
+                            <span class="text-[11px] text-emerald-400 font-semibold">Fechados no topo</span>
+                        </div>
+                        <div class="p-3 border-b border-slate-100">
+                            <input type="text" id="closure-search" oninput="renderClosuresTab()" placeholder="Buscar produto fechado ou aberto..." class="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs outline-none focus:ring-2 focus:ring-emerald-500">
+                        </div>
+                        <div id="closure-products-list" class="divide-y divide-slate-100 max-h-[520px] overflow-y-auto">
+                            <!-- List injected via JS -->
                         </div>
                     </div>
 
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-2">
-                        <h4 class="font-bold text-slate-800 flex items-center gap-1.5">
-                            <i class="fa-brands fa-github text-base"></i> Como publicar no GitHub Pages:
+                    <!-- Right Column: Top 10 Ranked Buyers & WhatsApp Billing -->
+                    <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                        <div id="closure-detail-header" class="p-4 bg-slate-50 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
+                            <div>
+                                <h4 class="text-sm font-extrabold text-navy-900">Lista Oficial dos Participantes (Ordem de Reserva)</h4>
+                                <p class="text-xs text-slate-500">Clique em um produto à esquerda para cobrar os 10 primeiros.</p>
+                            </div>
+                        </div>
+
+                        <div id="closure-detail-body" class="p-5 flex-1">
+                            <div class="text-center py-12 text-slate-400">
+                                <i class="fa-solid fa-hand-pointer text-3xl mb-3 text-slate-300"></i>
+                                <p class="text-sm font-semibold text-slate-600">Nenhum produto selecionado</p>
+                                <p class="text-xs mt-1">Escolha um lote na lista ao lado para visualizar os 10 primeiros compradores e disparar a cobrança do valor cheio.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: SETTINGS -->
+            <div id="admin-tab-settings" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <form onsubmit="saveAdminSettings(event)" class="space-y-4">
+                        <h4 class="text-sm font-extrabold text-navy-900">Configurações de Recebimento & Segurança</h4>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">WhatsApp do Administrador (DDI + DDD + Número) *</label>
+                            <input type="text" id="setting-whatsapp" required placeholder="5511999999999" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <p class="text-[11px] text-slate-400 mt-1">Para onde o cliente será direcionado para enviar o comprovante do sinal.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Chave PIX (Copia e Cola) *</label>
+                            <input type="text" id="setting-pix" required placeholder="CPF, E-mail, Telefone ou Chave Aleatória" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Senha do Painel Admin *</label>
+                            <input type="text" id="setting-password" required placeholder="admin123" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-navy-900 hover:bg-navy-800 text-white text-xs font-bold transition shadow-sm">
+                            <i class="fa-solid fa-floppy-disk mr-1.5 text-emerald-400"></i> Salvar Configurações
+                        </button>
+                    </form>
+
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs text-slate-600 space-y-2.5">
+                        <h4 class="font-extrabold text-navy-900 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info text-emerald-600 text-base"></i> Como funciona a Trava Automática (10/10):
                         </h4>
-                        <p>1. Crie um repositório no GitHub e suba este arquivo renomeado para <strong>index.html</strong>.</p>
-                        <p>2. Como o GitHub Pages é estático, seus clientes salvam reservas no navegador deles e enviam o comprovante direto no seu WhatsApp.</p>
-                        <p>3. Para atualizar o catálogo oficial para todos os clientes: cadastre seus +100 produtos aqui, clique em <strong>Exportar JSON</strong> e suba o arquivo <code class="bg-white px-1 py-0.5 border rounded">produtos.json</code> na mesma pasta do repositório!</p>
+                        <p>• Cada reserva recebe um carimbo exato de data/hora (<code class="bg-white px-1 py-0.5 border rounded">timestamp</code>) no banco de dados compartilhado.</p>
+                        <p>• Quando a soma das peças reservadas atinge <strong>10/10</strong>, o produto trava automaticamente na vitrine.</p>
+                        <p>• Se você quiser vender mais unidades do mesmo produto, basta clicar em <strong>"Abrir Novo Lote"</strong> na aba <em>Produtos & Lotes</em> — o Lote 2 é criado mantendo o histórico do Lote 1 intacto.</p>
                         <div class="pt-2">
-                            <button onclick="resetDemoData()" class="text-rose-600 hover:underline font-semibold">
-                                <i class="fa-solid fa-rotate-left"></i> Restaurar 6 produtos de demonstração
+                            <button type="button" onclick="seedSampleProducts()" class="text-emerald-700 hover:underline font-bold">
+                                <i class="fa-solid fa-database"></i> Popular catálogo com 8 produtos de exemplo
                             </button>
                         </div>
                     </div>
@@ -283,60 +348,91 @@
         </div>
     </section>
 
-    <!-- Main Catalog Section -->
+    <!-- ===================================================================== -->
+    <!-- MAIN PUBLIC CATALOG SECTION -->
+    <!-- ===================================================================== -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         
-        <!-- Search, Status Filters & Sorting Bar -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 mb-6 flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center">
-            <!-- Search Input -->
-            <div class="relative flex-1">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                <input type="text" id="search-input" oninput="handleSearch()" placeholder="Buscar por nome do produto, código ou categoria..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition">
+        <!-- Search, Category & Status Filter Bar -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/90 mb-6 space-y-3">
+            <div class="flex flex-col lg:flex-row gap-3 justify-between items-stretch lg:items-center">
+                <!-- Search Input -->
+                <div class="relative flex-1">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="search-input" oninput="handleSearch()" placeholder="Buscar produto por nome, lote ou categoria..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition">
+                </div>
+
+                <!-- Category Select -->
+                <div class="flex flex-col sm:flex-row gap-2.5">
+                    <select id="category-select" onchange="handleCategoryChange()" class="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="all">Todas as Categorias</option>
+                    </select>
+
+                    <select id="sort-select" onchange="renderCatalog()" class="px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="default">Ordenar: Mais Recentes</option>
+                        <option value="almost">Quase Fechando (Faltam poucas vagas)</option>
+                        <option value="reserve-asc">Menor Valor de Sinal</option>
+                        <option value="name-asc">Ordem Alfabética (A-Z)</option>
+                    </select>
+                </div>
             </div>
 
             <!-- Status Filter Pills -->
-            <div class="flex flex-wrap items-center gap-2">
-                <button onclick="setFilter('all')" id="filter-all" class="filter-pill px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white transition">
-                    Todos (<span id="count-all">0</span>)
-                </button>
-                <button onclick="setFilter('open')" id="filter-open" class="filter-pill px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block mr-1"></span> Vagas Abertas (<span id="count-open">0</span>)
-                </button>
-                <button onclick="setFilter('almost')" id="filter-almost" class="filter-pill px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
-                    <i class="fa-solid fa-fire text-orange-500 mr-1"></i> Quase Fechando (<span id="count-almost">0</span>)
-                </button>
-                <button onclick="setFilter('closed')" id="filter-closed" class="filter-pill px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
-                    <i class="fa-solid fa-trophy text-amber-500 mr-1"></i> Meta Batida (<span id="count-closed">0</span>)
-                </button>
-            </div>
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="setStatusFilter('all')" id="filter-all" class="filter-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-navy-900 text-white transition">
+                        Todos (<span id="count-all">0</span>)
+                    </button>
+                    <button onclick="setStatusFilter('open')" id="filter-open" class="filter-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block mr-1"></span> Vagas Abertas (<span id="count-open">0</span>)
+                    </button>
+                    <button onclick="setStatusFilter('closed')" id="filter-closed" class="filter-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+                        <i class="fa-solid fa-lock text-amber-500 mr-1"></i> Lote Fechado 10/10 (<span id="count-closed">0</span>)
+                    </button>
+                </div>
 
-            <!-- Sort Dropdown -->
-            <div class="flex items-center gap-2">
-                <select id="sort-select" onchange="renderCatalog()" class="w-full lg:w-auto px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500">
-                    <option value="default">Ordenar: Mais recentes</option>
-                    <option value="progress-desc">Mais próximos de fechar (9/10)</option>
-                    <option value="reserve-asc">Menor valor de sinal</option>
-                    <option value="name-asc">Ordem Alfabética (A-Z)</option>
-                </select>
+                <div class="text-xs text-slate-500 flex items-center gap-2">
+                    <span>Exibindo <strong id="showing-range" class="text-navy-900">0-0</strong> de <strong id="total-filtered" class="text-navy-900">0</strong></span>
+                    <select id="per-page-select" onchange="changePerPage()" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-700">
+                        <option value="12" selected>12 / pág</option>
+                        <option value="24">24 / pág</option>
+                        <option value="48">48 / pág</option>
+                    </select>
+                </div>
             </div>
         </div>
 
-        <!-- Results Info Bar -->
-        <div class="flex justify-between items-center mb-4 text-xs text-slate-500">
-            <p>Exibindo <strong id="showing-range" class="text-slate-800">0-0</strong> de <strong id="total-filtered" class="text-slate-800">0</strong> produtos no catálogo</p>
-            <div class="flex items-center gap-2">
-                <span>Itens por página:</span>
-                <select id="per-page-select" onchange="changePerPage()" class="bg-white border border-slate-200 rounded-lg px-2 py-1 text-slate-700 font-semibold">
-                    <option value="12" selected>12</option>
-                    <option value="24">24</option>
-                    <option value="48">48</option>
-                </select>
+        <!-- Loading Skeleton -->
+        <div id="catalog-loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div class="bg-white rounded-2xl p-4 border border-slate-200 animate-pulse space-y-3">
+                <div class="aspect-[4/3] bg-slate-200 rounded-xl"></div>
+                <div class="h-4 bg-slate-200 rounded w-3/4"></div>
+                <div class="h-10 bg-slate-200 rounded-xl"></div>
+                <div class="h-8 bg-slate-200 rounded-xl"></div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 border border-slate-200 animate-pulse space-y-3 hidden sm:block">
+                <div class="aspect-[4/3] bg-slate-200 rounded-xl"></div>
+                <div class="h-4 bg-slate-200 rounded w-3/4"></div>
+                <div class="h-10 bg-slate-200 rounded-xl"></div>
+                <div class="h-8 bg-slate-200 rounded-xl"></div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 border border-slate-200 animate-pulse space-y-3 hidden lg:block">
+                <div class="aspect-[4/3] bg-slate-200 rounded-xl"></div>
+                <div class="h-4 bg-slate-200 rounded w-3/4"></div>
+                <div class="h-10 bg-slate-200 rounded-xl"></div>
+                <div class="h-8 bg-slate-200 rounded-xl"></div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 border border-slate-200 animate-pulse space-y-3 hidden xl:block">
+                <div class="aspect-[4/3] bg-slate-200 rounded-xl"></div>
+                <div class="h-4 bg-slate-200 rounded w-3/4"></div>
+                <div class="h-10 bg-slate-200 rounded-xl"></div>
+                <div class="h-8 bg-slate-200 rounded-xl"></div>
             </div>
         </div>
 
         <!-- Product Grid -->
-        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Product cards injected dynamically via JS -->
+        <div id="products-grid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Product cards injected dynamically -->
         </div>
 
         <!-- Empty State -->
@@ -344,30 +440,28 @@
             <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-4 text-2xl">
                 <i class="fa-solid fa-box-open"></i>
             </div>
-            <h3 class="text-lg font-bold text-slate-800">Nenhum produto encontrado</h3>
+            <h3 class="text-lg font-extrabold text-navy-900">Nenhum produto encontrado</h3>
             <p class="text-sm text-slate-500 mt-1">Tente limpar os filtros ou buscar por outro termo.</p>
-            <button onclick="resetFilters()" class="mt-4 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition">
-                Mostrar todos os produtos
+            <button onclick="resetFilters()" class="mt-4 px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition">
+                Mostrar Todos os Produtos
             </button>
         </div>
 
         <!-- Pagination Controls -->
-        <div id="pagination-controls" class="mt-8 flex flex-wrap justify-center items-center gap-2">
-            <!-- Pagination buttons injected dynamically -->
-        </div>
+        <div id="pagination-controls" class="mt-8 flex flex-wrap justify-center items-center gap-2"></div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 mt-12">
+    <footer class="bg-navy-950 text-slate-400 border-t border-slate-800 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs">
             <div class="flex items-center gap-2">
-                <span class="font-bold text-white text-sm">Rateio<span class="text-emerald-400">Pro</span></span>
-                <span>• Sistema de Compra Coletiva e Reservas</span>
+                <span class="font-extrabold text-white text-sm">Rateio<span class="text-emerald-400">Pro</span></span>
+                <span>• Compra Coletiva com Trava Automática em 10 Peças</span>
             </div>
             <div class="flex items-center gap-4">
-                <span>Ao atingir 10/10 reservas, o valor cheio é cobrado.</span>
-                <button onclick="handleAdminAccess()" class="text-slate-400 hover:text-emerald-400 underline transition">
-                    Área do Organizador
+                <span>Os 10 primeiros garantem o fechamento do lote.</span>
+                <button onclick="handleAdminAccess()" class="text-slate-300 hover:text-emerald-400 underline font-semibold transition">
+                    Painel Admin
                 </button>
             </div>
         </div>
@@ -377,12 +471,12 @@
     <!-- MODALS -->
     <!-- ===================================================================== -->
 
-    <!-- 1. Reservation Modal -->
-    <div id="modal-reserve" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-200 animate-fade-in">
-            <div class="bg-slate-900 text-white px-5 py-4 flex justify-between items-center">
-                <h3 class="font-bold text-base flex items-center gap-2">
-                    <i class="fa-solid fa-ticket text-emerald-400"></i> Reservar Cota no Rateio
+    <!-- 1. Reservation Modal (Client Booking) -->
+    <div id="modal-reserve" class="fixed inset-0 z-50 hidden bg-navy-950/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-200">
+            <div class="bg-navy-950 text-white px-5 py-4 flex justify-between items-center">
+                <h3 class="font-extrabold text-base flex items-center gap-2">
+                    <i class="fa-solid fa-ticket text-emerald-400"></i> Reservar Vaga no Lote
                 </h3>
                 <button onclick="closeModal('modal-reserve')" class="text-slate-400 hover:text-white p-1">
                     <i class="fa-solid fa-xmark text-lg"></i>
@@ -392,56 +486,61 @@
             <form id="form-reserve" onsubmit="submitReservation(event)" class="p-5 space-y-4">
                 <input type="hidden" id="res-product-id">
                 
-                <!-- Selected Product Summary -->
+                <!-- Product Summary -->
                 <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 flex gap-3 items-center">
-                    <img id="res-prod-img" src="" alt="" class="w-14 h-14 rounded-lg object-cover bg-slate-200 flex-shrink-0">
+                    <img id="res-prod-img" src="" alt="" class="w-16 h-16 rounded-xl object-cover bg-slate-200 flex-shrink-0">
                     <div class="min-w-0 flex-1">
-                        <h4 id="res-prod-title" class="font-bold text-sm text-slate-900 truncate">Nome do Produto</h4>
-                        <div class="flex items-center gap-3 mt-1 text-xs">
-                            <span class="text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded-md">
+                        <span id="res-prod-batch" class="inline-block text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-navy-900 text-white mb-1">Lote 1</span>
+                        <h4 id="res-prod-title" class="font-bold text-sm text-navy-900 truncate">Produto</h4>
+                        <div class="flex flex-wrap items-center gap-2 mt-1 text-xs">
+                            <span class="text-emerald-700 font-extrabold bg-emerald-100 px-2 py-0.5 rounded-md">
                                 Sinal: <span id="res-prod-signal">R$ 20,00</span>/un
                             </span>
                             <span class="text-slate-500">
-                                Cheio: <strong id="res-prod-full" class="text-slate-700">R$ 250,00</strong>
+                                Cheio: <strong id="res-prod-full" class="text-slate-800">R$ 249,90</strong>
                             </span>
                         </div>
-                        <p id="res-prod-slots" class="text-[11px] text-slate-500 mt-1">Restam 4 vagas para fechar o grupo</p>
+                        <p id="res-prod-slots" class="text-[11px] font-semibold text-orange-600 mt-1">Restam 4 vagas para fechar!</p>
                     </div>
                 </div>
 
-                <!-- Buyer Details -->
+                <!-- Client Inputs -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Seu Nome Completo *</label>
-                    <input type="text" id="res-buyer-name" required placeholder="Ex: Maria Oliveira" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Seu Nome Completo *</label>
+                    <input type="text" id="res-buyer-name" required placeholder="Ex: João da Silva" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Seu WhatsApp *</label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Seu WhatsApp (com DDD) *</label>
                         <input type="tel" id="res-buyer-phone" required placeholder="(11) 99999-9999" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Qtd. de Peças *</label>
-                        <select id="res-quantity" onchange="updateReservationTotal()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold focus:ring-2 focus:ring-emerald-500 outline-none">
-                            <!-- Options populated dynamically based on remaining slots -->
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Quantidade de Peças *</label>
+                        <select id="res-quantity" onchange="updateReservationTotals()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <!-- Populated dynamically with remaining slots -->
                         </select>
                     </div>
                 </div>
 
-                <!-- PIX / Total Box -->
+                <!-- Financial Breakdown & PIX -->
                 <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 space-y-2">
                     <div class="flex justify-between items-center text-sm">
-                        <span class="text-emerald-900 font-medium">Total do Sinal agora:</span>
+                        <span class="text-emerald-950 font-semibold">Sinal a pagar agora:</span>
                         <span id="res-total-signal" class="text-lg font-extrabold text-emerald-700">R$ 20,00</span>
                     </div>
-                    <div class="flex justify-between items-center text-xs text-emerald-800 border-t border-emerald-200/70 pt-2">
+                    <div class="flex justify-between items-center text-xs text-emerald-900 border-t border-emerald-200/70 pt-2">
                         <span>Valor cheio ao atingir 10/10:</span>
-                        <strong id="res-total-full">R$ 250,00</strong>
+                        <strong id="res-total-full">R$ 249,90</strong>
                     </div>
-                    <div id="pix-copy-box" class="pt-1">
-                        <div class="flex items-center justify-between bg-white px-2.5 py-1.5 rounded-lg border border-emerald-200 text-xs">
-                            <span class="truncate text-slate-600">PIX: <strong id="res-pix-key" class="text-slate-900">pix@rateiopro.com.br</strong></span>
-                            <button type="button" onclick="copyPixKey()" class="text-emerald-600 hover:text-emerald-800 font-bold ml-2 flex-shrink-0">
+                    <div class="flex justify-between items-center text-xs text-slate-600">
+                        <span>Saldo restante após sinal:</span>
+                        <strong id="res-total-balance" class="text-slate-800">R$ 229,90</strong>
+                    </div>
+                    <div class="pt-1.5">
+                        <div class="flex items-center justify-between bg-white px-3 py-2 rounded-lg border border-emerald-200 text-xs">
+                            <span class="truncate text-slate-600">PIX: <strong id="res-pix-key" class="text-navy-900">pix@rateiopro.com.br</strong></span>
+                            <button type="button" onclick="copyPixKey()" class="text-emerald-600 hover:text-emerald-800 font-extrabold ml-2 flex-shrink-0">
                                 <i class="fa-regular fa-copy"></i> Copiar
                             </button>
                         </div>
@@ -449,10 +548,10 @@
                 </div>
 
                 <div class="flex flex-col gap-2 pt-1">
-                    <button type="submit" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-check-circle"></i> Confirmar Reserva & Enviar no WhatsApp
+                    <button type="submit" id="btn-submit-reservation" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check-circle"></i> Garantir Vaga & Enviar Comprovante
                     </button>
-                    <button type="button" onclick="closeModal('modal-reserve')" class="w-full py-2 rounded-xl text-slate-500 hover:bg-slate-100 text-xs font-semibold transition">
+                    <button type="button" onclick="closeModal('modal-reserve')" class="w-full py-2 rounded-xl text-slate-500 hover:bg-slate-100 text-xs font-bold transition">
                         Cancelar
                     </button>
                 </div>
@@ -460,323 +559,310 @@
         </div>
     </div>
 
-    <!-- 2. Billing / Participants List Modal (When Goal Reached or Admin View) -->
-    <div id="modal-participants" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200">
-            <div class="bg-slate-900 text-white px-5 py-4 flex justify-between items-center">
+    <!-- 2. Public Participants Ranking Modal (Shows Top 10 Order) -->
+    <div id="modal-public-ranking" class="fixed inset-0 z-50 hidden bg-navy-950/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-200">
+            <div class="bg-navy-950 text-white px-5 py-4 flex justify-between items-center">
                 <div>
-                    <h3 class="font-bold text-base flex items-center gap-2">
-                        <i class="fa-solid fa-users text-amber-400"></i> Participantes & Cobrança
+                    <h3 class="font-extrabold text-base flex items-center gap-2">
+                        <i class="fa-solid fa-ranking-star text-amber-400"></i> Fila Oficial do Lote
                     </h3>
-                    <p id="part-modal-subtitle" class="text-xs text-slate-400 mt-0.5 truncate max-w-xs sm:max-w-sm">Produto</p>
+                    <p id="rank-modal-subtitle" class="text-xs text-slate-400 mt-0.5 truncate max-w-xs">Produto</p>
                 </div>
-                <button onclick="closeModal('modal-participants')" class="text-slate-400 hover:text-white p-1">
+                <button onclick="closeModal('modal-public-ranking')" class="text-slate-400 hover:text-white p-1">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
-            <div class="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
-                <!-- Status Alert -->
-                <div id="part-goal-banner" class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
-                    <i class="fa-solid fa-trophy text-amber-500 text-base mt-0.5"></i>
+            <div class="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+                <div id="rank-closed-alert" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
+                    <i class="fa-solid fa-lock text-amber-600 text-base mt-0.5"></i>
                     <div>
-                        <strong class="block text-sm">Meta de 10/10 Peças Batida!</strong>
-                        <span>O grupo está fechado. Copie a lista de cobrança abaixo para cobrar o <strong>valor cheio</strong> de cada participante no WhatsApp.</span>
+                        <strong class="block font-extrabold">LOTE FECHADO (10/10)!</strong>
+                        <span>As 10 vagas deste lote foram garantidas pelos participantes abaixo por ordem de chegada.</span>
                     </div>
                 </div>
 
-                <!-- Participants List -->
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Cotas Reservadas (<span id="part-count-label">0/10</span>)</h4>
-                        <span id="part-full-price-badge" class="text-xs font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded">Valor Cheio: R$ 0,00</span>
-                    </div>
-                    <div id="participants-list-container" class="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
-                        <!-- Participant rows injected here -->
-                    </div>
+                <div id="rank-list-container" class="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
+                    <!-- Ranked list injected here -->
                 </div>
 
-                <!-- WhatsApp Billing Message Generator -->
-                <div class="pt-2 border-t border-slate-200">
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5">
-                        <i class="fa-brands fa-whatsapp text-emerald-600"></i> Mensagem Pronta de Cobrança (Grupo/Lista):
-                    </label>
-                    <textarea id="billing-message-box" rows="5" readonly class="w-full p-3 rounded-xl bg-slate-100 border border-slate-200 text-xs font-mono text-slate-700 outline-none"></textarea>
-                    <div class="flex flex-wrap gap-2 mt-3">
-                        <button onclick="copyBillingMessage()" class="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm">
-                            <i class="fa-regular fa-copy"></i> Copiar Lista de Cobrança
-                        </button>
-                        <a id="btn-share-wa-group" href="#" target="_blank" class="py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition flex items-center justify-center gap-2">
-                            <i class="fa-brands fa-whatsapp text-emerald-400"></i> Abrir WhatsApp
-                        </a>
-                    </div>
-                </div>
+                <button onclick="closeModal('modal-public-ranking')" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                    Fechar
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- 3. Admin Login Modal (Replaces prompt()) -->
-    <div id="modal-admin-login" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <!-- 3. Admin Login Modal -->
+    <div id="modal-admin-login" class="fixed inset-0 z-50 hidden bg-navy-950/75 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl border border-slate-200">
-            <div class="bg-slate-900 text-white px-5 py-4 flex justify-between items-center">
-                <h3 class="font-bold text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-shield-halved text-emerald-400"></i> Acesso Administrativo
+            <div class="bg-navy-950 text-white px-5 py-4 flex justify-between items-center">
+                <h3 class="font-extrabold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-shield-halved text-emerald-400"></i> Acesso do Organizador
                 </h3>
                 <button onclick="closeModal('modal-admin-login')" class="text-slate-400 hover:text-white">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             <form onsubmit="verifyAdminPassword(event)" class="p-5 space-y-4">
-                <p class="text-xs text-slate-500">Digite a senha do organizador para cadastrar produtos, importar listas e gerenciar cobranças. (Padrão: <code class="bg-slate-100 px-1 py-0.5 rounded font-bold text-slate-700">admin123</code>)</p>
+                <p class="text-xs text-slate-500">Digite a senha administrativa para gerenciar produtos, lotes e cobrar os 10 primeiros. (Padrão: <code class="bg-slate-100 px-1.5 py-0.5 rounded font-bold text-slate-800">admin123</code>)</p>
                 <div>
-                    <input type="password" id="admin-password-input" required placeholder="Senha de acesso..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <input type="password" id="admin-password-input" required placeholder="Senha..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
                 </div>
                 <div class="flex justify-end gap-2">
-                    <button type="button" onclick="closeModal('modal-admin-login')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancelar</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm">Entrar</button>
+                    <button type="button" onclick="closeModal('modal-admin-login')" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm">Entrar no Painel</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- ===================================================================== -->
-    <!-- APPLICATION LOGIC (JavaScript) -->
+    <!-- FIREBASE REAL-TIME APPLICATION LOGIC -->
     <!-- ===================================================================== -->
-    <script>
-        // Storage Keys
-        const STORAGE_KEY_PRODUCTS = 'rateiopro_products_v1';
-        const STORAGE_KEY_SETTINGS = 'rateiopro_settings_v1';
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Application State
+        // Environment Firebase Setup
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'rateiopro-default';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+
+        // Global Reactive State
         let products = [];
-        let settings = {
+        let reservations = [];
+        let appSettings = {
             whatsapp: '5511999999999',
-            pixKey: 'pix@sualoja.com.br',
+            pixKey: 'pix@rateiopro.com.br',
             adminPassword: 'admin123'
         };
+
         let isAdmin = false;
-        let currentFilter = 'all';
+        let currentStatusFilter = 'all';
+        let currentCategoryFilter = 'all';
         let searchQuery = '';
         let currentPage = 1;
         let itemsPerPage = 12;
+        let selectedClosureProductId = null;
 
-        // Initial 6 Demo Products (Covering different progress levels: 3/10, 8/10, 10/10)
-        const DEMO_PRODUCTS = [
-            {
-                id: 'prod-101',
-                name: 'Perfume Árabe Lattafa Asad 100ml Original',
-                category: 'Perfumaria • #101',
-                image: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=600&q=80',
-                reservePrice: 20.00,
-                fullPrice: 249.90,
-                goal: 10,
-                reservations: [
-                    { id: 'r1', name: 'Carlos Eduardo', phone: '11988881111', qty: 1, date: '20/11/2026' },
-                    { id: 'r2', name: 'Fernanda Lima', phone: '11988882222', qty: 1, date: '20/11/2026' },
-                    { id: 'r3', name: 'Juliana Costa', phone: '11988883333', qty: 1, date: '20/11/2026' },
-                    { id: 'r4', name: 'Marcos Vinicius', phone: '11988884444', qty: 1, date: '20/11/2026' },
-                    { id: 'r5', name: 'Patrícia Alves', phone: '11988885555', qty: 1, date: '20/11/2026' },
-                    { id: 'r6', name: 'Ricardo Mendes', phone: '11988886666', qty: 1, date: '20/11/2026' },
-                    { id: 'r7', name: 'Camila Rocha', phone: '11988887777', qty: 1, date: '20/11/2026' },
-                    { id: 'r8', name: 'Lucas Ferreira', phone: '11988888888', qty: 1, date: '20/11/2026' },
-                    { id: 'r9', name: 'Beatriz Santos', phone: '11988889999', qty: 1, date: '20/11/2026' },
-                    { id: 'r10', name: 'Gabriel Souza', phone: '11988880000', qty: 1, date: '20/11/2026' }
-                ]
-            },
-            {
-                id: 'prod-102',
-                name: 'Fone de Ouvido Bluetooth ANC Noise Cancelling',
-                category: 'Eletrônicos • #102',
-                image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80',
-                reservePrice: 15.00,
-                fullPrice: 189.00,
-                goal: 10,
-                reservations: [
-                    { id: 'r21', name: 'Ana Paula', phone: '11977771111', qty: 2, date: '20/11/2026' },
-                    { id: 'r22', name: 'Rodrigo Silva', phone: '11977772222', qty: 3, date: '20/11/2026' },
-                    { id: 'r23', name: 'Tatiane Gomes', phone: '11977773333', qty: 3, date: '20/11/2026' }
-                ] // 8/10
-            },
-            {
-                id: 'prod-103',
-                name: 'Garrafa Térmica Inox 1.2L Parede Dupla',
-                category: 'Utilidades • #103',
-                image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=600&q=80',
-                reservePrice: 10.00,
-                fullPrice: 119.90,
-                goal: 10,
-                reservations: [
-                    { id: 'r31', name: 'Bruno Henrique', phone: '11966661111', qty: 2, date: '20/11/2026' },
-                    { id: 'r32', name: 'Mariana Dias', phone: '11966662222', qty: 1, date: '20/11/2026' }
-                ] // 3/10
-            },
-            {
-                id: 'prod-104',
-                name: 'Smartwatch Ultra Series 9 Amoled GPS',
-                category: 'Acessórios • #104',
-                image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=600&q=80',
-                reservePrice: 25.00,
-                fullPrice: 320.00,
-                goal: 10,
-                reservations: [
-                    { id: 'r41', name: 'Felipe Martins', phone: '11955551111', qty: 4, date: '20/11/2026' },
-                    { id: 'r42', name: 'Vanessa Castro', phone: '11955552222', qty: 5, date: '20/11/2026' }
-                ] // 9/10 (Falta 1!)
-            },
-            {
-                id: 'prod-105',
-                name: 'Kit 3 Camisetas Algodão Egípcio Premium',
-                category: 'Vestuário • #105',
-                image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80',
-                reservePrice: 15.00,
-                fullPrice: 159.90,
-                goal: 10,
-                reservations: [] // 0/10
-            },
-            {
-                id: 'prod-106',
-                name: 'Cafeteira Espresso Portátil Viagem',
-                category: 'Casa & Café • #106',
-                image: 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?auto=format&fit=crop&w=600&q=80',
-                reservePrice: 20.00,
-                fullPrice: 279.00,
-                goal: 10,
-                reservations: [
-                    { id: 'r61', name: 'Diego Nunes', phone: '11944441111', qty: 5, date: '20/11/2026' },
-                    { id: 'r62', name: 'Larissa Ribeiro', phone: '11944442222', qty: 5, date: '20/11/2026' }
-                ] // 10/10
-            }
-        ];
+        // Expose functions to global window for inline HTML handlers
+        window.resetFilters = resetFilters;
+        window.handleAdminAccess = handleAdminAccess;
+        window.verifyAdminPassword = verifyAdminPassword;
+        window.logoutAdmin = logoutAdmin;
+        window.switchAdminTab = switchAdminTab;
+        window.saveProductForm = saveProductForm;
+        window.editProduct = editProduct;
+        window.cancelEditProduct = cancelEditProduct;
+        window.deleteProduct = deleteProduct;
+        window.openNewBatch = openNewBatch;
+        window.renderAdminProductsTable = renderAdminProductsTable;
+        window.fillBulkExample = fillBulkExample;
+        window.processBulkImport = processBulkImport;
+        window.renderClosuresTab = renderClosuresTab;
+        window.selectClosureProduct = selectClosureProduct;
+        window.removeReservationAdmin = removeReservationAdmin;
+        window.saveAdminSettings = saveAdminSettings;
+        window.seedSampleProducts = seedSampleProducts;
+        window.handleSearch = handleSearch;
+        window.handleCategoryChange = handleCategoryChange;
+        window.setStatusFilter = setStatusFilter;
+        window.renderCatalog = renderCatalog;
+        window.changePerPage = changePerPage;
+        window.goToPage = goToPage;
+        window.openReserveModal = openReserveModal;
+        window.updateReservationTotals = updateReservationTotals;
+        window.copyPixKey = copyPixKey;
+        window.submitReservation = submitReservation;
+        window.openPublicRanking = openPublicRanking;
+        window.closeModal = closeModal;
 
         // =====================================================================
-        // INITIALIZATION & DATA PERSISTENCE
+        // INITIALIZE FIREBASE & REAL-TIME LISTENERS
         // =====================================================================
-        window.addEventListener('DOMContentLoaded', async () => {
-            loadSettings();
-            await loadProducts();
-            renderCatalog();
-        });
-
-        function loadSettings() {
-            const saved = localStorage.getItem(STORAGE_KEY_SETTINGS);
-            if (saved) {
-                try {
-                    settings = { ...settings, ...JSON.parse(saved) };
-                } catch (e) {
-                    console.error('Erro ao carregar configurações:', e);
-                }
-            }
-            document.getElementById('setting-whatsapp').value = settings.whatsapp;
-            document.getElementById('setting-pix').value = settings.pixKey;
-            document.getElementById('setting-password').value = settings.adminPassword;
-        }
-
-        function saveSettings() {
-            settings.whatsapp = document.getElementById('setting-whatsapp').value.replace(/\D/g, '') || '5511999999999';
-            settings.pixKey = document.getElementById('setting-pix').value.trim() || 'pix@sualoja.com.br';
-            settings.adminPassword = document.getElementById('setting-password').value.trim() || 'admin123';
-            localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings));
-            showToast('Configurações salvas com sucesso!', 'success');
-        }
-
-        async function loadProducts() {
-            const localData = localStorage.getItem(STORAGE_KEY_PRODUCTS);
-            if (localData) {
-                try {
-                    products = JSON.parse(localData);
-                    return;
-                } catch (e) {
-                    console.error('Erro no LocalStorage:', e);
-                }
+        async function initApp() {
+            if (!firebaseConfig) {
+                showToast('Configuração de nuvem não encontrada. Verifique o ambiente.', 'error');
+                return;
             }
 
-            // Try fetching external produtos.json if hosted on GitHub Pages
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+
             try {
-                const response = await fetch('./produtos.json');
-                if (response.ok) {
-                    const externalProducts = await response.json();
-                    if (Array.isArray(externalProducts) && externalProducts.length > 0) {
-                        products = externalProducts;
-                        saveProducts();
-                        return;
-                    }
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Erro na autenticação:", error);
+                showToast("Erro ao conectar ao servidor em tempo real.", "error");
+            }
+
+            onAuthStateChanged(auth, async (user) => {
+                if (!user) return;
+                currentUser = user;
+                await ensureInitialData();
+                startRealtimeListeners();
+            });
+        }
+
+        // Firestore Strict Paths (Rule 1)
+        const getProductsCol = () => collection(db, 'artifacts', appId, 'public', 'data', 'rateio_products');
+        const getProductDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'rateio_products', id);
+        const getReservationsCol = () => collection(db, 'artifacts', appId, 'public', 'data', 'rateio_reservations');
+        const getReservationDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'rateio_reservations', id);
+        const getSettingsDoc = () => doc(db, 'artifacts', appId, 'public', 'data', 'rateio_config', 'general');
+
+        async function ensureInitialData() {
+            try {
+                const settingsSnap = await getDoc(getSettingsDoc());
+                if (!settingsSnap.exists()) {
+                    await setDoc(getSettingsDoc(), appSettings);
                 }
             } catch (err) {
-                // Fallback to demo data if no produtos.json exists
+                console.error("Erro ao verificar configurações:", err);
             }
-
-            products = JSON.parse(JSON.stringify(DEMO_PRODUCTS));
-            saveProducts();
         }
 
-        function saveProducts() {
-            localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
-        }
+        function startRealtimeListeners() {
+            // 1. Settings Listener
+            onSnapshot(getSettingsDoc(), (docSnap) => {
+                if (docSnap.exists()) {
+                    appSettings = { ...appSettings, ...docSnap.data() };
+                    document.getElementById('setting-whatsapp').value = appSettings.whatsapp || '';
+                    document.getElementById('setting-pix').value = appSettings.pixKey || '';
+                    document.getElementById('setting-password').value = appSettings.adminPassword || 'admin123';
+                }
+            }, (err) => console.error("Erro listener settings:", err));
 
-        function resetDemoData() {
-            products = JSON.parse(JSON.stringify(DEMO_PRODUCTS));
-            saveProducts();
-            currentPage = 1;
-            renderCatalog();
-            showToast('Catálogo restaurado para os 6 produtos de exemplo.', 'info');
+            // 2. Products Listener
+            onSnapshot(getProductsCol(), (snapshot) => {
+                products = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                // Sort newest first in memory (Rule 2)
+                products.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                document.getElementById('catalog-loading').classList.add('hidden');
+                document.getElementById('products-grid').classList.remove('hidden');
+
+                updateCategoryDropdown();
+                renderCatalog();
+                if (isAdmin) {
+                    renderAdminProductsTable();
+                    renderClosuresTab();
+                }
+            }, (err) => {
+                console.error("Erro listener produtos:", err);
+                showToast("Falha ao sincronizar catálogo.", "error");
+            });
+
+            // 3. Reservations Listener (Ordered strictly by timestamp ascending so Top 10 are exact)
+            onSnapshot(getReservationsCol(), (snapshot) => {
+                reservations = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                // Sort strictly by timestamp ascending (first to reserve = rank #1)
+                reservations.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+                renderCatalog();
+                if (isAdmin) {
+                    renderAdminProductsTable();
+                    renderClosuresTab();
+                }
+            }, (err) => {
+                console.error("Erro listener reservas:", err);
+            });
         }
 
         // =====================================================================
         // HELPER FUNCTIONS
         // =====================================================================
-        function formatCurrency(value) {
-            return Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        function formatCurrency(val) {
+            return Number(val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        function getReservedCount(product) {
-            return (product.reservations || []).reduce((sum, r) => sum + Number(r.qty || 1), 0);
+        function formatDateTime(ts) {
+            if (!ts) return 'Agora';
+            const d = new Date(ts);
+            return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' +
+                   d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        function getProductBatchReservations(product) {
+            const batchNum = Number(product.batchNumber || 1);
+            return reservations
+                .filter(r => r.productId === product.id && Number(r.batchNumber || 1) === batchNum)
+                .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+        }
+
+        function getReservedQuantity(product) {
+            const list = getProductBatchReservations(product);
+            return list.reduce((acc, r) => acc + Number(r.qty || 1), 0);
         }
 
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            
-            const colors = {
-                success: 'bg-slate-900 border-emerald-500 text-white',
+            const styles = {
+                success: 'bg-navy-950 border-emerald-500 text-white',
                 error: 'bg-rose-950 border-rose-500 text-white',
-                info: 'bg-slate-800 border-blue-400 text-white'
+                info: 'bg-navy-900 border-amber-400 text-white'
             };
             const icons = {
                 success: '<i class="fa-solid fa-circle-check text-emerald-400"></i>',
                 error: '<i class="fa-solid fa-circle-exclamation text-rose-400"></i>',
-                info: '<i class="fa-solid fa-circle-info text-blue-400"></i>'
+                info: '<i class="fa-solid fa-circle-info text-amber-400"></i>'
             };
-
-            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 shadow-xl text-xs sm:text-sm font-medium transition-all transform translate-y-0 ${colors[type] || colors.success}`;
+            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 shadow-2xl text-xs sm:text-sm font-semibold transition-all ${styles[type] || styles.success}`;
             toast.innerHTML = `${icons[type] || icons.success} <span>${message}</span>`;
-            
             container.appendChild(toast);
             setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transform = 'translateX(20px)';
                 setTimeout(() => toast.remove(), 300);
-            }, 3500);
+            }, 3800);
         }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
         }
 
         // =====================================================================
-        // CATALOG RENDERING, SEARCH, FILTER & PAGINATION
+        // CATALOG FILTERING, SORTING & PAGINATION
         // =====================================================================
-        function setFilter(filterType) {
-            currentFilter = filterType;
+        function updateCategoryDropdown() {
+            const select = document.getElementById('category-select');
+            const currentVal = select.value;
+            const categories = [...new Set(products.map(p => (p.category || 'Geral').trim()))].sort();
+
+            select.innerHTML = `<option value="all">Todas as Categorias (${categories.length})</option>`;
+            categories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                select.appendChild(opt);
+            });
+            if (categories.includes(currentVal)) {
+                select.value = currentVal;
+            }
+        }
+
+        function setStatusFilter(status) {
+            currentStatusFilter = status;
             currentPage = 1;
-
             document.querySelectorAll('.filter-pill').forEach(btn => {
-                btn.classList.remove('bg-slate-900', 'text-white');
+                btn.classList.remove('bg-navy-900', 'text-white');
                 btn.classList.add('bg-slate-100', 'text-slate-600');
             });
-            const activeBtn = document.getElementById(`filter-${filterType}`);
+            const activeBtn = document.getElementById(`filter-${status}`);
             activeBtn.classList.remove('bg-slate-100', 'text-slate-600');
-            activeBtn.classList.add('bg-slate-900', 'text-white');
-
+            activeBtn.classList.add('bg-navy-900', 'text-white');
             renderCatalog();
         }
 
@@ -786,10 +872,18 @@
             renderCatalog();
         }
 
+        function handleCategoryChange() {
+            currentCategoryFilter = document.getElementById('category-select').value;
+            currentPage = 1;
+            renderCatalog();
+        }
+
         function resetFilters() {
             document.getElementById('search-input').value = '';
+            document.getElementById('category-select').value = 'all';
             searchQuery = '';
-            setFilter('all');
+            currentCategoryFilter = 'all';
+            setStatusFilter('all');
         }
 
         function changePerPage() {
@@ -799,72 +893,69 @@
         }
 
         function renderCatalog() {
-            // Update counters
             let openCount = 0;
             let closedCount = 0;
-            let almostCount = 0;
 
             products.forEach(p => {
-                const reserved = getReservedCount(p);
+                const reserved = getReservedQuantity(p);
                 const goal = Number(p.goal || 10);
-                if (reserved >= goal) {
-                    closedCount++;
-                } else {
-                    openCount++;
-                    if (goal - reserved <= 3) almostCount++;
-                }
+                if (reserved >= goal) closedCount++;
+                else openCount++;
             });
 
             document.getElementById('header-open-count').textContent = openCount;
             document.getElementById('header-closed-count').textContent = closedCount;
             document.getElementById('count-all').textContent = products.length;
             document.getElementById('count-open').textContent = openCount;
-            document.getElementById('count-almost').textContent = almostCount;
             document.getElementById('count-closed').textContent = closedCount;
+            document.getElementById('admin-closed-badge').textContent = closedCount;
 
-            // Filter products
+            // Apply Filters
             let filtered = products.filter(p => {
-                const reserved = getReservedCount(p);
+                const reserved = getReservedQuantity(p);
                 const goal = Number(p.goal || 10);
                 const isClosed = reserved >= goal;
 
-                if (currentFilter === 'open' && isClosed) return false;
-                if (currentFilter === 'closed' && !isClosed) return false;
-                if (currentFilter === 'almost' && (isClosed || (goal - reserved > 3))) return false;
+                if (currentStatusFilter === 'open' && isClosed) return false;
+                if (currentStatusFilter === 'closed' && !isClosed) return false;
+
+                if (currentCategoryFilter !== 'all' && (p.category || 'Geral').trim() !== currentCategoryFilter) {
+                    return false;
+                }
 
                 if (searchQuery) {
-                    const matchName = (p.name || '').toLowerCase().includes(searchQuery);
-                    const matchCat = (p.category || '').toLowerCase().includes(searchQuery);
-                    if (!matchName && !matchCat) return false;
+                    const nameMatch = (p.name || '').toLowerCase().includes(searchQuery);
+                    const catMatch = (p.category || '').toLowerCase().includes(searchQuery);
+                    const batchMatch = `lote ${p.batchNumber || 1}`.includes(searchQuery);
+                    if (!nameMatch && !catMatch && !batchMatch) return false;
                 }
                 return true;
             });
 
-            // Sort products
+            // Apply Sorting
             const sortBy = document.getElementById('sort-select').value;
-            if (sortBy === 'progress-desc') {
+            if (sortBy === 'almost') {
                 filtered.sort((a, b) => {
-                    const remA = a.goal - getReservedCount(a);
-                    const remB = b.goal - getReservedCount(b);
-                    // Put open items closest to 0 remaining first, closed items at the end
+                    const remA = (a.goal || 10) - getReservedQuantity(a);
+                    const remB = (b.goal || 10) - getReservedQuantity(b);
                     if (remA <= 0 && remB > 0) return 1;
                     if (remB <= 0 && remA > 0) return -1;
                     return remA - remB;
                 });
             } else if (sortBy === 'reserve-asc') {
-                filtered.sort((a, b) => a.reservePrice - b.reservePrice);
+                filtered.sort((a, b) => Number(a.reservePrice) - Number(b.reservePrice));
             } else if (sortBy === 'name-asc') {
-                filtered.sort((a, b) => a.name.localeCompare(b.name));
+                filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
             }
 
-            // Pagination math
+            // Pagination
             const totalItems = filtered.length;
             const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
             if (currentPage > totalPages) currentPage = totalPages;
 
             const startIdx = (currentPage - 1) * itemsPerPage;
             const endIdx = Math.min(startIdx + itemsPerPage, totalItems);
-            const paginatedItems = filtered.slice(startIdx, endIdx);
+            const paginated = filtered.slice(startIdx, endIdx);
 
             document.getElementById('showing-range').textContent = totalItems === 0 ? '0-0' : `${startIdx + 1}-${endIdx}`;
             document.getElementById('total-filtered').textContent = totalItems;
@@ -872,7 +963,7 @@
             const grid = document.getElementById('products-grid');
             const emptyState = document.getElementById('empty-state');
 
-            if (paginatedItems.length === 0) {
+            if (paginated.length === 0) {
                 grid.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 document.getElementById('pagination-controls').innerHTML = '';
@@ -880,108 +971,113 @@
             }
 
             emptyState.classList.add('hidden');
-            grid.innerHTML = paginatedItems.map(product => buildProductCard(product)).join('');
+            grid.innerHTML = paginated.map(p => buildProductCard(p)).join('');
             renderPagination(totalPages);
         }
 
         function buildProductCard(product) {
-            const reserved = getReservedCount(product);
+            const reserved = getReservedQuantity(product);
             const goal = Number(product.goal || 10);
+            const batchNum = Number(product.batchNumber || 1);
             const remaining = Math.max(0, goal - reserved);
-            const isGoalReached = reserved >= goal;
-            const percentage = Math.min(100, Math.round((reserved / goal) * 100));
+            const isClosed = reserved >= goal;
+            const pct = Math.min(100, Math.round((reserved / goal) * 100));
 
-            const fallbackImg = `https://placehold.co/600x450/e2e8f0/475569?text=${encodeURIComponent(product.name.substring(0, 18))}`;
+            const fallbackImg = `https://placehold.co/600x450/0f172a/10b981?text=${encodeURIComponent((product.name || 'Produto').substring(0, 16))}`;
             const imgSrc = product.image && product.image.trim() !== '' ? product.image : fallbackImg;
 
-            // Status Badge & Progress Colors
-            let badgeHTML = '';
-            let progressColor = 'bg-emerald-500';
-            let statusText = `${reserved} de ${goal} reservadas — faltam ${remaining}!`;
+            let topBadge = '';
+            let progressBarClass = 'bg-emerald-500';
+            let progressLabel = `Faltam ${remaining} para fechar o valor!`;
 
-            if (isGoalReached) {
-                badgeHTML = `
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 shadow-sm">
-                        <i class="fa-solid fa-trophy"></i> META BATIDA (${goal}/${goal})
+            if (isClosed) {
+                topBadge = `
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-amber-400 text-navy-950 shadow-md">
+                        <i class="fa-solid fa-lock"></i> LOTE FECHADO (${goal}/${goal})
                     </span>`;
-                progressColor = 'bg-amber-500 progress-stripe';
-                statusText = `Grupo fechado! Cobrar valor cheio.`;
+                progressBarClass = 'bg-amber-500 progress-stripe';
+                progressLabel = `Valor Cheio Liberado para os ${goal} primeiros`;
             } else if (remaining <= 3) {
-                badgeHTML = `
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-orange-500 text-white shadow-sm animate-pulse">
-                        <i class="fa-solid fa-fire"></i> ÚLTIMAS ${remaining} VAGAS!
+                topBadge = `
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-orange-500 text-white shadow-md animate-pulse">
+                        <i class="fa-solid fa-fire"></i> FALTAM ${remaining} VAGAS!
                     </span>`;
-                progressColor = 'bg-orange-500';
+                progressBarClass = 'bg-orange-500';
             } else {
-                badgeHTML = `
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-900/80 backdrop-blur-sm text-emerald-300">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Rateio Aberto
+                topBadge = `
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-navy-950/85 backdrop-blur-sm text-emerald-300">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Vagas Abertas
                     </span>`;
             }
 
             return `
-                <article class="bg-white rounded-2xl border ${isGoalReached ? 'border-amber-400 ring-2 ring-amber-400/20' : 'border-slate-200/90'} shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden group">
-                    <!-- Product Image & Badges -->
+                <article class="bg-white rounded-2xl border ${isClosed ? 'border-amber-400 ring-2 ring-amber-400/25' : 'border-slate-200/90'} shadow-sm hover:shadow-lg transition-all flex flex-col overflow-hidden group">
+                    <!-- Image Header -->
                     <div class="relative aspect-[4/3] bg-slate-100 overflow-hidden">
-                        <img src="${imgSrc}" onerror="this.onerror=null;this.src='${fallbackImg}';" alt="${product.name}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${isGoalReached ? 'opacity-90' : ''}">
-                        <div class="absolute top-3 left-3">
-                            ${badgeHTML}
+                        <img src="${imgSrc}" onerror="this.onerror=null;this.src='${fallbackImg}';" alt="${product.name}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${isClosed ? 'grayscale-[25%]' : ''}">
+                        <div class="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
+                            ${topBadge}
                         </div>
-                        ${isAdmin ? `
-                            <button onclick="deleteProduct('${product.id}')" title="Excluir Produto" class="absolute top-3 right-3 w-8 h-8 rounded-xl bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center shadow-md transition">
-                                <i class="fa-solid fa-trash-can text-xs"></i>
-                            </button>
-                        ` : ''}
+                        <span class="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-navy-950/90 text-white shadow">
+                            Lote #${batchNum}
+                        </span>
                     </div>
 
-                    <!-- Card Body -->
+                    <!-- Card Content -->
                     <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between">
                         <div>
-                            <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
                                 ${product.category || 'Catálogo Geral'}
                             </div>
-                            <h3 class="font-bold text-slate-900 text-base leading-snug line-clamp-2 min-h-[2.75rem]" title="${product.name}">
+                            <h3 class="font-extrabold text-navy-950 text-base leading-snug line-clamp-2 min-h-[2.75rem]" title="${product.name}">
                                 ${product.name}
                             </h3>
 
-                            <!-- Pricing Box -->
-                            <div class="mt-3 p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                            <!-- Price Box -->
+                            <div class="mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200/70 flex items-center justify-between">
                                 <div>
-                                    <span class="block text-[10px] font-bold uppercase text-emerald-700 tracking-wide">Sinal Reserva</span>
+                                    <span class="block text-[10px] font-extrabold uppercase text-emerald-700 tracking-wide">Sinal Reserva</span>
                                     <span class="text-lg font-extrabold text-emerald-600">${formatCurrency(product.reservePrice)}</span>
                                 </div>
                                 <div class="text-right border-l border-slate-200 pl-3">
-                                    <span class="block text-[10px] font-semibold uppercase text-slate-400">Valor Cheio (10/10)</span>
-                                    <span class="text-sm font-bold text-slate-700">${formatCurrency(product.fullPrice)}</span>
+                                    <span class="block text-[10px] font-bold uppercase text-slate-400">Valor Cheio (${goal}/${goal})</span>
+                                    <span class="text-sm font-extrabold text-navy-900">${formatCurrency(product.fullPrice)}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Progress Bar & CTA -->
+                        <!-- Progress & Actions -->
                         <div class="mt-4 pt-3 border-t border-slate-100">
                             <div class="flex justify-between items-center text-xs mb-1.5">
-                                <span class="font-semibold ${isGoalReached ? 'text-amber-700' : 'text-slate-700'}">${statusText}</span>
-                                <span class="font-bold text-slate-900">${percentage}%</span>
+                                <span class="font-bold ${isClosed ? 'text-amber-700' : 'text-slate-700'}">${progressLabel}</span>
+                                <span class="font-extrabold text-navy-950">${reserved}/${goal}</span>
                             </div>
                             <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                                <div class="h-full ${progressColor} rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+                                <div class="h-full ${progressBarClass} rounded-full transition-all duration-500" style="width: ${pct}%"></div>
                             </div>
 
-                            <!-- Action Buttons -->
-                            <div class="mt-4 flex gap-2">
-                                ${isGoalReached ? `
-                                    <button onclick="openParticipantsModal('${product.id}')" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 font-extrabold text-xs shadow-sm transition flex items-center justify-center gap-1.5">
-                                        <i class="fa-brands fa-whatsapp text-sm"></i> Ver Lista & Cobrar Cheio
+                            ${isClosed ? `
+                                <div class="mt-3 p-2 rounded-xl bg-amber-50 border border-amber-200 text-[11px] font-bold text-amber-900 text-center">
+                                    LOTE FECHADO (${goal}/${goal}) - Valor Cheio Liberado para os ${goal} primeiros
+                                </div>
+                                <div class="mt-2.5 flex gap-2">
+                                    <button disabled class="flex-1 py-2.5 px-3 rounded-xl bg-slate-200 text-slate-500 font-extrabold text-xs cursor-not-allowed flex items-center justify-center gap-1.5">
+                                        <i class="fa-solid fa-lock"></i> Lote Esgotado
                                     </button>
-                                ` : `
-                                    <button onclick="openReserveModal('${product.id}')" class="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition flex items-center justify-center gap-1.5">
-                                        <i class="fa-solid fa-ticket"></i> Reservar (${formatCurrency(product.reservePrice)})
+                                    <button onclick="openPublicRanking('${product.id}')" class="py-2.5 px-3 rounded-xl bg-navy-900 hover:bg-navy-800 text-amber-400 text-xs font-bold transition flex items-center gap-1" title="Ver os 10 primeiros">
+                                        <i class="fa-solid fa-list-ol"></i> Top ${goal}
                                     </button>
-                                    <button onclick="openParticipantsModal('${product.id}')" title="Ver quem já reservou" class="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1">
+                                </div>
+                            ` : `
+                                <div class="mt-4 flex gap-2">
+                                    <button onclick="openReserveModal('${product.id}')" class="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-sm transition flex items-center justify-center gap-1.5">
+                                        <i class="fa-solid fa-ticket"></i> Reservar Vaga
+                                    </button>
+                                    <button onclick="openPublicRanking('${product.id}')" class="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-navy-900 text-xs font-bold transition flex items-center gap-1" title="Ver fila de reservas">
                                         <i class="fa-solid fa-users"></i> ${reserved}/${goal}
                                     </button>
-                                `}
-                            </div>
+                                </div>
+                            `}
                         </div>
                     </div>
                 </article>
@@ -996,59 +1092,58 @@
             }
 
             let html = `
-                <button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 disabled:opacity-40 hover:bg-slate-50">
+                <button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 disabled:opacity-40 hover:bg-slate-50">
                     <i class="fa-solid fa-chevron-left"></i> Anterior
                 </button>
             `;
-
             for (let i = 1; i <= totalPages; i++) {
                 if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
-                    const activeClass = i === currentPage ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50';
-                    html += `<button onclick="goToPage(${i})" class="w-9 h-9 rounded-xl border text-xs font-bold transition ${activeClass}">${i}</button>`;
+                    const active = i === currentPage ? 'bg-navy-900 text-white border-navy-900' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50';
+                    html += `<button onclick="goToPage(${i})" class="w-9 h-9 rounded-xl border text-xs font-extrabold transition ${active}">${i}</button>`;
                 } else if (i === currentPage - 2 || i === currentPage + 2) {
                     html += `<span class="text-slate-400 px-1">...</span>`;
                 }
             }
-
             html += `
-                <button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 disabled:opacity-40 hover:bg-slate-50">
+                <button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 disabled:opacity-40 hover:bg-slate-50">
                     Próxima <i class="fa-solid fa-chevron-right"></i>
                 </button>
             `;
-
             container.innerHTML = html;
         }
 
         function goToPage(page) {
             currentPage = page;
             renderCatalog();
-            window.scrollTo({ top: 220, behavior: 'smooth' });
+            window.scrollTo({ top: 200, behavior: 'smooth' });
         }
 
         // =====================================================================
-        // RESERVATION FLOW
+        // CLIENT RESERVATION WITH TRANSACTIONAL LOCK AT 10/10
         // =====================================================================
         function openReserveModal(productId) {
             const product = products.find(p => p.id === productId);
             if (!product) return;
 
-            const reserved = getReservedCount(product);
-            const remaining = Math.max(0, product.goal - reserved);
+            const reserved = getReservedQuantity(product);
+            const goal = Number(product.goal || 10);
+            const remaining = Math.max(0, goal - reserved);
+
             if (remaining <= 0) {
-                showToast('Este grupo já atingiu a meta de 10 reservas!', 'info');
+                showToast('Este lote acabou de atingir 10/10 vagas!', 'info');
                 return;
             }
 
-            const fallbackImg = `https://placehold.co/200x200/e2e8f0/475569?text=Produto`;
+            const fallbackImg = `https://placehold.co/200x200/0f172a/10b981?text=Lote`;
             document.getElementById('res-product-id').value = product.id;
             document.getElementById('res-prod-img').src = product.image || fallbackImg;
+            document.getElementById('res-prod-batch').textContent = `Lote #${product.batchNumber || 1}`;
             document.getElementById('res-prod-title').textContent = product.name;
             document.getElementById('res-prod-signal').textContent = formatCurrency(product.reservePrice);
             document.getElementById('res-prod-full').textContent = formatCurrency(product.fullPrice);
-            document.getElementById('res-prod-slots').textContent = `Restam ${remaining} vaga(s) de ${product.goal} para fechar o grupo`;
-            document.getElementById('res-pix-key').textContent = settings.pixKey;
+            document.getElementById('res-prod-slots').textContent = `Restam ${remaining} vaga(s) de ${goal} para fechar este lote!`;
+            document.getElementById('res-pix-key').textContent = appSettings.pixKey;
 
-            // Populate quantity dropdown up to remaining slots
             const qtySelect = document.getElementById('res-quantity');
             qtySelect.innerHTML = '';
             for (let i = 1; i <= remaining; i++) {
@@ -1058,32 +1153,39 @@
                 qtySelect.appendChild(opt);
             }
 
-            updateReservationTotal();
+            updateReservationTotals();
             document.getElementById('modal-reserve').classList.remove('hidden');
         }
 
-        function updateReservationTotal() {
+        function updateReservationTotals() {
             const productId = document.getElementById('res-product-id').value;
             const product = products.find(p => p.id === productId);
             if (!product) return;
 
             const qty = Number(document.getElementById('res-quantity').value || 1);
-            document.getElementById('res-total-signal').textContent = formatCurrency(product.reservePrice * qty);
-            document.getElementById('res-total-full').textContent = formatCurrency(product.fullPrice * qty);
+            const totalSignal = Number(product.reservePrice) * qty;
+            const totalFull = Number(product.fullPrice) * qty;
+            const balance = Math.max(0, totalFull - totalSignal);
+
+            document.getElementById('res-total-signal').textContent = formatCurrency(totalSignal);
+            document.getElementById('res-total-full').textContent = formatCurrency(totalFull);
+            document.getElementById('res-total-balance').textContent = formatCurrency(balance);
         }
 
         function copyPixKey() {
             const tempInput = document.createElement('input');
-            tempInput.value = settings.pixKey;
+            tempInput.value = appSettings.pixKey;
             document.body.appendChild(tempInput);
             tempInput.select();
             document.execCommand('copy');
             document.body.removeChild(tempInput);
-            showToast('Chave PIX copiada para a área de transferência!', 'success');
+            showToast('Chave PIX copiada! Realize o pagamento do sinal.', 'success');
         }
 
-        function submitReservation(event) {
+        async function submitReservation(event) {
             event.preventDefault();
+            if (!currentUser) return;
+
             const productId = document.getElementById('res-product-id').value;
             const product = products.find(p => p.id === productId);
             if (!product) return;
@@ -1091,159 +1193,129 @@
             const buyerName = document.getElementById('res-buyer-name').value.trim();
             const buyerPhone = document.getElementById('res-buyer-phone').value.trim();
             const qty = Number(document.getElementById('res-quantity').value);
+            const goal = Number(product.goal || 10);
+            const batchNumber = Number(product.batchNumber || 1);
 
-            const reserved = getReservedCount(product);
-            if (reserved + qty > product.goal) {
-                showToast('Quantidade maior que as vagas restantes!', 'error');
+            // Re-validate live count before saving
+            const currentReserved = getReservedQuantity(product);
+            if (currentReserved + qty > goal) {
+                showToast(`Ops! Restam apenas ${Math.max(0, goal - currentReserved)} vaga(s) neste lote.`, 'error');
+                closeModal('modal-reserve');
                 return;
             }
 
-            const newReservation = {
-                id: 'res-' + Date.now(),
-                name: buyerName,
-                phone: buyerPhone,
-                qty: qty,
-                date: new Date().toLocaleDateString('pt-BR')
-            };
+            const btn = document.getElementById('btn-submit-reservation');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando vaga...';
 
-            if (!product.reservations) product.reservations = [];
-            product.reservations.push(newReservation);
-            saveProducts();
-
-            const newTotalReserved = getReservedCount(product);
-            const totalSignal = formatCurrency(product.reservePrice * qty);
-            const totalFull = formatCurrency(product.fullPrice * qty);
-
-            closeModal('modal-reserve');
-            document.getElementById('form-reserve').reset();
-            renderCatalog();
-
-            if (newTotalReserved >= product.goal) {
-                showToast(`🎉 META BATIDA (${product.goal}/${product.goal})! O grupo fechou!`, 'success');
-            } else {
-                showToast(`Reserva confirmada! (${newTotalReserved}/${product.goal} peças)`, 'success');
-            }
-
-            // Open WhatsApp message to Admin with reservation details
-            const waText = encodeURIComponent(
-                `Olá! Acabei de reservar no *RateioPro*:\n\n` +
-                `📦 *Produto:* ${product.name}\n` +
-                `👤 *Nome:* ${buyerName}\n` +
-                `🎟️ *Cotas:* ${qty} peça(s)\n` +
-                `💰 *Sinal da Reserva:* ${totalSignal}\n` +
-                `📊 *Progresso:* ${newTotalReserved}/${product.goal}\n\n` +
-                `_Estou ciente que ao atingir ${product.goal}/${product.goal} será cobrado o valor cheio de ${totalFull}. Segue comprovante do sinal:_`
-            );
-            window.open(`https://wa.me/${settings.whatsapp}?text=${waText}`, '_blank');
-        }
-
-        // =====================================================================
-        // PARTICIPANTS & BILLING LIST MODAL
-        // =====================================================================
-        function openParticipantsModal(productId) {
-            const product = products.find(p => p.id === productId);
-            if (!product) return;
-
-            const reserved = getReservedCount(product);
-            const goal = Number(product.goal || 10);
-            const isGoalReached = reserved >= goal;
-
-            document.getElementById('part-modal-subtitle').textContent = product.name;
-            document.getElementById('part-count-label').textContent = `${reserved}/${goal} peças`;
-            document.getElementById('part-full-price-badge').textContent = `Valor Cheio: ${formatCurrency(product.fullPrice)}/un`;
-
-            const banner = document.getElementById('part-goal-banner');
-            if (isGoalReached) {
-                banner.classList.remove('hidden');
-            } else {
-                banner.classList.add('hidden');
-            }
-
-            const listContainer = document.getElementById('participants-list-container');
-            if (!product.reservations || product.reservations.length === 0) {
-                listContainer.innerHTML = `<div class="p-4 text-center text-xs text-slate-500">Nenhuma cota reservada ainda. Seja o primeiro!</div>`;
-            } else {
-                listContainer.innerHTML = product.reservations.map((r, index) => `
-                    <div class="p-3 flex items-center justify-between gap-2 bg-white text-xs">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center flex-shrink-0">
-                                ${index + 1}
-                            </span>
-                            <div class="truncate">
-                                <p class="font-bold text-slate-800 truncate">${r.name} <span class="text-emerald-600 font-extrabold">(${r.qty}x)</span></p>
-                                <p class="text-[11px] text-slate-400">${isAdmin ? r.phone : maskPhone(r.phone)} • ${r.date || ''}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 flex-shrink-0">
-                            <span class="font-bold text-slate-700">${formatCurrency(product.fullPrice * r.qty)}</span>
-                            ${isAdmin ? `
-                                <button onclick="removeReservation('${product.id}', '${r.id}')" title="Remover reserva" class="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            ` : ''}
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            // Build WhatsApp Billing Message
-            let msg = isGoalReached
-                ? `🎉 *META BATIDA (${reserved}/${goal}) — RATEIO FECHADO!* 🎉\n\n`
-                : `📊 *PARCIAL DO RATEIO (${reserved}/${goal})*\n\n`;
-
-            msg += `📦 *Produto:* ${product.name}\n`;
-            msg += `💵 *Valor Cheio:* ${formatCurrency(product.fullPrice)} por peça\n`;
-            msg += `🔑 *Chave PIX:* ${settings.pixKey}\n\n`;
-            msg += `👥 *Lista de Participantes:*\n`;
-
-            if (product.reservations && product.reservations.length > 0) {
-                product.reservations.forEach((r, i) => {
-                    msg += `${i + 1}. ${r.name} (${r.qty}x) — Total: ${formatCurrency(product.fullPrice * r.qty)}\n`;
+            try {
+                const nowTs = Date.now();
+                await addDoc(getReservationsCol(), {
+                    productId: product.id,
+                    productName: product.name,
+                    batchNumber: batchNumber,
+                    buyerName: buyerName,
+                    buyerPhone: buyerPhone,
+                    qty: qty,
+                    signalPaid: Number(product.reservePrice) * qty,
+                    fullPriceTotal: Number(product.fullPrice) * qty,
+                    timestamp: nowTs,
+                    userId: currentUser.uid
                 });
-            } else {
-                msg += `(Nenhuma reserva ainda)\n`;
+
+                const newCount = currentReserved + qty;
+                closeModal('modal-reserve');
+                document.getElementById('form-reserve').reset();
+
+                if (newCount >= goal) {
+                    showToast(`🎉 LOTE FECHADO (${goal}/${goal})! Você garantiu uma das 10 vagas!`, 'success');
+                } else {
+                    showToast(`Vaga garantida (${newCount}/${goal})! Envie o comprovante no WhatsApp.`, 'success');
+                }
+
+                // Redirect to Admin WhatsApp with proof message
+                const totalSignalStr = formatCurrency(Number(product.reservePrice) * qty);
+                const totalFullStr = formatCurrency(Number(product.fullPrice) * qty);
+                const balanceStr = formatCurrency(Math.max(0, (Number(product.fullPrice) - Number(product.reservePrice)) * qty));
+
+                const waMsg = encodeURIComponent(
+                    `Olá! Acabei de reservar minha vaga no *RateioPro*:\n\n` +
+                    `📦 *Produto:* ${product.name} (Lote #${batchNumber})\n` +
+                    `👤 *Nome:* ${buyerName}\n` +
+                    `🎟️ *Quantidade:* ${qty} peça(s)\n` +
+                    `💰 *Sinal da Reserva:* ${totalSignalStr}\n` +
+                    `📊 *Status do Lote:* ${newCount}/${goal} peças\n\n` +
+                    `Estou ciente de que ao fechar ${goal}/${goal} será cobrado o valor cheio de *${totalFullStr}* (saldo restante de *${balanceStr}* após abater o sinal).\n\n` +
+                    `_Segue abaixo o comprovante do PIX do sinal:_`
+                );
+                const cleanAdminWa = (appSettings.whatsapp || '5511999999999').replace(/\D/g, '');
+                window.open(`https://wa.me/${cleanAdminWa}?text=${waMsg}`, '_blank');
+
+            } catch (err) {
+                console.error("Erro ao salvar reserva:", err);
+                showToast("Erro ao registrar reserva. Tente novamente.", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Garantir Vaga & Enviar Comprovante';
             }
-
-            if (isGoalReached) {
-                msg += `\n✅ *Por favor, realizem o pagamento do valor cheio para fecharmos o pedido!*`;
-            }
-
-            document.getElementById('billing-message-box').value = msg;
-            document.getElementById('btn-share-wa-group').href = `https://wa.me/?text=${encodeURIComponent(msg)}`;
-
-            document.getElementById('modal-participants').classList.remove('hidden');
-        }
-
-        function maskPhone(phone) {
-            if (!phone || phone.length < 4) return '****';
-            return '••••-' + phone.slice(-4);
-        }
-
-        function copyBillingMessage() {
-            const box = document.getElementById('billing-message-box');
-            box.select();
-            document.execCommand('copy');
-            showToast('Lista de cobrança copiada! Cole no seu grupo do WhatsApp.', 'success');
-        }
-
-        function removeReservation(productId, reservationId) {
-            const product = products.find(p => p.id === productId);
-            if (!product) return;
-
-            product.reservations = product.reservations.filter(r => r.id !== reservationId);
-            saveProducts();
-            renderCatalog();
-            openParticipantsModal(productId);
-            showToast('Reserva removida com sucesso.', 'info');
         }
 
         // =====================================================================
-        // ADMIN PANEL & BULK IMPORT / EXPORT (+100 PRODUCTS)
+        // PUBLIC RANKING MODAL (SHOWS TOP 10 ORDER)
+        // =====================================================================
+        function openPublicRanking(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const list = getProductBatchReservations(product);
+            const reserved = getReservedQuantity(product);
+            const goal = Number(product.goal || 10);
+            const isClosed = reserved >= goal;
+
+            document.getElementById('rank-modal-subtitle').textContent = `${product.name} • Lote #${product.batchNumber || 1}`;
+            const alertBox = document.getElementById('rank-closed-alert');
+            if (isClosed) alertBox.classList.remove('hidden');
+            else alertBox.classList.add('hidden');
+
+            const container = document.getElementById('rank-list-container');
+            if (list.length === 0) {
+                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-500">Nenhuma vaga reservada neste lote ainda. Seja o #1!</div>`;
+            } else {
+                let pieceCounter = 0;
+                container.innerHTML = list.map((r) => {
+                    const startPos = pieceCounter + 1;
+                    pieceCounter += Number(r.qty || 1);
+                    const endPos = pieceCounter;
+                    const posLabel = startPos === endPos ? `#${startPos}` : `#${startPos} ao #${endPos}`;
+
+                    return `
+                        <div class="p-3 bg-white flex items-center justify-between gap-2 text-xs">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <span class="px-2 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-extrabold text-[11px] flex-shrink-0">
+                                    ${posLabel}
+                                </span>
+                                <div class="truncate">
+                                    <p class="font-bold text-navy-900 truncate">${r.buyerName} <span class="text-emerald-600 font-extrabold">(${r.qty}x)</span></p>
+                                    <p class="text-[11px] text-slate-400">${formatDateTime(r.timestamp)}</p>
+                                </div>
+                            </div>
+                            <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600 flex-shrink-0">
+                                Garantido
+                            </span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            document.getElementById('modal-public-ranking').classList.remove('hidden');
+        }
+
+        // =====================================================================
+        // ADMIN AUTHENTICATION & TABS
         // =====================================================================
         function handleAdminAccess() {
             if (isAdmin) {
-                const panel = document.getElementById('admin-panel');
-                panel.classList.toggle('hidden');
+                document.getElementById('admin-panel').classList.toggle('hidden');
             } else {
                 document.getElementById('admin-password-input').value = '';
                 document.getElementById('modal-admin-login').classList.remove('hidden');
@@ -1253,169 +1325,490 @@
 
         function verifyAdminPassword(event) {
             event.preventDefault();
-            const input = document.getElementById('admin-password-input').value;
-            if (input === settings.adminPassword) {
+            const typed = document.getElementById('admin-password-input').value;
+            if (typed === (appSettings.adminPassword || 'admin123')) {
                 isAdmin = true;
                 closeModal('modal-admin-login');
                 document.getElementById('admin-panel').classList.remove('hidden');
                 document.getElementById('admin-icon').className = 'fa-solid fa-unlock text-emerald-400';
                 document.getElementById('admin-btn-text').textContent = 'Admin Ativo';
-                renderCatalog();
-                showToast('Modo Administrador desbloqueado!', 'success');
+                renderAdminProductsTable();
+                renderClosuresTab();
+                showToast('Painel Administrativo desbloqueado!', 'success');
             } else {
-                showToast('Senha incorreta! Tente novamente.', 'error');
+                showToast('Senha incorreta!', 'error');
             }
         }
 
         function logoutAdmin() {
             isAdmin = false;
             document.getElementById('admin-panel').classList.add('hidden');
-            document.getElementById('admin-icon').className = 'fa-solid fa-lock text-emerald-400';
+            document.getElementById('admin-icon').className = 'fa-solid fa-shield-halved text-emerald-400';
             document.getElementById('admin-btn-text').textContent = 'Painel Admin';
-            renderCatalog();
             showToast('Você saiu do modo administrador.', 'info');
         }
 
-        function switchAdminTab(tabName) {
-            ['single', 'bulk', 'settings'].forEach(t => {
+        function switchAdminTab(tab) {
+            ['products', 'bulk', 'closures', 'settings'].forEach(t => {
                 document.getElementById(`admin-tab-${t}`).classList.add('hidden');
                 const btn = document.getElementById(`tab-btn-${t}`);
-                btn.classList.remove('bg-emerald-600', 'text-white');
+                btn.classList.remove('bg-navy-900', 'text-white');
                 btn.classList.add('bg-white', 'text-slate-600');
             });
-
-            document.getElementById(`admin-tab-${tabName}`).classList.remove('hidden');
-            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            document.getElementById(`admin-tab-${tab}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tab}`);
             activeBtn.classList.remove('bg-white', 'text-slate-600');
-            activeBtn.classList.add('bg-emerald-600', 'text-white');
+            activeBtn.classList.add('bg-navy-900', 'text-white');
+
+            if (tab === 'closures') renderClosuresTab();
+            if (tab === 'products') renderAdminProductsTable();
         }
 
-        function addSingleProduct(event) {
+        // =====================================================================
+        // ADMIN: PRODUCTS CRUD & NEW BATCH (LOTE 2, 3...)
+        // =====================================================================
+        async function saveProductForm(event) {
             event.preventDefault();
-            const name = document.getElementById('prod-name').value.trim();
-            const category = document.getElementById('prod-category').value.trim() || 'Catálogo';
-            const reservePrice = parseFloat(document.getElementById('prod-reserve-price').value);
-            const fullPrice = parseFloat(document.getElementById('prod-full-price').value);
-            const goal = parseInt(document.getElementById('prod-goal').value) || 10;
-            const image = document.getElementById('prod-image').value.trim();
+            if (!currentUser) return;
 
-            const newProd = {
-                id: 'prod-' + Date.now(),
-                name,
-                category,
-                reservePrice,
-                fullPrice,
-                goal,
-                image,
-                reservations: []
+            const editId = document.getElementById('edit-product-id').value;
+            const payload = {
+                name: document.getElementById('prod-name').value.trim(),
+                category: document.getElementById('prod-category').value.trim() || 'Geral',
+                reservePrice: parseFloat(document.getElementById('prod-reserve-price').value),
+                fullPrice: parseFloat(document.getElementById('prod-full-price').value),
+                goal: parseInt(document.getElementById('prod-goal').value) || 10,
+                batchNumber: parseInt(document.getElementById('prod-batch').value) || 1,
+                image: document.getElementById('prod-image').value.trim()
             };
 
-            products.unshift(newProd);
-            saveProducts();
-            document.getElementById('form-add-product').reset();
+            try {
+                if (editId) {
+                    await updateDoc(getProductDoc(editId), payload);
+                    showToast('Produto atualizado com sucesso!', 'success');
+                    cancelEditProduct();
+                } else {
+                    payload.createdAt = Date.now();
+                    await addDoc(getProductsCol(), payload);
+                    document.getElementById('form-product').reset();
+                    document.getElementById('prod-reserve-price').value = '20.00';
+                    document.getElementById('prod-goal').value = '10';
+                    document.getElementById('prod-batch').value = '1';
+                    showToast('Novo produto cadastrado na vitrine!', 'success');
+                }
+            } catch (err) {
+                console.error("Erro ao salvar produto:", err);
+                showToast("Erro ao salvar produto.", "error");
+            }
+        }
+
+        function editProduct(productId) {
+            const p = products.find(item => item.id === productId);
+            if (!p) return;
+
+            document.getElementById('edit-product-id').value = p.id;
+            document.getElementById('prod-name').value = p.name;
+            document.getElementById('prod-category').value = p.category || '';
+            document.getElementById('prod-reserve-price').value = p.reservePrice;
+            document.getElementById('prod-full-price').value = p.fullPrice;
+            document.getElementById('prod-goal').value = p.goal || 10;
+            document.getElementById('prod-batch').value = p.batchNumber || 1;
+            document.getElementById('prod-image').value = p.image || '';
+
+            document.getElementById('product-form-title').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-500"></i> Editando: ${p.name}`;
+            document.getElementById('btn-cancel-edit').classList.remove('hidden');
+            document.getElementById('admin-panel').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEditProduct() {
+            document.getElementById('edit-product-id').value = '';
+            document.getElementById('form-product').reset();
             document.getElementById('prod-reserve-price').value = '20.00';
             document.getElementById('prod-goal').value = '10';
-            renderCatalog();
-            showToast(`Produto "${name}" cadastrado com sucesso!`, 'success');
+            document.getElementById('prod-batch').value = '1';
+            document.getElementById('product-form-title').innerHTML = `<i class="fa-solid fa-plus-circle text-emerald-600"></i> Cadastrar Novo Produto no Catálogo`;
+            document.getElementById('btn-cancel-edit').classList.add('hidden');
         }
 
-        function deleteProduct(productId) {
-            products = products.filter(p => p.id !== productId);
-            saveProducts();
-            renderCatalog();
-            showToast('Produto removido do catálogo.', 'info');
+        async function deleteProduct(productId) {
+            if (!currentUser) return;
+            try {
+                await deleteDoc(getProductDoc(productId));
+                showToast('Produto excluído do catálogo.', 'info');
+            } catch (err) {
+                console.error("Erro ao excluir:", err);
+                showToast("Erro ao excluir produto.", "error");
+            }
         }
 
+        async function openNewBatch(productId) {
+            if (!currentUser) return;
+            const p = products.find(item => item.id === productId);
+            if (!p) return;
+
+            const nextBatch = Number(p.batchNumber || 1) + 1;
+            try {
+                await updateDoc(getProductDoc(productId), {
+                    batchNumber: nextBatch,
+                    createdAt: Date.now()
+                });
+                showToast(`Lote #${nextBatch} aberto para "${p.name}"! Histórico do lote anterior preservado.`, 'success');
+            } catch (err) {
+                console.error("Erro ao abrir novo lote:", err);
+                showToast("Erro ao abrir novo lote.", "error");
+            }
+        }
+
+        function renderAdminProductsTable() {
+            const tbody = document.getElementById('admin-products-tbody');
+            const filterTxt = (document.getElementById('admin-prod-search').value || '').toLowerCase().trim();
+
+            const filtered = products.filter(p =>
+                (p.name || '').toLowerCase().includes(filterTxt) ||
+                (p.category || '').toLowerCase().includes(filterTxt)
+            );
+
+            document.getElementById('admin-table-count').textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Nenhum produto encontrado.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(p => {
+                const reserved = getReservedQuantity(p);
+                const goal = Number(p.goal || 10);
+                const isClosed = reserved >= goal;
+                const batchNum = Number(p.batchNumber || 1);
+
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="py-3 px-4">
+                            <div class="font-bold text-navy-900">${p.name}</div>
+                            <div class="text-[11px] text-slate-400">${p.category || 'Geral'}</div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-0.5 rounded bg-navy-900 text-white font-bold text-[11px]">Lote #${batchNum}</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="text-emerald-600 font-bold">${formatCurrency(p.reservePrice)}</span> /
+                            <span class="text-slate-700 font-semibold">${formatCurrency(p.fullPrice)}</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="px-2 py-0.5 rounded-full text-[11px] font-extrabold ${isClosed ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
+                                ${reserved}/${goal} ${isClosed ? '(FECHADO)' : ''}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-right space-x-1 whitespace-nowrap">
+                            ${isClosed ? `
+                                <button onclick="openNewBatch('${p.id}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition" title="Abrir Lote #${batchNum + 1} mantendo histórico">
+                                    <i class="fa-solid fa-forward-step"></i> Abrir Lote #${batchNum + 1}
+                                </button>
+                            ` : ''}
+                            <button onclick="editProduct('${p.id}')" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition" title="Editar">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="deleteProduct('${p.id}')" class="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition" title="Excluir">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // =====================================================================
+        // ADMIN: BULK IMPORT (+100 PRODUCTS)
+        // =====================================================================
         function fillBulkExample() {
             document.getElementById('bulk-textarea').value =
-                `Tênis Corrida UltraBoost Pro; 30.00; 389.90; Calçados; https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600\n` +
-                `Mochila Executiva Impermeável Notebook; 15.00; 179.00; Acessórios; https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600\n` +
-                `Óculos de Sol Polarizado Clássico; 12.00; 139.90; Moda; https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600\n` +
-                `Teclado Mecânico RGB Compacto 60%; 25.00; 299.00; Eletrônicos; https://images.unsplash.com/photo-1595225476474-87563907a212?w=600\n` +
-                `Luminária de Mesa LED Touch Recarregável; 10.00; 99.90; Casa & Decor; `;
+                `Perfume Árabe Lattafa Asad 100ml; 20.00; 249.90; Perfumaria; https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600\n` +
+                `Fone Bluetooth Noise Cancelling Pro; 15.00; 189.00; Eletrônicos; https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600\n` +
+                `Smartwatch Ultra Series 9 Amoled; 25.00; 319.90; Acessórios; https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600\n` +
+                `Garrafa Térmica Inox 1.2L Parede Dupla; 10.00; 119.90; Utilidades; https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600\n` +
+                `Kit 3 Camisetas Algodão Egípcio; 15.00; 159.90; Vestuário; https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600`;
         }
 
-        function processBulkImport() {
-            const rawText = document.getElementById('bulk-textarea').value.trim();
-            if (!rawText) {
+        async function processBulkImport() {
+            if (!currentUser) return;
+            const raw = document.getElementById('bulk-textarea').value.trim();
+            if (!raw) {
                 showToast('Cole a lista de produtos antes de importar.', 'error');
                 return;
             }
 
-            const lines = rawText.split('\n');
-            let addedCount = 0;
+            const lines = raw.split('\n').filter(l => l.trim() !== '');
+            const btn = document.getElementById('btn-bulk-submit');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Importando ${lines.length} itens...`;
 
-            lines.forEach((line, idx) => {
-                const parts = line.split(';').map(item => item.trim());
-                if (parts.length >= 3 && parts[0]) {
-                    const name = parts[0];
-                    const reservePrice = parseFloat(parts[1].replace(',', '.')) || 15.00;
-                    const fullPrice = parseFloat(parts[2].replace(',', '.')) || 150.00;
-                    const category = parts[3] || `Lote #${products.length + addedCount + 1}`;
-                    const image = parts[4] || '';
+            let imported = 0;
+            const baseTs = Date.now();
 
-                    products.unshift({
-                        id: `prod-bulk-${Date.now()}-${idx}`,
-                        name,
-                        category,
-                        reservePrice,
-                        fullPrice,
-                        goal: 10,
-                        image,
-                        reservations: []
-                    });
-                    addedCount++;
+            try {
+                for (let i = 0; i < lines.length; i++) {
+                    const parts = lines[i].split(';').map(s => s.trim());
+                    if (parts.length >= 3 && parts[0]) {
+                        const name = parts[0];
+                        const reservePrice = parseFloat(parts[1].replace(',', '.')) || 15.00;
+                        const fullPrice = parseFloat(parts[2].replace(',', '.')) || 150.00;
+                        const category = parts[3] || 'Geral';
+                        const image = parts[4] || '';
+
+                        await addDoc(getProductsCol(), {
+                            name,
+                            reservePrice,
+                            fullPrice,
+                            category,
+                            image,
+                            goal: 10,
+                            batchNumber: 1,
+                            createdAt: baseTs + i
+                        });
+                        imported++;
+                    }
                 }
-            });
 
-            if (addedCount > 0) {
-                saveProducts();
-                document.getElementById('bulk-textarea').value = '';
-                renderCatalog();
-                showToast(`${addedCount} produtos importados com sucesso!`, 'success');
-            } else {
-                showToast('Formato inválido. Use: Nome; Valor Reserva; Valor Cheio', 'error');
+                if (imported > 0) {
+                    document.getElementById('bulk-textarea').value = '';
+                    showToast(`${imported} produtos importados com sucesso para a nuvem!`, 'success');
+                } else {
+                    showToast('Formato inválido. Use: Nome; Sinal; Valor Cheio; Categoria; URL', 'error');
+                }
+            } catch (err) {
+                console.error("Erro na importação em massa:", err);
+                showToast("Erro durante a importação em massa.", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-bolt"></i> Importar Todos para o Banco`;
             }
         }
 
-        function exportJSON() {
-            const dataStr = JSON.stringify(products, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'produtos.json';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            showToast('Arquivo produtos.json exportado! Suba no seu GitHub Pages.', 'success');
+        // =====================================================================
+        // ADMIN: CLOSURES & TOP 10 BILLING TAB
+        // =====================================================================
+        function renderClosuresTab() {
+            const listContainer = document.getElementById('closure-products-list');
+            const query = (document.getElementById('closure-search').value || '').toLowerCase().trim();
+
+            // Sort products: closed (10/10) first, then highest progress
+            const sortedProducts = [...products]
+                .filter(p => (p.name || '').toLowerCase().includes(query) || (p.category || '').toLowerCase().includes(query))
+                .sort((a, b) => {
+                    const resA = getReservedQuantity(a);
+                    const goalA = Number(a.goal || 10);
+                    const resB = getReservedQuantity(b);
+                    const goalB = Number(b.goal || 10);
+
+                    const closedA = resA >= goalA ? 1 : 0;
+                    const closedB = resB >= goalB ? 1 : 0;
+                    if (closedA !== closedB) return closedB - closedA;
+                    return resB - resA;
+                });
+
+            if (sortedProducts.length === 0) {
+                listContainer.innerHTML = `<div class="p-6 text-center text-xs text-slate-400">Nenhum produto encontrado.</div>`;
+                return;
+            }
+
+            listContainer.innerHTML = sortedProducts.map(p => {
+                const reserved = getReservedQuantity(p);
+                const goal = Number(p.goal || 10);
+                const isClosed = reserved >= goal;
+                const isSelected = p.id === selectedClosureProductId;
+
+                return `
+                    <div onclick="selectClosureProduct('${p.id}')" class="p-3.5 cursor-pointer transition flex items-center justify-between gap-2 ${isSelected ? 'bg-emerald-50 border-l-4 border-emerald-600' : 'hover:bg-slate-50'}">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-navy-900 text-white">Lote #${p.batchNumber || 1}</span>
+                                ${isClosed
+                                    ? `<span class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-amber-400 text-navy-950"><i class="fa-solid fa-lock"></i> FECHADO 10/10</span>`
+                                    : `<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600">Aberto</span>`
+                                }
+                            </div>
+                            <p class="font-bold text-xs text-navy-900 truncate mt-1">${p.name}</p>
+                        </div>
+                        <div class="text-right flex-shrink-0">
+                            <span class="text-xs font-extrabold ${isClosed ? 'text-amber-700' : 'text-emerald-600'}">${reserved}/${goal}</span>
+                            <span class="block text-[10px] text-slate-400">${formatCurrency(p.fullPrice)}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (selectedClosureProductId) {
+                renderClosureDetails(selectedClosureProductId);
+            }
         }
 
-        function importJSON(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        function selectClosureProduct(productId) {
+            selectedClosureProductId = productId;
+            renderClosuresTab();
+        }
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if (Array.isArray(imported)) {
-                        products = imported;
-                        saveProducts();
-                        currentPage = 1;
-                        renderCatalog();
-                        showToast(`${imported.length} produtos carregados do JSON!`, 'success');
-                    } else {
-                        showToast('Arquivo JSON inválido.', 'error');
-                    }
-                } catch (err) {
-                    showToast('Erro ao ler o arquivo JSON.', 'error');
-                }
+        function renderClosureDetails(productId) {
+            const product = products.find(p => p.id === productId);
+            const headerEl = document.getElementById('closure-detail-header');
+            const bodyEl = document.getElementById('closure-detail-body');
+
+            if (!product) {
+                bodyEl.innerHTML = `<p class="text-xs text-slate-400">Produto não encontrado.</p>`;
+                return;
+            }
+
+            const batchRes = getProductBatchReservations(product);
+            const reserved = getReservedQuantity(product);
+            const goal = Number(product.goal || 10);
+            const isClosed = reserved >= goal;
+            const batchNum = Number(product.batchNumber || 1);
+
+            headerEl.innerHTML = `
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h4 class="text-sm font-extrabold text-navy-950">${product.name} (Lote #${batchNum})</h4>
+                        ${isClosed
+                            ? `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-400 text-navy-950">LOTE FECHADO (${reserved}/${goal})</span>`
+                            : `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">${reserved}/${goal} Reservadas</span>`
+                        }
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5">
+                        Sinal: <strong>${formatCurrency(product.reservePrice)}</strong> • Valor Cheio: <strong>${formatCurrency(product.fullPrice)}</strong>
+                    </p>
+                </div>
+                ${isClosed ? `
+                    <button onclick="openNewBatch('${product.id}')" class="px-3 py-1.5 rounded-xl bg-navy-900 hover:bg-navy-800 text-emerald-400 text-xs font-bold transition">
+                        <i class="fa-solid fa-plus"></i> Abrir Lote #${batchNum + 1}
+                    </button>
+                ` : ''}
+            `;
+
+            if (batchRes.length === 0) {
+                bodyEl.innerHTML = `<div class="text-center py-10 text-xs text-slate-400">Nenhuma reserva registrada neste lote ainda.</div>`;
+                return;
+            }
+
+            let rankCounter = 0;
+            const rowsHTML = batchRes.map((r) => {
+                const qty = Number(r.qty || 1);
+                const startPos = rankCounter + 1;
+                rankCounter += qty;
+                const endPos = rankCounter;
+                const rankBadge = startPos === endPos ? `#${startPos}` : `#${startPos} a #${endPos}`;
+
+                const signalPaid = Number(product.reservePrice) * qty;
+                const fullTotal = Number(product.fullPrice) * qty;
+                const remainingBalance = Math.max(0, fullTotal - signalPaid);
+
+                const cleanPhone = (r.buyerPhone || '').replace(/\D/g, '');
+                const waPhone = cleanPhone.startsWith('55') ? cleanPhone : `55${cleanPhone}`;
+
+                const billingMsg = encodeURIComponent(
+                    `Olá *${r.buyerName}*! 🎉\n\n` +
+                    `Ótima notícia: o lote do produto *${product.name}* (Lote #${batchNum}) atingiu *${goal}/${goal} peças* e você está garantido(a) na posição *${rankBadge}*!\n\n` +
+                    `📋 *Resumo do seu Fechamento:*\n` +
+                    `• Quantidade: ${qty} peça(s)\n` +
+                    `• Valor Cheio Total: ${formatCurrency(fullTotal)}\n` +
+                    `• Sinal já pago: - ${formatCurrency(signalPaid)}\n` +
+                    `💰 *Saldo Restante a Pagar:* *${formatCurrency(remainingBalance)}*\n\n` +
+                    `🔑 *Chave PIX para pagamento:* ${appSettings.pixKey}\n\n` +
+                    `Envie o comprovante por aqui para confirmarmos seu pedido!`
+                );
+
+                return `
+                    <div class="p-3.5 rounded-xl border ${isClosed ? 'border-amber-200 bg-amber-50/30' : 'border-slate-200 bg-white'} flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-start gap-3">
+                            <span class="px-2.5 py-1 rounded-lg bg-navy-900 text-emerald-400 font-extrabold text-xs flex-shrink-0">
+                                ${rankBadge}
+                            </span>
+                            <div>
+                                <div class="font-extrabold text-sm text-navy-950">
+                                    ${r.buyerName} <span class="text-emerald-600">(${qty}x)</span>
+                                </div>
+                                <div class="text-xs text-slate-500 flex flex-wrap items-center gap-2 mt-0.5">
+                                    <span><i class="fa-brands fa-whatsapp text-emerald-600"></i> ${r.buyerPhone}</span>
+                                    <span>•</span>
+                                    <span><i class="fa-regular fa-clock"></i> ${formatDateTime(r.timestamp)}</span>
+                                </div>
+                                <div class="text-[11px] text-slate-600 mt-1">
+                                    Cheio: <strong>${formatCurrency(fullTotal)}</strong> | Sinal: <strong>${formatCurrency(signalPaid)}</strong> |
+                                    <span class="text-emerald-700 font-extrabold">Restante: ${formatCurrency(remainingBalance)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 self-end sm:self-center">
+                            <a href="https://wa.me/${waPhone}?text=${billingMsg}" target="_blank" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-sm transition flex items-center gap-1.5 whitespace-nowrap">
+                                <i class="fa-brands fa-whatsapp text-sm"></i> Cobrar Valor Cheio
+                            </a>
+                            <button onclick="removeReservationAdmin('${r.id}')" title="Remover desistência e reabrir vaga" class="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs transition">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            bodyEl.innerHTML = `<div class="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">${rowsHTML}</div>`;
+        }
+
+        async function removeReservationAdmin(reservationId) {
+            if (!currentUser) return;
+            try {
+                await deleteDoc(getReservationDoc(reservationId));
+                showToast('Reserva removida! A vaga foi reaberta automaticamente no lote.', 'info');
+            } catch (err) {
+                console.error("Erro ao remover reserva:", err);
+                showToast("Erro ao remover reserva.", "error");
+            }
+        }
+
+        // =====================================================================
+        // ADMIN: SETTINGS & SAMPLE SEED
+        // =====================================================================
+        async function saveAdminSettings(event) {
+            event.preventDefault();
+            if (!currentUser) return;
+
+            const updated = {
+                whatsapp: document.getElementById('setting-whatsapp').value.replace(/\D/g, '') || '5511999999999',
+                pixKey: document.getElementById('setting-pix').value.trim() || 'pix@rateiopro.com.br',
+                adminPassword: document.getElementById('setting-password').value.trim() || 'admin123'
             };
-            reader.readAsText(file);
-            event.target.value = '';
+
+            try {
+                await setDoc(getSettingsDoc(), updated);
+                showToast('Configurações atualizadas na nuvem!', 'success');
+            } catch (err) {
+                console.error("Erro ao salvar configurações:", err);
+                showToast("Erro ao salvar configurações.", "error");
+            }
         }
+
+        async function seedSampleProducts() {
+            if (!currentUser) return;
+            const samples = [
+                { name: 'Perfume Árabe Lattafa Asad 100ml', category: 'Perfumaria', reservePrice: 20, fullPrice: 249.90, goal: 10, batchNumber: 1, image: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600' },
+                { name: 'Fone Bluetooth ANC Noise Cancelling', category: 'Eletrônicos', reservePrice: 15, fullPrice: 189.00, goal: 10, batchNumber: 1, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600' },
+                { name: 'Smartwatch Ultra Series 9 Amoled', category: 'Acessórios', reservePrice: 25, fullPrice: 320.00, goal: 10, batchNumber: 1, image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600' },
+                { name: 'Garrafa Térmica Inox 1.2L', category: 'Utilidades', reservePrice: 10, fullPrice: 119.90, goal: 10, batchNumber: 1, image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600' },
+                { name: 'Kit 3 Camisetas Algodão Egípcio', category: 'Vestuário', reservePrice: 15, fullPrice: 159.90, goal: 10, batchNumber: 1, image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600' },
+                { name: 'Cafeteira Espresso Portátil', category: 'Casa & Café', reservePrice: 20, fullPrice: 279.00, goal: 10, batchNumber: 1, image: 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=600' }
+            ];
+
+            try {
+                const now = Date.now();
+                for (let i = 0; i < samples.length; i++) {
+                    await addDoc(getProductsCol(), { ...samples[i], createdAt: now + i });
+                }
+                showToast('6 produtos de demonstração adicionados!', 'success');
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // Start App
+        initApp();
     </script>
 </body>
 </html>
