@@ -5,40 +5,101 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sistema de Rateio & Compra Coletiva</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Inter', sans-serif; }
     .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
 
+  <!-- TELA DE BLOQUEIO TOTAL (TERÇAS E QUARTAS-FEIRAS) -->
+  <div id="closedDaysOverlay" class="hidden fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
+    <div class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-2xl space-y-5">
+      <div class="w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto text-3xl font-extrabold">
+        🔒
+      </div>
+      <div>
+        <span class="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+          Site Fechado • Terça e Quarta-feira
+        </span>
+        <h2 class="text-2xl font-extrabold text-white mt-3">Voltamos na Quinta-feira!</h2>
+        <p class="text-sm text-slate-400 mt-2 leading-relaxed">
+          Nosso sistema de rateio permanece fechado todas as <strong class="text-slate-200">terças e quartas-feiras</strong> para conferência de boxes e atualização de catálogo.
+        </p>
+      </div>
+
+      <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4">
+        <p class="text-xs text-slate-400">Reabertura automática em:</p>
+        <p id="reopenCountdown" class="text-xl font-mono font-extrabold text-blue-400 mt-1">--d --h --m --s</p>
+        <p class="text-[11px] text-slate-500 mt-1">Quinta-feira às 00:00 (Horário de Brasília)</p>
+      </div>
+
+      <div class="pt-2">
+        <button onclick="openAdminModal()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition">
+          Acesso Restrito — Painel Administrativo
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Navbar -->
   <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur border-b border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-extrabold text-white text-lg shadow-lg shadow-blue-600/30">
           R10
         </div>
         <div>
-          <h1 class="font-bold text-lg leading-tight text-white">Rateio Oficial</h1>
-          <p class="text-xs text-slate-400">Boxes contínuos de 10 peças • Tempo real</p>
+          <h1 class="font-bold text-base sm:text-lg leading-tight text-white">Rateio Oficial</h1>
+          <p class="text-[11px] sm:text-xs text-slate-400">Boxes contínuos de 10 peças • Aberto de Qui a Seg</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2 sm:gap-3">
-        <span id="connectionBadge" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          Online
+      <div class="flex items-center gap-2">
+        <span id="adminBypassBadge" class="hidden px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold">
+          Modo Admin (Dia Fechado)
         </span>
-        <button onclick="openAdminModal()" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium border border-slate-700 transition">
-          Painel Admin
+
+        <!-- Botão Área do Cliente -->
+        <button id="headerClientBtn" onclick="openClientAuthModal()" class="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold transition">
+          Entrar / Cadastrar
+        </button>
+        <button id="headerMyOrdersBtn" onclick="openMyOrdersModal()" class="hidden px-3 py-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs sm:text-sm font-semibold transition">
+          Meus Pedidos (<span id="headerOrderCount">0</span>)
+        </button>
+        <button id="headerLogoutBtn" onclick="logoutClient()" class="hidden px-2.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs border border-slate-700" title="Sair da conta">
+          Sair
+        </button>
+
+        <!-- Botão Admin -->
+        <button onclick="openAdminModal()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium border border-slate-700 transition">
+          Admin
         </button>
       </div>
     </div>
   </header>
+
+  <!-- Barra de Boas-vindas do Cliente Logado -->
+  <div id="loggedClientBar" class="hidden bg-blue-950/50 border-b border-blue-900/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span class="text-slate-300">Logado como: <strong id="loggedClientName" class="text-white"></strong> (<span id="loggedClientEmail" class="text-slate-400"></span>)</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="loggedClientCreditBadge" class="hidden px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
+          Crédito p/ Abatimento: R$ 0,00
+        </span>
+        <button onclick="openMyOrdersModal()" class="text-blue-400 hover:underline font-semibold">
+          Ver minhas reservas e cancelamentos &rarr;
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Hero / Regras -->
   <section class="bg-gradient-to-b from-slate-900 to-slate-950 border-b border-slate-800/80 py-6">
@@ -48,21 +109,21 @@
           <span class="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-400 font-bold text-sm flex items-center justify-center shrink-0">1</span>
           <div>
             <h3 class="font-semibold text-sm text-white">Reserve Sempre pelo Sinal Fixo</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Todas as reservas entram pelo mesmo valor fixo de sinal (ex: R$ 20,00), sem bloquear.</p>
+            <p class="text-xs text-slate-400 mt-0.5">Cadastre-se e garanta sua peça pelo valor fixo de reserva (ex: R$ 20,00), sem bloquear.</p>
           </div>
         </div>
         <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
           <span class="w-7 h-7 rounded-lg bg-emerald-600/20 text-emerald-400 font-bold text-sm flex items-center justify-center shrink-0">2</span>
           <div>
             <h3 class="font-semibold text-sm text-white">A Cada 10 Peças, Libera um Box</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Completou 10 reservas (Box #1), os 10 primeiros já podem pagar o restante.</p>
+            <p class="text-xs text-slate-400 mt-0.5">Completou 10 reservas (Box #1), os 10 participantes pagam o restante. O 11º abre o Box #2.</p>
           </div>
         </div>
         <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
-          <span class="w-7 h-7 rounded-lg bg-purple-600/20 text-purple-400 font-bold text-sm flex items-center justify-center shrink-0">3</span>
+          <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 font-bold text-sm flex items-center justify-center shrink-0">3</span>
           <div>
-            <h3 class="font-semibold text-sm text-white">Próximo Box Abre Automaticamente</h3>
-            <p class="text-xs text-slate-400 mt-0.5">O 11º cliente entra no Box #2 pelo mesmo sinal e libera quando fechar 20.</p>
+            <h3 class="font-semibold text-sm text-white">Cancelamento & Crédito</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Pode cancelar antes de fechar 10/10; o sinal fica retido como crédito para abater em outros produtos.</p>
           </div>
         </div>
       </div>
@@ -91,7 +152,7 @@
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div id="loadingState" class="text-center py-16">
       <div class="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-      <p class="text-slate-400 text-sm mt-3">Sincronizando produtos e boxes em tempo real...</p>
+      <p class="text-slate-400 text-sm mt-3">Sincronizando produtos, clientes e boxes em tempo real...</p>
     </div>
 
     <div id="emptyState" class="hidden text-center py-16 bg-slate-900/50 border border-slate-800 rounded-2xl">
@@ -102,7 +163,71 @@
     <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
   </main>
 
-  <!-- Modal de Reserva (Cliente) -->
+  <!-- MODAL 1: LOGIN E CADASTRO DO CLIENTE -->
+  <div id="clientAuthModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div class="flex gap-4">
+          <button id="authTabLogin" onclick="switchAuthMode('login')" class="text-sm font-bold text-blue-400 border-b-2 border-blue-500 pb-1">
+            Já tenho cadastro
+          </button>
+          <button id="authTabRegister" onclick="switchAuthMode('register')" class="text-sm font-bold text-slate-400 hover:text-white pb-1">
+            Criar conta
+          </button>
+        </div>
+        <button onclick="closeClientAuthModal()" class="text-slate-400 hover:text-white text-xl leading-none">&times;</button>
+      </div>
+
+      <!-- Form Login -->
+      <form id="clientLoginForm" onsubmit="handleClientLogin(event)" class="mt-4 space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">E-mail cadastrado *</label>
+          <input id="loginEmail" type="email" required placeholder="seuemail@exemplo.com"
+            class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Senha *</label>
+          <input id="loginPassword" type="password" required placeholder="Sua senha"
+            class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition">
+          Entrar na Minha Conta
+        </button>
+        <p class="text-center text-xs text-slate-400 pt-1">
+          Ainda não tem conta? <button type="button" onclick="switchAuthMode('register')" class="text-blue-400 underline">Cadastre-se agora</button>
+        </p>
+      </form>
+
+      <!-- Form Cadastro -->
+      <form id="clientRegisterForm" onsubmit="handleClientRegister(event)" class="hidden mt-4 space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Nome Completo *</label>
+          <input id="regName" type="text" required placeholder="Ex: João da Silva"
+            class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">E-mail *</label>
+          <input id="regEmail" type="email" required placeholder="seuemail@exemplo.com"
+            class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Telefone / WhatsApp (com DDD) *</label>
+          <input id="regPhone" type="tel" required placeholder="Ex: 11999998888"
+            class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Crie uma Senha *</label>
+          <input id="regPassword" type="password" required minlength="4" placeholder="Mínimo 4 caracteres"
+            class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition">
+          Concluir Cadastro e Continuar
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: CONFIRMAR RESERVA (CLIENTE LOGADO) -->
   <div id="reserveModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl">
       <div class="flex justify-between items-start gap-3">
@@ -114,6 +239,10 @@
       </div>
 
       <div class="mt-4 bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-2 text-sm">
+        <div class="flex justify-between">
+          <span class="text-slate-400">Cliente:</span>
+          <span id="modalClientDisplay" class="font-semibold text-white"></span>
+        </div>
         <div class="flex justify-between">
           <span class="text-slate-400">Sinal fixo da reserva (agora):</span>
           <span id="modalDepositPrice" class="font-extrabold text-blue-400">R$ 20,00</span>
@@ -132,24 +261,17 @@
         </div>
       </div>
 
-      <form id="reserveForm" onsubmit="submitReservation(event)" class="mt-4 space-y-3">
+      <div id="pixInstructionBox" class="hidden mt-3 bg-blue-950/40 border border-blue-800/60 rounded-lg p-3 text-xs text-blue-200">
+        <p class="font-semibold text-blue-300">Chave PIX para pagamento do sinal:</p>
+        <p id="displayPixKey" class="font-mono mt-1 select-all bg-slate-950 px-2 py-1 rounded border border-blue-900/50"></p>
+      </div>
+
+      <p class="mt-3 text-[11px] text-slate-400 leading-relaxed">
+        * Caso desista antes de o Box completar 10 peças, o sinal não é estornado, mas fica como crédito para abater na sua conta caso tenha outros produtos.
+      </p>
+
+      <form id="reserveForm" onsubmit="submitReservation(event)" class="mt-4">
         <input type="hidden" id="modalProductId" />
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">Seu Nome Completo *</label>
-          <input id="clientName" type="text" required placeholder="Ex: João Silva"
-            class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">Seu WhatsApp (com DDD) *</label>
-          <input id="clientWhatsapp" type="tel" required placeholder="Ex: 11999998888"
-            class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
-        </div>
-
-        <div id="pixInstructionBox" class="hidden bg-blue-950/40 border border-blue-800/60 rounded-lg p-3 text-xs text-blue-200">
-          <p class="font-semibold text-blue-300">Chave PIX para pagamento do sinal:</p>
-          <p id="displayPixKey" class="font-mono mt-1 select-all bg-slate-950 px-2 py-1 rounded border border-blue-900/50"></p>
-        </div>
-
         <button id="confirmReserveBtn" type="submit"
           class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition shadow-lg shadow-blue-600/20">
           Confirmar Reserva
@@ -158,19 +280,50 @@
     </div>
   </div>
 
-  <!-- Modal Admin -->
-  <div id="adminModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+  <!-- MODAL 3: MEUS PEDIDOS, CANCELAMENTO E CRÉDITOS DO CLIENTE -->
+  <div id="myOrdersModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
-        <h2 class="text-lg font-bold text-white">Painel Administrativo — Rateio por Boxes</h2>
-        <button onclick="closeAdminModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+        <div>
+          <h2 class="text-lg font-bold text-white">Meus Pedidos & Saldo de Conta</h2>
+          <p id="myOrdersSubtitle" class="text-xs text-slate-400"></p>
+        </div>
+        <button onclick="closeMyOrdersModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
-      <!-- Login Admin -->
-      <div id="adminLoginView" class="p-8 max-w-sm mx-auto w-full text-center">
-        <p class="text-sm text-slate-300 mb-4">Digite a senha administrativa para gerenciar produtos, boxes e cobranças.</p>
-        <input id="adminPasswordInput" type="password" placeholder="Senha (padrão: admin123)"
-          class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white mb-3 outline-none focus:border-blue-500" />
+      <div id="myOrdersBody" class="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-5"></div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: PAINEL ADMINISTRATIVO -->
+  <div id="adminModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-6xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between gap-2">
+        <div>
+          <h2 class="text-lg font-bold text-white">Painel Administrativo — Gestão & Auditoria</h2>
+          <p id="loggedAdminBanner" class="hidden text-xs text-emerald-400"></p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button id="adminLogoutBtn" onclick="logoutAdmin()" class="hidden px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 border border-slate-700">
+            Sair do Admin
+          </button>
+          <button onclick="closeAdminModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+        </div>
+      </div>
+
+      <!-- Login Admin Individual -->
+      <div id="adminLoginView" class="p-8 max-w-sm mx-auto w-full space-y-3">
+        <p class="text-sm text-slate-300 text-center">Entre com seu E-mail e Senha individual de Administrador.</p>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">E-mail do Administrador</label>
+          <input id="adminEmailInput" type="email" value="admin@rateio.com" placeholder="admin@rateio.com"
+            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-blue-500" />
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Senha Individual</label>
+          <input id="adminPasswordInput" type="password" placeholder="Senha (inicial: admin123)"
+            class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-blue-500" />
+        </div>
         <button onclick="loginAdmin()" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 font-semibold text-sm text-white">
           Acessar Painel
         </button>
@@ -179,8 +332,14 @@
       <!-- Conteúdo Admin Logado -->
       <div id="adminDashboardView" class="hidden flex-1 flex flex-col overflow-hidden">
         <div class="flex border-b border-slate-800 px-6 gap-4 overflow-x-auto bg-slate-950/50">
-          <button onclick="switchAdminTab('closings')" id="tab-closings" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-blue-500 text-blue-400 whitespace-nowrap">
-            Boxes & Cobrança do Restante
+          <button onclick="switchAdminTab('weekly')" id="tab-weekly" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-blue-500 text-blue-400 whitespace-nowrap">
+            Arrecadação Semanal (Ter–Dom)
+          </button>
+          <button onclick="switchAdminTab('clients')" id="tab-clients" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
+            Pedidos por Cliente (Add/Excluir)
+          </button>
+          <button onclick="switchAdminTab('closings')" id="tab-closings" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
+            Boxes & Cobrança
           </button>
           <button onclick="switchAdminTab('products')" id="tab-products" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
             Produtos Cadastrados
@@ -188,18 +347,74 @@
           <button onclick="switchAdminTab('bulk')" id="tab-bulk" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
             Cadastro em Massa (+100)
           </button>
+          <button onclick="switchAdminTab('admins')" id="tab-admins" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
+            Admins & Auditoria
+          </button>
           <button onclick="switchAdminTab('settings')" id="tab-settings" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
-            Configurações PIX / Senha
+            Configurações & E-mail
           </button>
         </div>
 
         <div class="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-6">
-          <!-- ABA 1: BOXES E COBRANÇA -->
-          <div id="view-closings" class="space-y-4">
+          <!-- ABA 1: ARRECADAÇÃO SEMANAL -->
+          <div id="view-weekly" class="space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-950 border border-slate-800 rounded-xl p-4">
+              <div>
+                <h3 class="font-bold text-white text-base">Fechamento Semanal (Terça 00:00 até Domingo 23:59)</h3>
+                <p class="text-xs text-slate-400">Ao encerrar domingo às 23:59, a lista de todos os boxes fechados (10/10) é enviada automaticamente para o e-mail dos admins.</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <select id="weeklySelector" onchange="renderWeeklyRevenue()" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-semibold"></select>
+                <button onclick="triggerWeeklyReportEmail(true)" class="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs">
+                  Enviar Lista de Boxes Fechados Agora
+                </button>
+              </div>
+            </div>
+
+            <div id="weeklySummaryCards" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
+
+            <div class="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden">
+              <div class="px-4 py-3 border-b border-slate-800 flex justify-between items-center">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Histórico de Todas as Semanas Armazenadas</h4>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-slate-900 text-slate-400 border-b border-slate-800">
+                    <tr>
+                      <th class="p-3">Período (Terça a Domingo 23:59)</th>
+                      <th class="p-3">Reservas na Semana</th>
+                      <th class="p-3">Sinais Arrecadados</th>
+                      <th class="p-3">Restantes Quitados</th>
+                      <th class="p-3 text-right">Total Arrecadado</th>
+                      <th class="p-3 text-center">Relatório E-mail</th>
+                    </tr>
+                  </thead>
+                  <tbody id="weeklyHistoryTable" class="divide-y divide-slate-800"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ABA 2: CONSULTAR CLIENTE -->
+          <div id="view-clients" class="hidden space-y-5">
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
+              <div>
+                <h3 class="font-bold text-white text-sm">Gerenciar Pedidos de Qualquer Cliente</h3>
+                <p class="text-xs text-slate-400">Busque pelo nome, e-mail ou telefone para ver pedidos, créditos retidos, adicionar ou excluir produtos (exige sua senha individual e grava no log).</p>
+              </div>
+              <input id="adminClientSearch" type="text" oninput="renderAdminClients()" placeholder="Buscar cliente por nome, e-mail ou telefone..."
+                class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3.5 py-2 text-xs text-white outline-none" />
+            </div>
+
+            <div id="adminClientsList" class="space-y-4"></div>
+          </div>
+
+          <!-- ABA 3: BOXES E COBRANÇA -->
+          <div id="view-closings" class="hidden space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <h3 class="font-bold text-white">Controle de Boxes (10 peças por Box)</h3>
-                <p class="text-xs text-slate-400">Boxes completos (10/10) estão liberados para cobrar o restante. Boxes incompletos aguardam fechar 10.</p>
+                <p class="text-xs text-slate-400">Boxes completos (10/10) estão liberados para cobrar o restante (já descontando créditos retidos do cliente, se houver).</p>
               </div>
               <select id="adminClosingFilter" onchange="renderAdminClosings()" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
                 <option value="ALL">Todos os Boxes</option>
@@ -210,7 +425,7 @@
             <div id="adminClosingsList" class="space-y-4"></div>
           </div>
 
-          <!-- ABA 2: CADASTRAR / GERENCIAR PRODUTOS -->
+          <!-- ABA 4: CADASTRAR / GERENCIAR PRODUTOS -->
           <div id="view-products" class="hidden space-y-6">
             <form onsubmit="addSingleProduct(event)" class="bg-slate-950 border border-slate-800 rounded-xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
               <input id="prodName" type="text" required placeholder="Nome do Produto" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
@@ -231,7 +446,7 @@
                     <th class="p-3">Categoria</th>
                     <th class="p-3">Sinal</th>
                     <th class="p-3">Valor Cheio</th>
-                    <th class="p-3">Boxes / Total Reservas</th>
+                    <th class="p-3">Boxes / Reservas Ativas</th>
                     <th class="p-3 text-right">Ações</th>
                   </tr>
                 </thead>
@@ -240,7 +455,7 @@
             </div>
           </div>
 
-          <!-- ABA 3: CADASTRO EM MASSA -->
+          <!-- ABA 5: CADASTRO EM MASSA -->
           <div id="view-bulk" class="hidden space-y-4">
             <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
               <h3 class="font-bold text-sm text-white">Importar Lista de 100+ Produtos</h3>
@@ -253,9 +468,62 @@
             </div>
           </div>
 
-          <!-- ABA 4: CONFIGURAÇÕES -->
-          <div id="view-settings" class="hidden max-w-md space-y-4">
+          <!-- ABA 6: ADMINS & AUDITORIA -->
+          <div id="view-admins" class="hidden space-y-6">
             <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
+              <div>
+                <h3 class="font-bold text-sm text-white">Cadastrar Novo Administrador (Recebe Relatórios Semanais & Possui Senha Própria)</h3>
+                <p class="text-xs text-slate-400">Cada administrador cadastrado terá login individual e receberá a lista de boxes fechados no domingo às 23:59.</p>
+              </div>
+              <form onsubmit="addNewAdmin(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <input id="newAdminName" type="text" required placeholder="Nome do Admin" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
+                <input id="newAdminEmail" type="email" required placeholder="E-mail do Admin (receberá relatórios)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
+                <input id="newAdminPass" type="password" required minlength="4" placeholder="Senha individual" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
+                <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs">
+                  + Cadastrar Admin
+                </button>
+              </form>
+
+              <div class="overflow-x-auto border border-slate-800 rounded-xl mt-3">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-slate-900 text-slate-400 border-b border-slate-800">
+                    <tr>
+                      <th class="p-3">Nome</th>
+                      <th class="p-3">E-mail (Destino Relatório)</th>
+                      <th class="p-3">Cadastrado em</th>
+                      <th class="p-3 text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminsTableBody" class="divide-y divide-slate-800"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden">
+              <div class="px-4 py-3 border-b border-slate-800">
+                <h3 class="font-bold text-sm text-white">Registro de Auditoria (Alterações por Administrador)</h3>
+                <p class="text-xs text-slate-400">Histórico completo de quem adicionou, alterou ou excluiu registros no painel.</p>
+              </div>
+              <div class="overflow-x-auto max-h-80 custom-scrollbar">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-slate-900 text-slate-400 border-b border-slate-800 sticky top-0">
+                    <tr>
+                      <th class="p-3">Data / Hora</th>
+                      <th class="p-3">Administrador</th>
+                      <th class="p-3">Ação Realizada</th>
+                      <th class="p-3">Detalhes</th>
+                    </tr>
+                  </thead>
+                  <tbody id="auditLogsTableBody" class="divide-y divide-slate-800"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ABA 7: CONFIGURAÇÕES -->
+          <div id="view-settings" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
+              <h3 class="font-bold text-sm text-white">Dados da Loja & Pagamento</h3>
               <div>
                 <label class="block text-xs text-slate-400 mb-1">Chave PIX (exibida ao reservar e nas cobranças)</label>
                 <input id="settingPixKey" type="text" placeholder="Ex: seuemail@pix.com ou CNPJ" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
@@ -264,12 +532,30 @@
                 <label class="block text-xs text-slate-400 mb-1">WhatsApp da Loja (para contato)</label>
                 <input id="settingStoreWhatsapp" type="text" placeholder="Ex: 5511999998888" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
               </div>
-              <div>
-                <label class="block text-xs text-slate-400 mb-1">Alterar Senha do Painel Admin</label>
-                <input id="settingAdminPass" type="text" placeholder="Nova senha" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
-              </div>
               <button onclick="saveSettings()" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs">
-                Salvar Configurações
+                Salvar Dados da Loja
+              </button>
+            </div>
+
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
+              <h3 class="font-bold text-sm text-white">Configuração de Envio de E-mail Automático (Domingo 23:59)</h3>
+              <p class="text-[11px] text-slate-400 leading-relaxed">
+                Crie uma conta grátis em <strong>emailjs.com</strong>, crie um template com <code class="text-blue-400">{{to_email}}</code>, <code class="text-blue-400">{{subject}}</code> e <code class="text-blue-400">{{message}}</code> e cole os 3 códigos abaixo:
+              </p>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">EmailJS Public Key</label>
+                <input id="settingEmailJsPublicKey" type="text" placeholder="Ex: user_xxxxxxxxxxxx" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono" />
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">EmailJS Service ID</label>
+                <input id="settingEmailJsServiceId" type="text" placeholder="Ex: service_xxxxxxx" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono" />
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">EmailJS Template ID</label>
+                <input id="settingEmailJsTemplateId" type="text" placeholder="Ex: template_xxxxxxx" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono" />
+              </div>
+              <button onclick="saveEmailJsSettings()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs">
+                Salvar Configuração de E-mail
               </button>
             </div>
           </div>
@@ -278,12 +564,12 @@
     </div>
   </div>
 
-  <!-- Firebase SDK + Lógica de Boxes Contínuos de 10 em 10 -->
+  <!-- Firebase SDK + Lógica Completa -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
     import {
       getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc,
-      onSnapshot, query, orderBy, runTransaction, serverTimestamp
+      onSnapshot, query, orderBy, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -301,23 +587,207 @@
 
     let products = [];
     let reservations = [];
-    let storeConfig = { pixKey: "", storeWhatsapp: "", adminPass: "admin123" };
+    let users = [];
+    let admins = [];
+    let auditLogs = [];
+    let weeklyReports = {};
+    let storeConfig = {
+      pixKey: "",
+      storeWhatsapp: "",
+      emailJsPublicKey: "",
+      emailJsServiceId: "",
+      emailJsTemplateId: ""
+    };
+
+    let currentUser = null;
+    let currentAdmin = null;
+    let pendingProductAfterAuth = null;
 
     const formatBRL = (val) => Number(val || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    const formatDateTime = (ms) => ms ? new Date(ms).toLocaleString("pt-BR") : "-";
 
-    // Funções Admin registradas imediatamente
+    // --- CONTROLE DE BLOQUEIO TOTAL ÀS TERÇAS (2) E QUARTAS (3) ---
+    function getBrazilDate() {
+      // Converte o relógio atual para o fuso America/Sao_Paulo independente do dispositivo do cliente
+      const str = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
+      return new Date(str);
+    }
+
+    function isSiteClosedNow() {
+      const brNow = getBrazilDate();
+      const day = brNow.getDay(); // 0=Dom, 1=Seg, 2=Terça, 3=Quarta, 4=Qui, 5=Sex, 6=Sab
+      return day === 2 || day === 3;
+    }
+
+    function updateSiteScheduleLock() {
+      const closed = isSiteClosedNow();
+      const overlay = document.getElementById("closedDaysOverlay");
+      const bypassBadge = document.getElementById("adminBypassBadge");
+
+      if (closed && !currentAdmin) {
+        overlay.classList.remove("hidden");
+        bypassBadge.classList.add("hidden");
+        // Fecha modais de cliente se estiverem abertos
+        document.getElementById("clientAuthModal").classList.add("hidden");
+        document.getElementById("reserveModal").classList.add("hidden");
+        document.getElementById("myOrdersModal").classList.add("hidden");
+      } else {
+        overlay.classList.add("hidden");
+        if (closed && currentAdmin) {
+          bypassBadge.classList.remove("hidden");
+        } else {
+          bypassBadge.classList.add("hidden");
+        }
+      }
+
+      if (closed) {
+        const brNow = getBrazilDate();
+        const day = brNow.getDay(); // 2 (Ter) ou 3 (Qua)
+        const daysUntilThursday = day === 2 ? 2 : 1;
+        const reopenDate = new Date(
+          brNow.getFullYear(),
+          brNow.getMonth(),
+          brNow.getDate() + daysUntilThursday,
+          0, 0, 0, 0
+        );
+        const diffMs = Math.max(0, reopenDate.getTime() - brNow.getTime());
+        const totalSec = Math.floor(diffMs / 1000);
+        const d = Math.floor(totalSec / 86400);
+        const h = Math.floor((totalSec % 86400) / 3600);
+        const m = Math.floor((totalSec % 3600) / 60);
+        const s = totalSec % 60;
+        const pad = (n) => String(n).padStart(2, "0");
+        const cdEl = document.getElementById("reopenCountdown");
+        if (cdEl) cdEl.textContent = `${d}d ${pad(h)}h ${pad(m)}m ${pad(s)}s`;
+      }
+    }
+
+    setInterval(updateSiteScheduleLock, 1000);
+    updateSiteScheduleLock();
+
+    // --- UTILITÁRIO DE SEMANA: TERÇA 00:00 ATÉ DOMINGO 23:59 ---
+    function getTueSunWeekInfo(timestampMs) {
+      const d = new Date(timestampMs);
+      const day = d.getDay();
+      let diffToTuesday;
+      if (day === 0) diffToTuesday = -5;
+      else if (day === 1) diffToTuesday = 1;
+      else diffToTuesday = 2 - day;
+
+      const start = new Date(d.getFullYear(), d.getMonth(), d.getDate() + diffToTuesday, 0, 0, 0, 0);
+      const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 5, 23, 59, 59, 999);
+
+      const pad = (n) => String(n).padStart(2, "0");
+      const key = `${start.getFullYear()}-${pad(start.getMonth() + 1)}-${pad(start.getDate())}`;
+      const label = `Ter ${pad(start.getDate())}/${pad(start.getMonth() + 1)} 00:00 até Dom ${pad(end.getDate())}/${pad(end.getMonth() + 1)} 23:59`;
+
+      return { key, label, startMs: start.getTime(), endMs: end.getTime() };
+    }
+
+    // --- AUDITORIA DE ALTERAÇÕES DOS ADMINS ---
+    async function logAdminAudit(action, details) {
+      if (!currentAdmin) return;
+      await addDoc(collection(db, "audit_logs"), {
+        adminId: currentAdmin.id,
+        adminName: currentAdmin.name,
+        adminEmail: currentAdmin.email,
+        action,
+        details,
+        createdAtMs: Date.now(),
+        createdAt: serverTimestamp()
+      });
+    }
+
+    function verifyCurrentAdminPassword() {
+      if (!currentAdmin) {
+        alert("Sessão de administrador expirada. Faça login novamente.");
+        return false;
+      }
+      const typed = prompt(`Admin [${currentAdmin.name}], digite sua senha individual para confirmar:`);
+      if (typed === null) return false;
+      if (typed !== currentAdmin.password) {
+        alert("Senha incorreta! Operação bloqueada.");
+        return false;
+      }
+      return true;
+    }
+
+    // --- CONTROLE DE MODAIS ---
+    window.openClientAuthModal = () => {
+      if (isSiteClosedNow() && !currentAdmin) return;
+      document.getElementById("clientAuthModal").classList.remove("hidden");
+    };
+    window.closeClientAuthModal = () => document.getElementById("clientAuthModal").classList.add("hidden");
+    window.closeReserveModal = () => document.getElementById("reserveModal").classList.add("hidden");
+    window.openMyOrdersModal = () => {
+      if (isSiteClosedNow() && !currentAdmin) return;
+      renderMyOrders();
+      document.getElementById("myOrdersModal").classList.remove("hidden");
+    };
+    window.closeMyOrdersModal = () => document.getElementById("myOrdersModal").classList.add("hidden");
     window.openAdminModal = () => document.getElementById("adminModal").classList.remove("hidden");
     window.closeAdminModal = () => document.getElementById("adminModal").classList.add("hidden");
 
-    window.loginAdmin = function () {
-      const pass = document.getElementById("adminPasswordInput").value;
-      if (pass === (storeConfig.adminPass || "admin123")) {
-        document.getElementById("adminLoginView").classList.add("hidden");
-        document.getElementById("adminDashboardView").classList.remove("hidden");
-      } else {
-        alert("Senha incorreta!");
-      }
+    window.switchAuthMode = function (mode) {
+      const isLogin = mode === "login";
+      document.getElementById("clientLoginForm").classList.toggle("hidden", !isLogin);
+      document.getElementById("clientRegisterForm").classList.toggle("hidden", isLogin);
+
+      document.getElementById("authTabLogin").className = isLogin
+        ? "text-sm font-bold text-blue-400 border-b-2 border-blue-500 pb-1"
+        : "text-sm font-bold text-slate-400 hover:text-white pb-1";
+      document.getElementById("authTabRegister").className = !isLogin
+        ? "text-sm font-bold text-emerald-400 border-b-2 border-emerald-500 pb-1"
+        : "text-sm font-bold text-slate-400 hover:text-white pb-1";
     };
+
+    // --- LOGIN / LOGOUT ADMIN INDIVIDUAL ---
+    window.loginAdmin = function () {
+      const email = document.getElementById("adminEmailInput").value.trim().toLowerCase();
+      const pass = document.getElementById("adminPasswordInput").value;
+
+      const found = admins.find(a => (a.email || "").toLowerCase() === email && a.password === pass);
+      if (!found) {
+        alert("E-mail ou senha de administrador inválidos!");
+        return;
+      }
+
+      currentAdmin = found;
+      localStorage.setItem("rateio_admin_id", found.id);
+      updateAdminHeaderState();
+      updateSiteScheduleLock();
+      renderWeeklyRevenue();
+      renderAdminClients();
+      renderAdminsAndAudit();
+    };
+
+    window.logoutAdmin = function () {
+      currentAdmin = null;
+      localStorage.removeItem("rateio_admin_id");
+      updateAdminHeaderState();
+      updateSiteScheduleLock();
+    };
+
+    function updateAdminHeaderState() {
+      const loginView = document.getElementById("adminLoginView");
+      const dashView = document.getElementById("adminDashboardView");
+      const banner = document.getElementById("loggedAdminBanner");
+      const logoutBtn = document.getElementById("adminLogoutBtn");
+
+      if (!currentAdmin) {
+        loginView.classList.remove("hidden");
+        dashView.classList.add("hidden");
+        banner.classList.add("hidden");
+        logoutBtn.classList.add("hidden");
+        return;
+      }
+
+      loginView.classList.add("hidden");
+      dashView.classList.remove("hidden");
+      banner.classList.remove("hidden");
+      logoutBtn.classList.remove("hidden");
+      banner.textContent = `Admin ativo: ${currentAdmin.name} (${currentAdmin.email}) — Todas as ações são registradas`;
+    }
 
     window.switchAdminTab = function (tab) {
       document.querySelectorAll(".admin-tab").forEach(el => {
@@ -327,21 +797,75 @@
       document.getElementById(`tab-${tab}`).classList.add("border-blue-500", "text-blue-400");
       document.getElementById(`tab-${tab}`).classList.remove("border-transparent", "text-slate-400");
 
-      ["closings", "products", "bulk", "settings"].forEach(v => {
+      ["weekly", "clients", "closings", "products", "bulk", "admins", "settings"].forEach(v => {
         document.getElementById(`view-${v}`).classList.toggle("hidden", v !== tab);
       });
+
+      if (tab === "weekly") renderWeeklyRevenue();
+      if (tab === "clients") renderAdminClients();
+      if (tab === "admins") renderAdminsAndAudit();
     };
 
-    // Escutar Configurações
+    // --- LISTENERS EM TEMPO REAL (FIRESTORE) ---
     onSnapshot(doc(db, "config", "store"), (snap) => {
       if (snap.exists()) {
         storeConfig = { ...storeConfig, ...snap.data() };
         document.getElementById("settingPixKey").value = storeConfig.pixKey || "";
         document.getElementById("settingStoreWhatsapp").value = storeConfig.storeWhatsapp || "";
+        document.getElementById("settingEmailJsPublicKey").value = storeConfig.emailJsPublicKey || "";
+        document.getElementById("settingEmailJsServiceId").value = storeConfig.emailJsServiceId || "";
+        document.getElementById("settingEmailJsTemplateId").value = storeConfig.emailJsTemplateId || "";
+        if (storeConfig.emailJsPublicKey && window.emailjs) {
+          window.emailjs.init({ publicKey: storeConfig.emailJsPublicKey });
+        }
       }
     });
 
-    // Escutar Produtos em Tempo Real
+    onSnapshot(collection(db, "admins"), async (snapshot) => {
+      if (snapshot.empty) {
+        await addDoc(collection(db, "admins"), {
+          name: "Admin Principal",
+          email: "admin@rateio.com",
+          password: storeConfig.adminPass || "admin123",
+          isMaster: true,
+          createdAtMs: Date.now()
+        });
+        return;
+      }
+      admins = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      const savedAdminId = localStorage.getItem("rateio_admin_id");
+      if (savedAdminId) {
+        currentAdmin = admins.find(a => a.id === savedAdminId) || null;
+        updateAdminHeaderState();
+        updateSiteScheduleLock();
+      }
+      renderAdminsAndAudit();
+    });
+
+    onSnapshot(query(collection(db, "audit_logs"), orderBy("createdAtMs", "desc")), (snapshot) => {
+      auditLogs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderAdminsAndAudit();
+    });
+
+    onSnapshot(collection(db, "weekly_reports"), (snapshot) => {
+      weeklyReports = {};
+      snapshot.docs.forEach(d => {
+        weeklyReports[d.id] = d.data();
+      });
+      renderWeeklyRevenue();
+      checkSunday2359Closing();
+    });
+
+    onSnapshot(collection(db, "users"), (snapshot) => {
+      users = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      const savedUserId = localStorage.getItem("rateio_user_id");
+      if (savedUserId) {
+        currentUser = users.find(u => u.id === savedUserId) || null;
+      }
+      updateClientHeaderUI();
+      renderAdminClients();
+    });
+
     onSnapshot(collection(db, "products"), (snapshot) => {
       products = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       document.getElementById("loadingState").classList.add("hidden");
@@ -354,31 +878,281 @@
       document.getElementById("loadingState").innerHTML = `<p class="text-red-400 text-sm">Erro ao conectar ao banco de dados. Verifique as Regras do Firestore.</p>`;
     });
 
-    // Escutar Reservas em Tempo Real ordenadas por chegada
     onSnapshot(query(collection(db, "reservations"), orderBy("createdAtMs", "asc")), (snapshot) => {
       reservations = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      updateClientHeaderUI();
       renderCatalog();
+      renderMyOrders();
       renderAdminProducts();
       renderAdminClosings();
+      renderAdminClients();
+      renderWeeklyRevenue();
     });
 
-    function getProductReservations(productId) {
-      return reservations.filter(r => r.productId === productId);
+    // --- RELATÓRIO SEMANAL DOMINGO 23:59 ---
+    function buildClosedBoxesReportText(weekObj) {
+      const completedBoxesReport = [];
+
+      products.forEach(p => {
+        const info = getBoxesInfo(p.id);
+        info.boxes.forEach(box => {
+          if (!box.isComplete) return;
+          const tenthMember = box.members[9];
+          const closedWeek = getTueSunWeekInfo(tenthMember?.createdAtMs || Date.now());
+          if (closedWeek.key === weekObj.key) {
+            completedBoxesReport.push({ product: p, box });
+          }
+        });
+      });
+
+      let body = `RELATÓRIO DE FECHAMENTO SEMANAL — RATEIO OFICIAL\n`;
+      body += `Período: ${weekObj.label}\n`;
+      body += `Total de Boxes Fechados (10/10) nesta semana: ${completedBoxesReport.length}\n`;
+      body += `====================================================\n\n`;
+
+      if (completedBoxesReport.length === 0) {
+        body += `Nenhum Box completou 10/10 peças neste ciclo semanal.\n`;
+      } else {
+        completedBoxesReport.forEach(({ product: p, box }) => {
+          const remaining = Math.max(0, Number(p.fullPrice) - Number(p.depositPrice));
+          body += `PRODUTO: ${p.name} — BOX #${box.boxNumber} (10/10 COMPLETO)\n`;
+          body += `Sinal: ${formatBRL(p.depositPrice)} | Cheio: ${formatBRL(p.fullPrice)} | Restante: ${formatBRL(remaining)}\n`;
+          box.members.forEach((m, idx) => {
+            body += `  #${idx + 1} - ${m.clientName} | Tel: ${m.clientWhatsapp} | E-mail: ${m.clientEmail || '-'}\n`;
+          });
+          body += `\n----------------------------------------------------\n\n`;
+        });
+      }
+
+      return { count: completedBoxesReport.length, text: body };
     }
 
-    // Divide as reservas de um produto em Boxes de 10 em 10
+    window.triggerWeeklyReportEmail = async function (isManual = false, targetWeekKey = null) {
+      const now = Date.now();
+      const targetWeek = targetWeekKey
+        ? getTueSunWeekInfo(new Date(targetWeekKey + "T12:00:00").getTime())
+        : getTueSunWeekInfo(now);
+
+      if (!isManual && weeklyReports[targetWeek.key]?.sent) return;
+
+      const adminEmails = admins.map(a => a.email).filter(Boolean);
+      if (adminEmails.length === 0) return;
+
+      const report = buildClosedBoxesReportText(targetWeek);
+
+      await setDoc(doc(db, "weekly_reports", targetWeek.key), {
+        weekKey: targetWeek.key,
+        weekLabel: targetWeek.label,
+        closedBoxesCount: report.count,
+        recipients: adminEmails,
+        sent: true,
+        sentAtMs: Date.now()
+      }, { merge: true });
+
+      if (storeConfig.emailJsPublicKey && storeConfig.emailJsServiceId && storeConfig.emailJsTemplateId && window.emailjs) {
+        try {
+          for (const email of adminEmails) {
+            await window.emailjs.send(storeConfig.emailJsServiceId, storeConfig.emailJsTemplateId, {
+              to_email: email,
+              subject: `Fechamento Semanal Rateio (${targetWeek.label}) - ${report.count} Box(es) Fechado(s)`,
+              message: report.text
+            });
+          }
+          if (isManual) alert(`Relatório enviado com sucesso para: ${adminEmails.join(", ")}`);
+        } catch (err) {
+          console.error("Erro EmailJS:", err);
+          if (isManual) alert("Falha no envio via EmailJS. Abrindo cliente de e-mail padrão como alternativa...");
+        }
+      } else if (isManual) {
+        const mailto = `mailto:${adminEmails.join(",")}?subject=${encodeURIComponent(`Fechamento Semanal Rateio - ${targetWeek.label}`)}&body=${encodeURIComponent(report.text)}`;
+        window.open(mailto, "_blank");
+      }
+    };
+
+    function checkSunday2359Closing() {
+      const now = new Date();
+      const currentWeek = getTueSunWeekInfo(now.getTime());
+
+      if (now.getDay() === 0 && now.getHours() === 23 && now.getMinutes() >= 59) {
+        if (!weeklyReports[currentWeek.key]?.sent) {
+          triggerWeeklyReportEmail(false, currentWeek.key);
+        }
+      }
+
+      const lastWeekStart = new Date(currentWeek.startMs - 7 * 24 * 60 * 60 * 1000);
+      const lastWeekInfo = getTueSunWeekInfo(lastWeekStart.getTime());
+      if (now.getTime() > lastWeekInfo.endMs && !weeklyReports[lastWeekInfo.key]?.sent && reservations.length > 0) {
+        triggerWeeklyReportEmail(false, lastWeekInfo.key);
+      }
+    }
+
+    setInterval(checkSunday2359Closing, 30000);
+
+    // --- AUTENTICAÇÃO DO CLIENTE ---
+    window.handleClientRegister = async function (e) {
+      e.preventDefault();
+      if (isSiteClosedNow() && !currentAdmin) {
+        alert("O site está fechado às terças e quartas-feiras.");
+        return;
+      }
+      const name = document.getElementById("regName").value.trim();
+      const email = document.getElementById("regEmail").value.trim().toLowerCase();
+      const phone = document.getElementById("regPhone").value.replace(/\D/g, "");
+      const password = document.getElementById("regPassword").value;
+
+      if (phone.length < 10) {
+        alert("Informe um telefone/WhatsApp válido com DDD.");
+        return;
+      }
+      if (users.some(u => (u.email || "").toLowerCase() === email)) {
+        alert("Este e-mail já está cadastrado. Faça login na aba 'Já tenho cadastro'.");
+        switchAuthMode("login");
+        return;
+      }
+
+      const newUserRef = await addDoc(collection(db, "users"), {
+        name,
+        email,
+        phone,
+        password,
+        createdAtMs: Date.now(),
+        createdAt: serverTimestamp()
+      });
+
+      currentUser = { id: newUserRef.id, name, email, phone, password };
+      localStorage.setItem("rateio_user_id", newUserRef.id);
+      document.getElementById("clientRegisterForm").reset();
+      closeClientAuthModal();
+      updateClientHeaderUI();
+
+      if (pendingProductAfterAuth) {
+        const pid = pendingProductAfterAuth;
+        pendingProductAfterAuth = null;
+        openReserveModal(pid);
+      } else {
+        alert(`Bem-vindo(a), ${name}! Cadastro realizado com sucesso.`);
+      }
+    };
+
+    window.handleClientLogin = function (e) {
+      e.preventDefault();
+      if (isSiteClosedNow() && !currentAdmin) {
+        alert("O site está fechado às terças e quartas-feiras.");
+        return;
+      }
+      const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+      const password = document.getElementById("loginPassword").value;
+
+      const found = users.find(u => (u.email || "").toLowerCase() === email && u.password === password);
+      if (!found) {
+        alert("E-mail ou senha inválidos.");
+        return;
+      }
+
+      currentUser = found;
+      localStorage.setItem("rateio_user_id", found.id);
+      document.getElementById("clientLoginForm").reset();
+      closeClientAuthModal();
+      updateClientHeaderUI();
+
+      if (pendingProductAfterAuth) {
+        const pid = pendingProductAfterAuth;
+        pendingProductAfterAuth = null;
+        openReserveModal(pid);
+      }
+    };
+
+    window.logoutClient = function () {
+      currentUser = null;
+      localStorage.removeItem("rateio_user_id");
+      updateClientHeaderUI();
+    };
+
+    function getClientFinancialSummary(user) {
+      if (!user) return { activeRes: [], cancelledRes: [], totalRetainedCredit: 0, totalClosedRemaining: 0, netToPay: 0 };
+
+      const userMatch = (r) =>
+        (r.userId && r.userId === user.id) ||
+        (r.clientEmail && r.clientEmail.toLowerCase() === (user.email || "").toLowerCase()) ||
+        (r.clientWhatsapp && r.clientWhatsapp === user.phone);
+
+      const userReservations = reservations.filter(userMatch);
+      const activeRes = userReservations.filter(r => r.status !== "CANCELLED");
+      const cancelledRes = userReservations.filter(r => r.status === "CANCELLED");
+
+      const totalRetainedCredit = cancelledRes.reduce((acc, r) => acc + Number(r.depositPrice || 0), 0);
+
+      let totalClosedRemaining = 0;
+      activeRes.forEach(r => {
+        const info = getBoxesInfo(r.productId);
+        const myBox = info.boxes.find(b => b.members.some(m => m.id === r.id));
+        const isBoxComplete = myBox ? myBox.isComplete : false;
+        if (isBoxComplete && !r.paidFull) {
+          totalClosedRemaining += Math.max(0, Number(r.fullPrice || 0) - Number(r.depositPrice || 0));
+        }
+      });
+
+      const netToPay = Math.max(0, totalClosedRemaining - totalRetainedCredit);
+
+      return {
+        activeRes,
+        cancelledRes,
+        totalRetainedCredit,
+        totalClosedRemaining,
+        netToPay
+      };
+    }
+
+    function updateClientHeaderUI() {
+      const authBtn = document.getElementById("headerClientBtn");
+      const ordersBtn = document.getElementById("headerMyOrdersBtn");
+      const logoutBtn = document.getElementById("headerLogoutBtn");
+      const bar = document.getElementById("loggedClientBar");
+
+      if (!currentUser) {
+        authBtn.classList.remove("hidden");
+        ordersBtn.classList.add("hidden");
+        logoutBtn.classList.add("hidden");
+        bar.classList.add("hidden");
+        return;
+      }
+
+      const summary = getClientFinancialSummary(currentUser);
+      authBtn.classList.add("hidden");
+      ordersBtn.classList.remove("hidden");
+      logoutBtn.classList.remove("hidden");
+      bar.classList.remove("hidden");
+
+      document.getElementById("headerOrderCount").textContent = summary.activeRes.length;
+      document.getElementById("loggedClientName").textContent = currentUser.name;
+      document.getElementById("loggedClientEmail").textContent = currentUser.email;
+
+      const creditBadge = document.getElementById("loggedClientCreditBadge");
+      if (summary.totalRetainedCredit > 0) {
+        creditBadge.classList.remove("hidden");
+        creditBadge.textContent = `Crédito Retido p/ Abater: ${formatBRL(summary.totalRetainedCredit)}`;
+      } else {
+        creditBadge.classList.add("hidden");
+      }
+    }
+
+    // --- LÓGICA DE BOXES CONTÍNUOS ---
+    function getActiveProductReservations(productId) {
+      return reservations.filter(r => r.productId === productId && r.status !== "CANCELLED");
+    }
+
     function getBoxesInfo(productId) {
-      const allRes = getProductReservations(productId);
-      const total = allRes.length;
+      const allActive = getActiveProductReservations(productId);
+      const total = allActive.length;
       const completedBoxesCount = Math.floor(total / 10);
       const activeBoxNumber = completedBoxesCount + 1;
       const activeBoxStartIndex = completedBoxesCount * 10;
-      const activeBoxReservations = allRes.slice(activeBoxStartIndex, activeBoxStartIndex + 10);
+      const activeBoxReservations = allActive.slice(activeBoxStartIndex, activeBoxStartIndex + 10);
 
       const boxes = [];
       for (let i = 0; i < total; i += 10) {
         const boxNum = Math.floor(i / 10) + 1;
-        const members = allRes.slice(i, i + 10);
+        const members = allActive.slice(i, i + 10);
         boxes.push({
           boxNumber: boxNum,
           members,
@@ -387,7 +1161,7 @@
       }
 
       return {
-        allRes,
+        allActive,
         total,
         completedBoxesCount,
         activeBoxNumber,
@@ -502,6 +1276,17 @@
     };
 
     window.openReserveModal = function (productId) {
+      if (isSiteClosedNow() && !currentAdmin) {
+        alert("O site está fechado às terças e quartas-feiras.");
+        return;
+      }
+      if (!currentUser) {
+        pendingProductAfterAuth = productId;
+        switchAuthMode("register");
+        openClientAuthModal();
+        return;
+      }
+
       const p = products.find(item => item.id === productId);
       if (!p) return;
       const info = getBoxesInfo(p.id);
@@ -510,10 +1295,11 @@
       document.getElementById("modalProductId").value = p.id;
       document.getElementById("modalBoxTag").textContent = `Box #${info.activeBoxNumber} • Vaga #${info.activeBoxCount + 1}/10`;
       document.getElementById("modalProductName").textContent = p.name;
+      document.getElementById("modalClientDisplay").textContent = `${currentUser.name} (${currentUser.phone})`;
       document.getElementById("modalDepositPrice").textContent = formatBRL(p.depositPrice);
       document.getElementById("modalFullPrice").textContent = formatBRL(p.fullPrice);
       document.getElementById("modalRemainingPrice").textContent = formatBRL(remaining);
-      document.getElementById("modalBoxProgress").textContent = `${info.activeBoxCount + 1} de 10 (Total geral: #${info.total + 1})`;
+      document.getElementById("modalBoxProgress").textContent = `${info.activeBoxCount + 1} de 10`;
 
       const pixBox = document.getElementById("pixInstructionBox");
       if (storeConfig.pixKey) {
@@ -526,96 +1312,526 @@
       document.getElementById("reserveModal").classList.remove("hidden");
     };
 
-    window.closeReserveModal = () => document.getElementById("reserveModal").classList.add("hidden");
-
-    // Transação Atômica Contínua: Todas reservas = Sinal Fixo, agrupadas em Boxes de 10
     window.submitReservation = async function (e) {
       e.preventDefault();
-      const btn = document.getElementById("confirmReserveBtn");
-      const productId = document.getElementById("modalProductId").value;
-      const clientName = document.getElementById("clientName").value.trim();
-      const clientWhatsapp = document.getElementById("clientWhatsapp").value.replace(/\D/g, "");
-
-      if (!clientName || clientWhatsapp.length < 10) {
-        alert("Preencha seu nome e WhatsApp com DDD.");
+      if (isSiteClosedNow() && !currentAdmin) {
+        alert("O site está fechado às terças e quartas-feiras.");
         return;
       }
+      if (!currentUser) return;
+
+      const btn = document.getElementById("confirmReserveBtn");
+      const productId = document.getElementById("modalProductId").value;
+      const p = products.find(item => item.id === productId);
+      if (!p) return;
 
       btn.disabled = true;
       btn.textContent = "Registrando reserva...";
 
       try {
-        const prodRef = doc(db, "products", productId);
-        let globalPos = 0;
-        let boxNumber = 1;
-        let posInBox = 1;
-        let productObj = null;
+        const infoBefore = getBoxesInfo(productId);
+        const posInBox = infoBefore.activeBoxCount + 1;
+        const boxNumber = infoBefore.activeBoxNumber;
+        const nowMs = Date.now();
+        const weekInfo = getTueSunWeekInfo(nowMs);
 
-        await runTransaction(db, async (transaction) => {
-          const prodSnap = await transaction.get(prodRef);
-          if (!prodSnap.exists()) throw new Error("Produto não encontrado.");
-          productObj = prodSnap.data();
-
-          const currentTotal = productObj.reservedCount || 0;
-          globalPos = currentTotal + 1;
-          boxNumber = Math.floor(currentTotal / 10) + 1;
-          posInBox = (currentTotal % 10) + 1;
-
-          transaction.update(prodRef, { reservedCount: globalPos });
-
-          const newResRef = doc(collection(db, "reservations"));
-          transaction.set(newResRef, {
-            productId,
-            productName: productObj.name,
-            globalPosition: globalPos,
-            boxNumber,
-            positionInBox: posInBox,
-            clientName,
-            clientWhatsapp,
-            depositPrice: Number(productObj.depositPrice),
-            fullPrice: Number(productObj.fullPrice),
-            paidFull: false,
-            createdAtMs: Date.now(),
-            createdAt: serverTimestamp()
-          });
+        await addDoc(collection(db, "reservations"), {
+          productId,
+          productName: p.name,
+          userId: currentUser.id,
+          clientName: currentUser.name,
+          clientEmail: currentUser.email,
+          clientWhatsapp: currentUser.phone,
+          depositPrice: Number(p.depositPrice),
+          fullPrice: Number(p.fullPrice),
+          status: "ACTIVE",
+          paidFull: false,
+          paidFullAtMs: null,
+          weekKey: weekInfo.key,
+          createdAtMs: nowMs,
+          createdAt: serverTimestamp()
         });
 
-        document.getElementById("reserveForm").reset();
         closeReserveModal();
 
         if (posInBox === 10) {
           alert(
-            `🎉 PARABÉNS ${clientName}!\n\n` +
-            `Você foi a peça #10/10 do BOX #${boxNumber} (reserva geral #${globalPos}) de "${productObj.name}"!\n` +
-            `O BOX #${boxNumber} está COMPLETO e LIBERADO para todos os 10 clientes desse box pagarem o restante do valor!`
+            `🎉 PARABÉNS ${currentUser.name}!\n\n` +
+            `Você completou a 10ª peça (#10/10) do BOX #${boxNumber} de "${p.name}"!\n` +
+            `O BOX #${boxNumber} está LIBERADO para todos os 10 participantes pagarem o valor restante!`
           );
         } else {
           alert(
-            `✅ Reserva confirmada (${formatBRL(productObj.depositPrice)})!\n\n` +
-            `Produto: ${productObj.name}\n` +
-            `Você está na posição #${posInBox}/10 do BOX #${boxNumber} (reserva geral #${globalPos}).\n` +
-            `Assim que o Box #${boxNumber} completar 10 peças, enviaremos a mensagem no seu WhatsApp liberando o pagamento do restante!`
+            `✅ Reserva confirmada (${formatBRL(p.depositPrice)})!\n\n` +
+            `Produto: ${p.name}\n` +
+            `Posição: #${posInBox}/10 no BOX #${boxNumber}.\n` +
+            `Assim que o Box #${boxNumber} fechar 10 peças, o pagamento do restante será liberado.`
           );
         }
       } catch (err) {
-        alert(err.message || "Erro ao registrar reserva.");
+        alert("Erro ao registrar reserva: " + err.message);
       } finally {
         btn.disabled = false;
         btn.textContent = "Confirmar Reserva";
       }
     };
 
+    // --- MEUS PEDIDOS & CANCELAMENTO PELO CLIENTE ---
+    window.cancelClientReservation = async function (resId) {
+      if (isSiteClosedNow() && !currentAdmin) {
+        alert("O site está fechado às terças e quartas-feiras.");
+        return;
+      }
+      const res = reservations.find(r => r.id === resId);
+      if (!res || res.status === "CANCELLED") return;
+
+      const info = getBoxesInfo(res.productId);
+      const myBox = info.boxes.find(b => b.members.some(m => m.id === resId));
+
+      if (myBox && myBox.isComplete) {
+        alert("Este Box já completou 10/10 peças! Não é mais possível cancelar esta reserva.");
+        return;
+      }
+
+      const ok = confirm(
+        `Atenção: Ao cancelar "${res.productName}", o valor da reserva (${formatBRL(res.depositPrice)}) NÃO será devolvido, ` +
+        `mas ficará retido como CRÉDITO para ser abatido da sua conta total caso você tenha outros produtos.\n\nDeseja confirmar o cancelamento?`
+      );
+      if (!ok) return;
+
+      await updateDoc(doc(db, "reservations", resId), {
+        status: "CANCELLED",
+        cancelledAtMs: Date.now()
+      });
+    };
+
+    function renderMyOrders() {
+      const container = document.getElementById("myOrdersBody");
+      if (!container || !currentUser) return;
+
+      document.getElementById("myOrdersSubtitle").textContent = `${currentUser.name} • ${currentUser.email} • ${currentUser.phone}`;
+      const summary = getClientFinancialSummary(currentUser);
+
+      container.innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5">
+            <p class="text-[11px] text-slate-400">Restante em Boxes Fechados (10/10)</p>
+            <p class="text-base font-extrabold text-white mt-0.5">${formatBRL(summary.totalClosedRemaining)}</p>
+          </div>
+          <div class="bg-slate-950 border border-amber-500/30 rounded-xl p-3.5">
+            <p class="text-[11px] text-amber-300">Crédito Retido (Reservas Canceladas)</p>
+            <p class="text-base font-extrabold text-amber-400 mt-0.5">- ${formatBRL(summary.totalRetainedCredit)}</p>
+            <p class="text-[10px] text-slate-500 mt-0.5">Abatido automaticamente na conta total</p>
+          </div>
+          <div class="bg-slate-950 border border-emerald-500/40 rounded-xl p-3.5">
+            <p class="text-[11px] text-emerald-300">Saldo Líquido a Pagar (Conta Total)</p>
+            <p class="text-base font-extrabold text-emerald-400 mt-0.5">${formatBRL(summary.netToPay)}</p>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2.5">Minhas Reservas Ativas (${summary.activeRes.length})</h3>
+          ${summary.activeRes.length === 0 ? `<p class="text-xs text-slate-500">Você não possui reservas ativas no momento.</p>` : `
+            <div class="space-y-2.5">
+              ${summary.activeRes.map(r => {
+                const info = getBoxesInfo(r.productId);
+                const myBox = info.boxes.find(b => b.members.some(m => m.id === r.id));
+                const boxNum = myBox ? myBox.boxNumber : 1;
+                const boxCount = myBox ? myBox.members.length : 1;
+                const isComplete = myBox ? myBox.isComplete : false;
+                const remaining = Math.max(0, Number(r.fullPrice) - Number(r.depositPrice));
+
+                return `
+                  <div class="bg-slate-950 border ${isComplete ? 'border-emerald-500/40' : 'border-slate-800'} rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <span class="text-[11px] font-bold px-2 py-0.5 rounded ${isComplete ? 'bg-emerald-600 text-white' : 'bg-blue-600/20 text-blue-400'}">
+                          Box #${boxNum} (${boxCount}/10)
+                        </span>
+                        <span class="text-xs font-semibold ${isComplete ? 'text-emerald-400' : 'text-amber-300'}">
+                          ${isComplete ? 'LIBERADO P/ PAGAR RESTANTE' : 'Aguardando completar 10 peças'}
+                        </span>
+                      </div>
+                      <h4 class="font-bold text-white text-sm mt-1">${r.productName}</h4>
+                      <p class="text-xs text-slate-400 mt-0.5">
+                        Sinal pago: <strong class="text-blue-400">${formatBRL(r.depositPrice)}</strong> •
+                        Valor cheio: <strong class="text-white">${formatBRL(r.fullPrice)}</strong> •
+                        Restante: <strong class="text-emerald-400">${formatBRL(remaining)}</strong>
+                      </p>
+                    </div>
+
+                    <div>
+                      ${isComplete ? `
+                        <span class="inline-block px-3 py-1.5 rounded-lg bg-emerald-950/70 border border-emerald-700/50 text-emerald-300 text-xs font-semibold">
+                          ${r.paidFull ? 'Quitado ✓' : 'Box Fechado (Não cancelável)'}
+                        </span>
+                      ` : `
+                        <button onclick="cancelClientReservation('${r.id}')"
+                          class="px-3 py-1.5 rounded-lg bg-red-950 hover:bg-red-900/80 border border-red-800/60 text-red-300 text-xs font-semibold transition">
+                          Cancelar Reserva (Reter Sinal)
+                        </button>
+                      `}
+                    </div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          `}
+        </div>
+
+        ${summary.cancelledRes.length > 0 ? `
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">Reservas Canceladas (Sinais Retidos como Crédito)</h3>
+            <div class="space-y-2">
+              ${summary.cancelledRes.map(r => `
+                <div class="bg-slate-950/60 border border-amber-500/20 rounded-xl p-3 flex items-center justify-between text-xs">
+                  <div>
+                    <p class="font-semibold text-slate-300">${r.productName}</p>
+                    <p class="text-[11px] text-slate-500">Cancelado antes de fechar o Box</p>
+                  </div>
+                  <span class="font-bold text-amber-400">+ ${formatBRL(r.depositPrice)} em crédito</span>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        ` : ''}
+      `;
+    }
+
+    // --- ADMIN: ARRECADAÇÃO SEMANAL ---
+    window.renderWeeklyRevenue = function () {
+      const selector = document.getElementById("weeklySelector");
+      const cardsEl = document.getElementById("weeklySummaryCards");
+      const tableEl = document.getElementById("weeklyHistoryTable");
+      if (!selector || !cardsEl || !tableEl) return;
+
+      const weeksMap = new Map();
+      const currentWeek = getTueSunWeekInfo(Date.now());
+      weeksMap.set(currentWeek.key, {
+        ...currentWeek,
+        reservationsCount: 0,
+        depositsTotal: 0,
+        fullPaymentsTotal: 0,
+        grandTotal: 0
+      });
+
+      reservations.forEach(r => {
+        const wRes = getTueSunWeekInfo(r.createdAtMs || Date.now());
+        if (!weeksMap.has(wRes.key)) {
+          weeksMap.set(wRes.key, { ...wRes, reservationsCount: 0, depositsTotal: 0, fullPaymentsTotal: 0, grandTotal: 0 });
+        }
+        const entry = weeksMap.get(wRes.key);
+        entry.reservationsCount += 1;
+        entry.depositsTotal += Number(r.depositPrice || 0);
+        entry.grandTotal += Number(r.depositPrice || 0);
+
+        if (r.paidFull && r.status !== "CANCELLED") {
+          const wPaid = getTueSunWeekInfo(r.paidFullAtMs || r.createdAtMs || Date.now());
+          if (!weeksMap.has(wPaid.key)) {
+            weeksMap.set(wPaid.key, { ...wPaid, reservationsCount: 0, depositsTotal: 0, fullPaymentsTotal: 0, grandTotal: 0 });
+          }
+          const paidEntry = weeksMap.get(wPaid.key);
+          const rem = Math.max(0, Number(r.fullPrice || 0) - Number(r.depositPrice || 0));
+          paidEntry.fullPaymentsTotal += rem;
+          paidEntry.grandTotal += rem;
+        }
+      });
+
+      const sortedWeeks = Array.from(weeksMap.values()).sort((a, b) => b.startMs - a.startMs);
+      const prevSelected = selector.value;
+
+      selector.innerHTML = sortedWeeks.map(w => `
+        <option value="${w.key}">${w.key === currentWeek.key ? 'SEMANA ATUAL: ' : ''}${w.label}</option>
+      `).join("");
+
+      if (prevSelected && weeksMap.has(prevSelected)) selector.value = prevSelected;
+      const selectedWeek = weeksMap.get(selector.value) || sortedWeeks[0];
+
+      cardsEl.innerHTML = `
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+          <p class="text-xs text-slate-400">Sinais Arrecadados (${selectedWeek.reservationsCount} reservas)</p>
+          <p class="text-xl font-extrabold text-blue-400 mt-1">${formatBRL(selectedWeek.depositsTotal)}</p>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+          <p class="text-xs text-slate-400">Restantes Quitados na Semana</p>
+          <p class="text-xl font-extrabold text-purple-400 mt-1">${formatBRL(selectedWeek.fullPaymentsTotal)}</p>
+        </div>
+        <div class="bg-slate-950 border border-emerald-500/40 rounded-xl p-4">
+          <p class="text-xs text-emerald-300 font-semibold">Total Geral Arrecadado (Ter–Dom 23:59)</p>
+          <p class="text-2xl font-extrabold text-emerald-400 mt-1">${formatBRL(selectedWeek.grandTotal)}</p>
+        </div>
+      `;
+
+      tableEl.innerHTML = sortedWeeks.map(w => {
+        const rep = weeklyReports[w.key];
+        return `
+          <tr class="${w.key === selectedWeek.key ? 'bg-blue-950/20' : ''}">
+            <td class="p-3 font-medium text-white">
+              ${w.label}
+              ${w.key === currentWeek.key ? '<span class="ml-2 text-[10px] px-2 py-0.5 rounded bg-blue-600 text-white font-bold">Atual</span>' : ''}
+            </td>
+            <td class="p-3 text-slate-300">${w.reservationsCount}</td>
+            <td class="p-3 text-blue-400">${formatBRL(w.depositsTotal)}</td>
+            <td class="p-3 text-purple-400">${formatBRL(w.fullPaymentsTotal)}</td>
+            <td class="p-3 text-right font-extrabold text-emerald-400">${formatBRL(w.grandTotal)}</td>
+            <td class="p-3 text-center">
+              ${rep?.sent
+                ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300">Enviado ✓</span>`
+                : `<button onclick="triggerWeeklyReportEmail(true, '${w.key}')" class="px-2 py-0.5 rounded text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300">Enviar E-mail</button>`
+              }
+            </td>
+          </tr>
+        `;
+      }).join("");
+    };
+
+    // --- ADMIN: PEDIDOS POR CLIENTE ---
+    window.adminAddProductToClient = async function (userId) {
+      const selectEl = document.getElementById(`admin-add-prod-${userId}`);
+      if (!selectEl || !selectEl.value) {
+        alert("Selecione um produto para adicionar ao cliente.");
+        return;
+      }
+      if (!verifyCurrentAdminPassword()) return;
+
+      const user = users.find(u => u.id === userId);
+      const prod = products.find(p => p.id === selectEl.value);
+      if (!user || !prod) return;
+
+      const nowMs = Date.now();
+      const weekInfo = getTueSunWeekInfo(nowMs);
+
+      await addDoc(collection(db, "reservations"), {
+        productId: prod.id,
+        productName: prod.name,
+        userId: user.id,
+        clientName: user.name,
+        clientEmail: user.email,
+        clientWhatsapp: user.phone,
+        depositPrice: Number(prod.depositPrice),
+        fullPrice: Number(prod.fullPrice),
+        status: "ACTIVE",
+        paidFull: false,
+        paidFullAtMs: null,
+        weekKey: weekInfo.key,
+        createdAtMs: nowMs,
+        createdAt: serverTimestamp()
+      });
+
+      await logAdminAudit("Acrescentou produto ao cliente", `Cliente: ${user.name} (${user.email}) | Produto: ${prod.name}`);
+      alert(`Produto "${prod.name}" adicionado ao pedido de ${user.name}!`);
+    };
+
+    window.adminDeleteClientReservation = async function (resId, productName, clientName) {
+      if (!verifyCurrentAdminPassword()) return;
+      await deleteDoc(doc(db, "reservations", resId));
+      await logAdminAudit("Excluiu reserva de cliente", `Cliente: ${clientName} | Produto: ${productName}`);
+      alert(`Reserva de "${productName}" excluída com sucesso.`);
+    };
+
+    window.renderAdminClients = function () {
+      const container = document.getElementById("adminClientsList");
+      if (!container) return;
+
+      const q = (document.getElementById("adminClientSearch")?.value || "").toLowerCase().trim();
+      const filteredUsers = users.filter(u =>
+        !q ||
+        (u.name || "").toLowerCase().includes(q) ||
+        (u.email || "").toLowerCase().includes(q) ||
+        (u.phone || "").includes(q)
+      );
+
+      if (filteredUsers.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500">Nenhum cliente cadastrado encontrado.</p>`;
+        return;
+      }
+
+      const productOptions = products.map(p => `<option value="${p.id}">${p.name} (Sinal: ${formatBRL(p.depositPrice)} | Cheio: ${formatBRL(p.fullPrice)})</option>`).join("");
+
+      container.innerHTML = filteredUsers.map(u => {
+        const summary = getClientFinancialSummary(u);
+        return `
+          <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
+              <div>
+                <h4 class="font-bold text-white text-sm">${u.name}</h4>
+                <p class="text-xs text-slate-400">E-mail: ${u.email} • Tel/WhatsApp: ${u.phone}</p>
+              </div>
+              <div class="text-right text-xs space-y-0.5">
+                <p class="text-slate-400">Restante Boxes Fechados: <strong class="text-white">${formatBRL(summary.totalClosedRemaining)}</strong></p>
+                <p class="text-amber-400">Crédito Retido (Cancelados): <strong>- ${formatBRL(summary.totalRetainedCredit)}</strong></p>
+                <p class="text-emerald-400 font-bold">Total Líquido a Cobrar: ${formatBRL(summary.netToPay)}</p>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-2">
+              <select id="admin-add-prod-${u.id}" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
+                <option value="">-- Selecione um produto para acrescentar ao cliente --</option>
+                ${productOptions}
+              </select>
+              <button onclick="adminAddProductToClient('${u.id}')" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shrink-0">
+                + Acrescentar Produto (Senha)
+              </button>
+            </div>
+
+            ${summary.activeRes.length === 0 ? `<p class="text-xs text-slate-500">Nenhuma reserva ativa para este cliente.</p>` : `
+              <div class="divide-y divide-slate-900">
+                ${summary.activeRes.map(r => {
+                  const info = getBoxesInfo(r.productId);
+                  const myBox = info.boxes.find(b => b.members.some(m => m.id === r.id));
+                  const boxNum = myBox ? myBox.boxNumber : 1;
+                  const boxCount = myBox ? myBox.members.length : 1;
+                  const isComplete = myBox ? myBox.isComplete : false;
+
+                  return `
+                    <div class="py-2 flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <div>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isComplete ? 'bg-emerald-500/20 text-emerald-400' : 'bg-blue-500/20 text-blue-300'}">
+                          Box #${boxNum} (${boxCount}/10)
+                        </span>
+                        <span class="font-semibold text-white ml-1.5">${r.productName}</span>
+                        <span class="text-slate-400 ml-2">Sinal: ${formatBRL(r.depositPrice)} | Cheio: ${formatBRL(r.fullPrice)}</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <button onclick="togglePaidFull('${r.id}', ${!!r.paidFull})"
+                          class="px-2.5 py-1 rounded font-semibold ${r.paidFull ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-300'}">
+                          ${r.paidFull ? 'Quitado ✓' : 'Marcar Quitado'}
+                        </button>
+                        <button onclick="adminDeleteClientReservation('${r.id}', '${r.productName.replace(/'/g, "")}', '${u.name.replace(/'/g, "")}')"
+                          class="px-2.5 py-1 rounded bg-red-950 hover:bg-red-900 text-red-300 font-semibold">
+                          Excluir (Senha)
+                        </button>
+                      </div>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
+            `}
+          </div>
+        `;
+      }).join("");
+    };
+
+    // --- ADMIN: BOXES & COBRANÇA ---
+    window.togglePaidFull = async function (resId, currentStatus) {
+      const res = reservations.find(r => r.id === resId);
+      await updateDoc(doc(db, "reservations", resId), {
+        paidFull: !currentStatus,
+        paidFullAtMs: !currentStatus ? Date.now() : null
+      });
+      if (res) {
+        await logAdminAudit(
+          !currentStatus ? "Marcou pagamento integral como Quitado" : "Desmarcou pagamento integral",
+          `Cliente: ${res.clientName} | Produto: ${res.productName}`
+        );
+      }
+    };
+
+    window.renderAdminClosings = function () {
+      const container = document.getElementById("adminClosingsList");
+      if (!container) return;
+      const filter = document.getElementById("adminClosingFilter").value;
+
+      const allBoxCards = [];
+      products.forEach(p => {
+        const info = getBoxesInfo(p.id);
+        const remaining = Math.max(0, Number(p.fullPrice) - Number(p.depositPrice));
+
+        info.boxes.forEach(box => {
+          if (filter === "COMPLETED" && !box.isComplete) return;
+          if (filter === "IN_PROGRESS" && box.isComplete) return;
+          allBoxCards.push({ product: p, box, remaining });
+        });
+      });
+
+      allBoxCards.sort((a, b) => (b.box.isComplete ? 1 : 0) - (a.box.isComplete ? 1 : 0));
+
+      if (allBoxCards.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500">Nenhum box encontrado neste filtro.</p>`;
+        return;
+      }
+
+      container.innerHTML = allBoxCards.map(({ product: p, box, remaining }) => {
+        return `
+          <div class="bg-slate-950 border ${box.isComplete ? 'border-emerald-500/50' : 'border-slate-800'} rounded-xl p-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
+              <div>
+                <span class="text-xs font-bold ${box.isComplete ? 'text-emerald-400' : 'text-blue-400'}">
+                  ${box.isComplete ? `✅ BOX #${box.boxNumber} COMPLETO (10/10) — LIBERADO P/ PAGAR RESTANTE` : `⏳ BOX #${box.boxNumber} EM ANDAMENTO (${box.members.length}/10)`}
+                </span>
+                <h4 class="font-bold text-white text-sm">${p.name}</h4>
+              </div>
+              <div class="text-right text-xs">
+                <span class="text-slate-400">Cheio: <strong class="text-white">${formatBRL(p.fullPrice)}</strong></span> |
+                <span class="text-slate-400">Sinal: <strong class="text-blue-400">${formatBRL(p.depositPrice)}</strong></span> |
+                <span class="text-slate-400">Restante base: <strong class="text-emerald-400">${formatBRL(remaining)}</strong></span>
+              </div>
+            </div>
+
+            <div class="mt-3 divide-y divide-slate-900">
+              ${box.members.map((r, idx) => {
+                const clientObj = users.find(u => u.id === r.userId || (u.email && u.email === r.clientEmail));
+                const clientSummary = clientObj ? getClientFinancialSummary(clientObj) : { totalRetainedCredit: 0 };
+                const creditAvailable = clientSummary.totalRetainedCredit;
+                const finalToCharge = Math.max(0, remaining - creditAvailable);
+
+                const msg = encodeURIComponent(
+                  `Olá ${r.clientName}! Ótima notícia! 🎉\n\n` +
+                  `O *Box #${box.boxNumber}* do produto *${p.name}* completou 10/10 e está *LIBERADO*!\n\n` +
+                  `• Sua vaga: #${idx + 1}/10 do Box #${box.boxNumber}\n` +
+                  `• Valor Cheio: ${formatBRL(p.fullPrice)}\n` +
+                  `• Sinal já pago: -${formatBRL(p.depositPrice)}\n` +
+                  (creditAvailable > 0 ? `• Crédito retido abatido: -${formatBRL(creditAvailable)}\n` : '') +
+                  `• *Valor Restante a Pagar: ${formatBRL(finalToCharge)}*\n` +
+                  (storeConfig.pixKey ? `\nChave PIX: ${storeConfig.pixKey}` : '')
+                );
+
+                return `
+                  <div class="py-2 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center gap-2">
+                      <span class="w-6 h-6 rounded-full font-bold flex items-center justify-center ${box.isComplete ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-200'}">
+                        #${idx + 1}
+                      </span>
+                      <div>
+                        <p class="font-semibold text-white">
+                          ${r.clientName}
+                          ${creditAvailable > 0 ? `<span class="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">Crédito cliente: ${formatBRL(creditAvailable)}</span>` : ''}
+                        </p>
+                        <p class="text-slate-400">WhatsApp: ${r.clientWhatsapp}</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button onclick="togglePaidFull('${r.id}', ${!!r.paidFull})"
+                        class="px-2.5 py-1 rounded font-semibold ${r.paidFull ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-300'}">
+                        ${r.paidFull ? 'Restante Pago ✓' : 'Marcar Pago'}
+                      </button>
+                      <a href="https://wa.me/55${r.clientWhatsapp}?text=${msg}" target="_blank"
+                        class="px-3 py-1 rounded ${box.isComplete ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'} font-semibold">
+                        ${box.isComplete ? `Cobrar ${formatBRL(finalToCharge)}` : 'WhatsApp'}
+                      </a>
+                    </div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `;
+      }).join("");
+    };
+
+    // --- ADMIN: PRODUTOS ---
     window.addSingleProduct = async function (e) {
       e.preventDefault();
+      const name = document.getElementById("prodName").value.trim();
       await addDoc(collection(db, "products"), {
-        name: document.getElementById("prodName").value.trim(),
+        name,
         depositPrice: Number(document.getElementById("prodDeposit").value),
         fullPrice: Number(document.getElementById("prodFull").value),
         category: document.getElementById("prodCategory").value.trim() || "Geral",
         image: document.getElementById("prodImage").value.trim(),
-        reservedCount: 0,
         createdAt: serverTimestamp()
       });
+      await logAdminAudit("Cadastrou produto", `Produto: ${name}`);
       e.target.reset();
       document.getElementById("prodDeposit").value = "20";
       alert("Produto cadastrado!");
@@ -636,22 +1852,19 @@
           fullPrice: Number(full),
           category: cat || "Geral",
           image: img || "",
-          reservedCount: 0,
           createdAt: serverTimestamp()
         });
         count++;
       }
+      await logAdminAudit("Importação em massa de produtos", `${count} produtos importados`);
       document.getElementById("bulkInput").value = "";
       alert(`${count} produtos importados com sucesso!`);
     };
 
-    window.deleteProduct = async function (productId) {
-      if (!confirm("Excluir este produto?")) return;
+    window.deleteProduct = async function (productId, prodName) {
+      if (!verifyCurrentAdminPassword()) return;
       await deleteDoc(doc(db, "products", productId));
-    };
-
-    window.togglePaidFull = async function (resId, currentStatus) {
-      await updateDoc(doc(db, "reservations", resId), { paidFull: !currentStatus });
+      await logAdminAudit("Excluiu produto do catálogo", `Produto: ${prodName}`);
     };
 
     window.renderAdminProducts = function () {
@@ -670,116 +1883,119 @@
                 ${info.completedBoxesCount} Box(es) Fechado(s)
               </span>
               <span class="ml-1 px-2 py-0.5 rounded text-[11px] bg-slate-800 text-slate-300">
-                Box #${info.activeBoxNumber}: ${info.activeBoxCount}/10 (Total: ${info.total})
+                Box #${info.activeBoxNumber}: ${info.activeBoxCount}/10 (Ativas: ${info.total})
               </span>
             </td>
             <td class="p-3 text-right">
-              <button onclick="deleteProduct('${p.id}')" class="px-2.5 py-1 rounded bg-red-950 text-red-400 text-[11px]">Excluir</button>
+              <button onclick="deleteProduct('${p.id}', '${p.name.replace(/'/g, "")}')" class="px-2.5 py-1 rounded bg-red-950 text-red-400 text-[11px]">Excluir</button>
             </td>
           </tr>
         `;
       }).join("");
     };
 
-    window.renderAdminClosings = function () {
-      const container = document.getElementById("adminClosingsList");
-      if (!container) return;
-      const filter = document.getElementById("adminClosingFilter").value;
+    // --- GESTÃO DE NOVOS ADMINS & AUDITORIA ---
+    window.addNewAdmin = async function (e) {
+      e.preventDefault();
+      if (!verifyCurrentAdminPassword()) return;
 
-      const allBoxCards = [];
+      const name = document.getElementById("newAdminName").value.trim();
+      const email = document.getElementById("newAdminEmail").value.trim().toLowerCase();
+      const password = document.getElementById("newAdminPass").value;
 
-      products.forEach(p => {
-        const info = getBoxesInfo(p.id);
-        const remaining = Math.max(0, Number(p.fullPrice) - Number(p.depositPrice));
-
-        info.boxes.forEach(box => {
-          if (filter === "COMPLETED" && !box.isComplete) return;
-          if (filter === "IN_PROGRESS" && box.isComplete) return;
-
-          allBoxCards.push({
-            product: p,
-            box,
-            remaining
-          });
-        });
-      });
-
-      // Ordenar para mostrar primeiro os Boxes Completos (10/10)
-      allBoxCards.sort((a, b) => (b.box.isComplete ? 1 : 0) - (a.box.isComplete ? 1 : 0));
-
-      if (allBoxCards.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-500">Nenhum box encontrado neste filtro.</p>`;
+      if (admins.some(a => (a.email || "").toLowerCase() === email)) {
+        alert("Já existe um administrador cadastrado com este e-mail.");
         return;
       }
 
-      container.innerHTML = allBoxCards.map(({ product: p, box, remaining }) => {
-        return `
-          <div class="bg-slate-950 border ${box.isComplete ? 'border-emerald-500/50' : 'border-slate-800'} rounded-xl p-4">
-            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
-              <div>
-                <span class="text-xs font-bold ${box.isComplete ? 'text-emerald-400' : 'text-blue-400'}">
-                  ${box.isComplete ? `✅ BOX #${box.boxNumber} COMPLETO (10/10) — LIBERADO P/ PAGAR RESTANTE` : `⏳ BOX #${box.boxNumber} EM ANDAMENTO (${box.members.length}/10) — AGUARDANDO FECHAR 10`}
-                </span>
-                <h4 class="font-bold text-white text-sm">${p.name}</h4>
-              </div>
-              <div class="text-right text-xs">
-                <span class="text-slate-400">Cheio: <strong class="text-white">${formatBRL(p.fullPrice)}</strong></span> |
-                <span class="text-slate-400">Sinal: <strong class="text-blue-400">${formatBRL(p.depositPrice)}</strong></span> |
-                <span class="text-slate-400">Restante: <strong class="text-emerald-400">${formatBRL(remaining)}</strong></span>
-              </div>
-            </div>
+      await addDoc(collection(db, "admins"), {
+        name,
+        email,
+        password,
+        isMaster: false,
+        createdAtMs: Date.now()
+      });
 
-            <div class="mt-3 divide-y divide-slate-900">
-              ${box.members.map((r, idx) => {
-                const msg = encodeURIComponent(
-                  `Olá ${r.clientName}! Ótima notícia! 🎉\n\n` +
-                  `O *Box #${box.boxNumber}* do produto *${p.name}* completou as 10 reservas (10/10) e já está *LIBERADO* para o pagamento do restante!\n\n` +
-                  `• Sua vaga: #${idx + 1}/10 do Box #${box.boxNumber}\n` +
-                  `• Valor Cheio: ${formatBRL(p.fullPrice)}\n` +
-                  `• Sinal já pago: -${formatBRL(p.depositPrice)}\n` +
-                  `• *Valor Restante a Pagar: ${formatBRL(remaining)}*\n` +
-                  (storeConfig.pixKey ? `\nChave PIX: ${storeConfig.pixKey}` : '')
-                );
-                return `
-                  <div class="py-2 flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <div class="flex items-center gap-2">
-                      <span class="w-6 h-6 rounded-full font-bold flex items-center justify-center ${box.isComplete ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-200'}">
-                        #${idx + 1}
-                      </span>
-                      <div>
-                        <p class="font-semibold text-white">
-                          ${r.clientName}
-                          <span class="ml-1.5 text-[10px] text-slate-400">(Geral #${r.globalPosition || ((box.boxNumber - 1) * 10 + idx + 1)})</span>
-                        </p>
-                        <p class="text-slate-400">WhatsApp: ${r.clientWhatsapp}</p>
-                      </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <button onclick="togglePaidFull('${r.id}', ${!!r.paidFull})"
-                        class="px-2.5 py-1 rounded font-semibold ${r.paidFull ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-300'}">
-                        ${r.paidFull ? 'Restante Pago ✓' : 'Marcar Pago'}
-                      </button>
-                      <a href="https://wa.me/55${r.clientWhatsapp}?text=${msg}" target="_blank"
-                        class="px-3 py-1 rounded ${box.isComplete ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'} font-semibold">
-                        ${box.isComplete ? `Liberar Restante (${formatBRL(remaining)})` : 'WhatsApp'}
-                      </a>
-                    </div>
-                  </div>
-                `;
-              }).join("")}
-            </div>
-          </div>
-        `;
-      }).join("");
+      await logAdminAudit("Cadastrou novo administrador", `Novo Admin: ${name} (${email})`);
+      e.target.reset();
+      alert(`Administrador ${name} cadastrado com sucesso!`);
     };
 
+    window.deleteAdminAccount = async function (adminId, adminName) {
+      if (admins.length <= 1) {
+        alert("Não é possível excluir o único administrador do sistema.");
+        return;
+      }
+      if (!verifyCurrentAdminPassword()) return;
+      await deleteDoc(doc(db, "admins", adminId));
+      await logAdminAudit("Removeu administrador", `Admin removido: ${adminName}`);
+    };
+
+    function renderAdminsAndAudit() {
+      const adminsTbody = document.getElementById("adminsTableBody");
+      const logsTbody = document.getElementById("auditLogsTableBody");
+
+      if (adminsTbody) {
+        adminsTbody.innerHTML = admins.map(a => `
+          <tr>
+            <td class="p-3 font-semibold text-white">
+              ${a.name}
+              ${currentAdmin && currentAdmin.id === a.id ? '<span class="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-blue-600 text-white">Você</span>' : ''}
+            </td>
+            <td class="p-3 text-slate-300">${a.email}</td>
+            <td class="p-3 text-slate-400">${formatDateTime(a.createdAtMs)}</td>
+            <td class="p-3 text-right">
+              <button onclick="deleteAdminAccount('${a.id}', '${a.name.replace(/'/g, "")}')" class="px-2.5 py-1 rounded bg-red-950 text-red-400 text-[11px]">
+                Remover
+              </button>
+            </td>
+          </tr>
+        `).join("");
+      }
+
+      if (logsTbody) {
+        logsTbody.innerHTML = auditLogs.length === 0
+          ? `<tr><td colspan="4" class="p-4 text-center text-slate-500">Nenhuma alteração registrada ainda.</td></tr>`
+          : auditLogs.map(log => `
+            <tr>
+              <td class="p-3 text-slate-400 whitespace-nowrap">${formatDateTime(log.createdAtMs)}</td>
+              <td class="p-3 font-semibold text-blue-300">${log.adminName} <span class="text-slate-500 font-normal">(${log.adminEmail})</span></td>
+              <td class="p-3 font-medium text-white">${log.action}</td>
+              <td class="p-3 text-slate-300">${log.details}</td>
+            </tr>
+          `).join("");
+      }
+    }
+
+    // --- CONFIGURAÇÕES ---
     window.saveSettings = async function () {
+      if (!verifyCurrentAdminPassword()) return;
       const pixKey = document.getElementById("settingPixKey").value.trim();
       const storeWhatsapp = document.getElementById("settingStoreWhatsapp").value.trim();
-      const newPass = document.getElementById("settingAdminPass").value.trim();
 
-      const payload = { pixKey, storeWhatsapp };
-      if (newPass) payload.adminPass = newPass;
+      await setDoc(doc(db, "config", "store"), { pixKey, storeWhatsapp }, { merge: true });
+      await logAdminAudit("Alterou dados da loja / PIX", `PIX: ${pixKey || 'vazio'}`);
+      alert("Dados da loja salvos!");
+    };
 
-      await setDoc(doc(db, "config", "store"), payload, { merge: true });
-      alert("Configurações salvas no banco de dados!");
+    window.saveEmailJsSettings = async function () {
+      if (!verifyCurrentAdminPassword()) return;
+      const emailJsPublicKey = document.getElementById("settingEmailJsPublicKey").value.trim();
+      const emailJsServiceId = document.getElementById("settingEmailJsServiceId").value.trim();
+      const emailJsTemplateId = document.getElementById("settingEmailJsTemplateId").value.trim();
+
+      await setDoc(doc(db, "config", "store"), {
+        emailJsPublicKey,
+        emailJsServiceId,
+        emailJsTemplateId
+      }, { merge: true });
+
+      if (emailJsPublicKey && window.emailjs) {
+        window.emailjs.init({ publicKey: emailJsPublicKey });
+      }
+      await logAdminAudit("Configurou disparo de e-mail EmailJS", "Integração de relatório semanal atualizada");
+      alert("Configurações de envio de e-mail salvas!");
+    };
+  </script>
+</body>
+</html>
