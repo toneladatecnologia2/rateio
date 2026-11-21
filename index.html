@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sistema de Rateio & Compra Coletiva</title>
+  <title>Nexxus Oficial BR — Rateio & Compra Coletiva</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,11 +24,11 @@
       </div>
       <div>
         <span class="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
-          Site Fechado • Terça e Quarta-feira
+          Nexxus Oficial BR • Fechado Terça e Quarta
         </span>
         <h2 class="text-2xl font-extrabold text-white mt-3">Voltamos na Quinta-feira!</h2>
         <p class="text-sm text-slate-400 mt-2 leading-relaxed">
-          Nosso sistema de rateio permanece fechado todas as <strong class="text-slate-200">terças e quartas-feiras</strong> para conferência de boxes e atualização de catálogo.
+          O sistema da <strong class="text-white">Nexxus Oficial BR</strong> permanece fechado todas as <strong class="text-slate-200">terças e quartas-feiras</strong> para conferência de boxes e atualização de catálogo.
         </p>
       </div>
 
@@ -50,11 +50,11 @@
   <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-extrabold text-white text-lg shadow-lg shadow-blue-600/30">
-          R10
+        <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-extrabold text-white text-base shadow-lg shadow-blue-600/30">
+          NX
         </div>
         <div>
-          <h1 class="font-bold text-base sm:text-lg leading-tight text-white">Rateio Oficial</h1>
+          <h1 class="font-bold text-base sm:text-lg leading-tight text-white">Nexxus Oficial BR</h1>
           <p class="text-[11px] sm:text-xs text-slate-400">Boxes contínuos de 10 peças • Aberto de Qui a Seg</p>
         </div>
       </div>
@@ -148,7 +148,7 @@
     </div>
   </section>
 
-  <!-- Catálogo de Produtos -->
+  <!-- Catálogo de Produtos (Sem Imagens) -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div id="loadingState" class="text-center py-16">
       <div class="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -157,7 +157,7 @@
 
     <div id="emptyState" class="hidden text-center py-16 bg-slate-900/50 border border-slate-800 rounded-2xl">
       <p class="text-slate-300 font-semibold">Nenhum produto encontrado</p>
-      <p class="text-slate-500 text-sm mt-1">Cadastre produtos no Painel Admin ou ajuste os filtros.</p>
+      <p class="text-slate-500 text-sm mt-1">Aguarde o cadastro de produtos ou ajuste os filtros de busca.</p>
     </div>
 
     <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
@@ -285,7 +285,7 @@
     <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
         <div>
-          <h2 class="text-lg font-bold text-white">Meus Pedidos & Saldo de Conta</h2>
+          <h2 class="text-lg font-bold text-white">Meus Pedidos & Saldo de Conta — Nexxus Oficial BR</h2>
           <p id="myOrdersSubtitle" class="text-xs text-slate-400"></p>
         </div>
         <button onclick="closeMyOrdersModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
@@ -295,12 +295,12 @@
     </div>
   </div>
 
-  <!-- MODAL 4: PAINEL ADMINISTRATIVO -->
+  <!-- MODAL 4: PAINEL ADMINISTRATIVO (EXCLUSIVO ADMINS) -->
   <div id="adminModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-6xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between gap-2">
         <div>
-          <h2 class="text-lg font-bold text-white">Painel Administrativo — Gestão & Auditoria</h2>
+          <h2 class="text-lg font-bold text-white">Painel Administrativo — Nexxus Oficial BR</h2>
           <p id="loggedAdminBanner" class="hidden text-xs text-emerald-400"></p>
         </div>
         <div class="flex items-center gap-3">
@@ -342,10 +342,10 @@
             Boxes & Cobrança
           </button>
           <button onclick="switchAdminTab('products')" id="tab-products" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
-            Produtos Cadastrados
+            Cadastrar Produto (1 a 1)
           </button>
           <button onclick="switchAdminTab('bulk')" id="tab-bulk" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
-            Cadastro em Massa (+100)
+            Cadastro em Lote (+100)
           </button>
           <button onclick="switchAdminTab('admins')" id="tab-admins" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
             Admins & Auditoria
@@ -425,16 +425,41 @@
             <div id="adminClosingsList" class="space-y-4"></div>
           </div>
 
-          <!-- ABA 4: CADASTRAR / GERENCIAR PRODUTOS -->
+          <!-- ABA 4: CADASTRAR PRODUTO MANUALMENTE UM A UM (INSTRUÇÕES VISÍVEIS SOMENTE PARA ADMINS) -->
           <div id="view-products" class="hidden space-y-6">
+            <!-- Guia Exclusivo Admin: Cadastro Individual -->
+            <div class="bg-blue-950/35 border border-blue-800/60 rounded-xl p-4 space-y-2 text-xs">
+              <div class="flex items-center gap-2 text-blue-300 font-bold">
+                <span>📘 Instruções para Cadastro Manual (Um a Um) — Área Exclusiva Admin</span>
+              </div>
+              <ol class="list-decimal list-inside space-y-1 text-slate-300 leading-relaxed">
+                <li><strong>Nome do Produto:</strong> Digite o título completo do item (ex: <em>Perfume Sauvage Elixir 100ml</em> ou <em>Kit 5 Camisetas Básicas</em>).</li>
+                <li><strong>Sinal Fixo (R$):</strong> Informe o valor cobrado na reserva inicial de cada vaga (padrão <code>20</code> para R$ 20,00). Use ponto para centavos (ex: <code>25.50</code>).</li>
+                <li><strong>Valor Cheio (R$):</strong> Informe o preço final total do produto. Quando o Box atingir 10 peças, o sistema calculará automaticamente o restante (<code>Valor Cheio - Sinal</code>).</li>
+                <li><strong>Categoria:</strong> Informe o grupo do produto (ex: <em>Perfumes</em>, <em>Eletrônicos</em>, <em>Moda</em>) para criar filtros automáticos na loja.</li>
+                <li>Clique em <strong>Salvar Produto</strong> — ele aparecerá imediatamente no catálogo da <strong>Nexxus Oficial BR</strong> no <strong>Box #1 (0/10)</strong>.</li>
+              </ol>
+            </div>
+
             <form onsubmit="addSingleProduct(event)" class="bg-slate-950 border border-slate-800 rounded-xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-              <input id="prodName" type="text" required placeholder="Nome do Produto" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
-              <input id="prodDeposit" type="number" step="0.01" value="20" required placeholder="Sinal Fixo (ex: 20)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
-              <input id="prodFull" type="number" step="0.01" required placeholder="Valor Cheio (R$)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
-              <input id="prodCategory" type="text" placeholder="Categoria (ex: Perfumes)" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
-              <div class="flex gap-2">
-                <input id="prodImage" type="url" placeholder="URL da Foto (opcional)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
-                <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shrink-0">Salvar</button>
+              <div class="lg:col-span-2">
+                <label class="block text-[11px] text-slate-400 mb-1">Nome do Produto *</label>
+                <input id="prodName" type="text" required placeholder="Ex: Perfume Importado 100ml" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] text-slate-400 mb-1">Sinal Fixo (R$) *</label>
+                <input id="prodDeposit" type="number" step="0.01" value="20" required placeholder="20.00" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] text-slate-400 mb-1">Valor Cheio (R$) *</label>
+                <input id="prodFull" type="number" step="0.01" required placeholder="Ex: 350.00" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
+              </div>
+              <div>
+                <label class="block text-[11px] text-slate-400 mb-1">Categoria & Ação</label>
+                <div class="flex gap-2">
+                  <input id="prodCategory" type="text" placeholder="Ex: Perfumes" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
+                  <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shrink-0">Salvar</button>
+                </div>
               </div>
             </form>
 
@@ -455,15 +480,34 @@
             </div>
           </div>
 
-          <!-- ABA 5: CADASTRO EM MASSA -->
+          <!-- ABA 5: CADASTRO EM LOTE / MASSA (INSTRUÇÕES VISÍVEIS SOMENTE PARA ADMINS) -->
           <div id="view-bulk" class="hidden space-y-4">
+            <!-- Guia Exclusivo Admin: Cadastro em Lote -->
+            <div class="bg-emerald-950/30 border border-emerald-800/60 rounded-xl p-4 space-y-2 text-xs">
+              <div class="flex items-center gap-2 text-emerald-300 font-bold">
+                <span>📗 Instruções para Cadastro em Lote (+100 Produtos) — Área Exclusiva Admin</span>
+              </div>
+              <p class="text-slate-300">Para cadastrar dezenas ou centenas de produtos de uma só vez, siga exatamente este padrão:</p>
+              <ul class="list-disc list-inside space-y-1 text-slate-300 leading-relaxed">
+                <li>Coloque <strong>1 produto por linha</strong> separando os 4 campos por <strong>ponto e vírgula (<code>;</code>)</strong>.</li>
+                <li>Ordem obrigatória dos campos: <code class="text-emerald-300 bg-slate-950 px-1.5 py-0.5 rounded">Nome do Produto; Valor do Sinal; Valor Cheio; Categoria</code></li>
+                <li>Use <strong>ponto (<code>.</code>)</strong> para centavos e <strong>não</strong> coloque "R$" antes dos números.</li>
+                <li>Exemplo válido:<br>
+                  <code class="block mt-1 bg-slate-950 p-2 rounded border border-slate-800 text-blue-300 font-mono">
+                    Perfume Bleu 100ml; 20.00; 580.00; Perfumes<br>
+                    Relógio Esportivo Pro; 20.00; 240.00; Acessórios<br>
+                    Fone Sem Fio ANC; 20.00; 190.00; Eletrônicos
+                  </code>
+                </li>
+              </ul>
+            </div>
+
             <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
-              <h3 class="font-bold text-sm text-white">Importar Lista de 100+ Produtos</h3>
-              <p class="text-xs text-slate-400 mt-1">Cole uma linha por produto no formato: <code class="text-blue-400">Nome do Produto; Valor Sinal; Valor Cheio; Categoria; URL da Imagem</code></p>
-              <textarea id="bulkInput" rows="8" placeholder="Perfume Sauvage Elixir 100ml; 20.00; 650.00; Perfumes; https://exemplo.com/foto.jpg&#10;Fone Bluetooth Pro; 20.00; 180.00; Eletrônicos; "
+              <h3 class="font-bold text-sm text-white">Cole sua lista de produtos abaixo:</h3>
+              <textarea id="bulkInput" rows="9" placeholder="Perfume Sauvage Elixir 100ml; 20.00; 650.00; Perfumes&#10;Fone Bluetooth Pro; 20.00; 180.00; Eletrônicos&#10;Tênis Corrida Ultra; 20.00; 320.00; Calçados"
                 class="w-full mt-3 bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-white font-mono outline-none focus:border-blue-500"></textarea>
               <button onclick="importBulkProducts()" class="mt-3 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs">
-                Importar Todos os Produtos Agora
+                Importar Todos os Produtos em Lote Agora
               </button>
             </div>
           </div>
@@ -608,14 +652,13 @@
 
     // --- CONTROLE DE BLOQUEIO TOTAL ÀS TERÇAS (2) E QUARTAS (3) ---
     function getBrazilDate() {
-      // Converte o relógio atual para o fuso America/Sao_Paulo independente do dispositivo do cliente
       const str = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
       return new Date(str);
     }
 
     function isSiteClosedNow() {
       const brNow = getBrazilDate();
-      const day = brNow.getDay(); // 0=Dom, 1=Seg, 2=Terça, 3=Quarta, 4=Qui, 5=Sex, 6=Sab
+      const day = brNow.getDay(); // 2=Terça, 3=Quarta
       return day === 2 || day === 3;
     }
 
@@ -627,7 +670,6 @@
       if (closed && !currentAdmin) {
         overlay.classList.remove("hidden");
         bypassBadge.classList.add("hidden");
-        // Fecha modais de cliente se estiverem abertos
         document.getElementById("clientAuthModal").classList.add("hidden");
         document.getElementById("reserveModal").classList.add("hidden");
         document.getElementById("myOrdersModal").classList.add("hidden");
@@ -642,7 +684,7 @@
 
       if (closed) {
         const brNow = getBrazilDate();
-        const day = brNow.getDay(); // 2 (Ter) ou 3 (Qua)
+        const day = brNow.getDay();
         const daysUntilThursday = day === 2 ? 2 : 1;
         const reopenDate = new Date(
           brNow.getFullYear(),
@@ -905,7 +947,7 @@
         });
       });
 
-      let body = `RELATÓRIO DE FECHAMENTO SEMANAL — RATEIO OFICIAL\n`;
+      let body = `RELATÓRIO DE FECHAMENTO SEMANAL — NEXXUS OFICIAL BR\n`;
       body += `Período: ${weekObj.label}\n`;
       body += `Total de Boxes Fechados (10/10) nesta semana: ${completedBoxesReport.length}\n`;
       body += `====================================================\n\n`;
@@ -954,7 +996,7 @@
           for (const email of adminEmails) {
             await window.emailjs.send(storeConfig.emailJsServiceId, storeConfig.emailJsTemplateId, {
               to_email: email,
-              subject: `Fechamento Semanal Rateio (${targetWeek.label}) - ${report.count} Box(es) Fechado(s)`,
+              subject: `Fechamento Semanal Nexxus Oficial BR (${targetWeek.label}) - ${report.count} Box(es) Fechado(s)`,
               message: report.text
             });
           }
@@ -964,7 +1006,7 @@
           if (isManual) alert("Falha no envio via EmailJS. Abrindo cliente de e-mail padrão como alternativa...");
         }
       } else if (isManual) {
-        const mailto = `mailto:${adminEmails.join(",")}?subject=${encodeURIComponent(`Fechamento Semanal Rateio - ${targetWeek.label}`)}&body=${encodeURIComponent(report.text)}`;
+        const mailto = `mailto:${adminEmails.join(",")}?subject=${encodeURIComponent(`Fechamento Semanal Nexxus Oficial BR - ${targetWeek.label}`)}&body=${encodeURIComponent(report.text)}`;
         window.open(mailto, "_blank");
       }
     };
@@ -1030,7 +1072,7 @@
         pendingProductAfterAuth = null;
         openReserveModal(pid);
       } else {
-        alert(`Bem-vindo(a), ${name}! Cadastro realizado com sucesso.`);
+        alert(`Bem-vindo(a) à Nexxus Oficial BR, ${name}! Cadastro realizado com sucesso.`);
       }
     };
 
@@ -1180,6 +1222,7 @@
       if (cats.includes(current)) select.value = current;
     }
 
+    // --- RENDERIZAÇÃO DO CATÁLOGO (SEM IMAGENS) ---
     window.renderCatalog = function () {
       const search = document.getElementById("searchInput").value.toLowerCase().trim();
       const cat = document.getElementById("categoryFilter").value;
@@ -1206,69 +1249,71 @@
       grid.innerHTML = filtered.map(p => {
         const info = getBoxesInfo(p.id);
         const pct = (info.activeBoxCount / 10) * 100;
-        const imgUrl = p.image || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80";
 
         return `
-          <div class="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl overflow-hidden flex flex-col shadow-lg transition">
-            <div class="relative h-44 bg-slate-950">
-              <img src="${imgUrl}" alt="${p.name}" class="w-full h-full object-cover opacity-90" />
-              <span class="absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-blue-600 text-white shadow">
-                Box #${info.activeBoxNumber} Aberto
-              </span>
-              <span class="absolute top-3 right-3 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-950/90 text-slate-200 border border-slate-700">
-                ${info.activeBoxCount}/10 no Box
-              </span>
-              ${info.completedBoxesCount > 0 ? `
-                <span class="absolute bottom-2.5 left-3 text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-600 text-white shadow">
-                  ✓ ${info.completedBoxesCount} ${info.completedBoxesCount === 1 ? 'Box Fechado' : 'Boxes Fechados'} (Liberado)
+          <div class="bg-slate-900 border border-slate-800 hover:border-blue-500/40 rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-lg transition">
+            <div>
+              <!-- Cabeçalho do Card (Tags de Box sem imagem) -->
+              <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800/80">
+                <span class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30">
+                  Box #${info.activeBoxNumber} Aberto
                 </span>
-              ` : ''}
-            </div>
+                <span class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-950 text-slate-200 border border-slate-800">
+                  ${info.activeBoxCount}/10 no Box
+                </span>
+              </div>
 
-            <div class="p-4 flex-1 flex flex-col justify-between space-y-4">
-              <div>
+              ${info.completedBoxesCount > 0 ? `
+                <div class="mt-2.5">
+                  <span class="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded bg-emerald-600/20 text-emerald-300 border border-emerald-500/30">
+                    ✓ ${info.completedBoxesCount} ${info.completedBoxesCount === 1 ? 'Box Fechado' : 'Boxes Fechados'} (Liberado)
+                  </span>
+                </div>
+              ` : ''}
+
+              <div class="mt-3">
                 ${p.category ? `<span class="text-[11px] text-blue-400 font-semibold uppercase tracking-wider">${p.category}</span>` : ''}
                 <h3 class="font-bold text-white text-base leading-snug mt-0.5">${p.name}</h3>
-
-                <div class="mt-3 grid grid-cols-2 gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
-                  <div>
-                    <p class="text-[11px] text-slate-400">Reserva (Sinal)</p>
-                    <p class="font-extrabold text-blue-400 text-sm">${formatBRL(p.depositPrice)}</p>
-                  </div>
-                  <div>
-                    <p class="text-[11px] text-slate-400">Valor Cheio</p>
-                    <p class="font-extrabold text-white text-sm">${formatBRL(p.fullPrice)}</p>
-                  </div>
-                </div>
               </div>
 
-              <div>
-                <div class="flex justify-between text-xs mb-1.5">
-                  <span class="text-slate-400">Faltam ${10 - info.activeBoxCount} para fechar Box #${info.activeBoxNumber}</span>
-                  <span class="font-bold text-blue-400">${info.activeBoxCount}/10</span>
+              <div class="mt-3.5 grid grid-cols-2 gap-2 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
+                <div>
+                  <p class="text-[11px] text-slate-400">Reserva (Sinal)</p>
+                  <p class="font-extrabold text-blue-400 text-sm">${formatBRL(p.depositPrice)}</p>
                 </div>
-                <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                  <div class="h-full bg-blue-500 transition-all duration-300" style="width: ${pct}%"></div>
+                <div>
+                  <p class="text-[11px] text-slate-400">Valor Cheio</p>
+                  <p class="font-extrabold text-white text-sm">${formatBRL(p.fullPrice)}</p>
                 </div>
-
-                ${info.activeBoxReservations.length > 0 ? `
-                  <div class="mt-3 pt-2.5 border-t border-slate-800/80">
-                    <p class="text-[11px] text-slate-400 mb-1">No Box #${info.activeBoxNumber} agora:</p>
-                    <div class="flex flex-wrap gap-1">
-                      ${info.activeBoxReservations.map((r, i) => `
-                        <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">
-                          #${i + 1} ${r.clientName.split(' ')[0]}
-                        </span>
-                      `).join('')}
-                    </div>
-                  </div>
-                ` : ''}
-
-                <button onclick="openReserveModal('${p.id}')"
-                  class="mt-4 w-full py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20">
-                  Reservar no Box #${info.activeBoxNumber} (${formatBRL(p.depositPrice)})
-                </button>
               </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1.5">
+                <span class="text-slate-400">Faltam ${10 - info.activeBoxCount} para fechar Box #${info.activeBoxNumber}</span>
+                <span class="font-bold text-blue-400">${info.activeBoxCount}/10</span>
+              </div>
+              <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full bg-blue-500 transition-all duration-300" style="width: ${pct}%"></div>
+              </div>
+
+              ${info.activeBoxReservations.length > 0 ? `
+                <div class="mt-3 pt-2.5 border-t border-slate-800/80">
+                  <p class="text-[11px] text-slate-400 mb-1">No Box #${info.activeBoxNumber} agora:</p>
+                  <div class="flex flex-wrap gap-1">
+                    ${info.activeBoxReservations.map((r, i) => `
+                      <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">
+                        #${i + 1} ${r.clientName.split(' ')[0]}
+                      </span>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+
+              <button onclick="openReserveModal('${p.id}')"
+                class="mt-4 w-full py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20">
+                Reservar no Box #${info.activeBoxNumber} (${formatBRL(p.depositPrice)})
+              </button>
             </div>
           </div>
         `;
@@ -1776,7 +1821,7 @@
                 const finalToCharge = Math.max(0, remaining - creditAvailable);
 
                 const msg = encodeURIComponent(
-                  `Olá ${r.clientName}! Ótima notícia! 🎉\n\n` +
+                  `Olá ${r.clientName}! Ótima notícia da *Nexxus Oficial BR*! 🎉\n\n` +
                   `O *Box #${box.boxNumber}* do produto *${p.name}* completou 10/10 e está *LIBERADO*!\n\n` +
                   `• Sua vaga: #${idx + 1}/10 do Box #${box.boxNumber}\n` +
                   `• Valor Cheio: ${formatBRL(p.fullPrice)}\n` +
@@ -1819,7 +1864,7 @@
       }).join("");
     };
 
-    // --- ADMIN: PRODUTOS ---
+    // --- ADMIN: PRODUTOS (SEM IMAGEM) ---
     window.addSingleProduct = async function (e) {
       e.preventDefault();
       const name = document.getElementById("prodName").value.trim();
@@ -1828,13 +1873,12 @@
         depositPrice: Number(document.getElementById("prodDeposit").value),
         fullPrice: Number(document.getElementById("prodFull").value),
         category: document.getElementById("prodCategory").value.trim() || "Geral",
-        image: document.getElementById("prodImage").value.trim(),
         createdAt: serverTimestamp()
       });
-      await logAdminAudit("Cadastrou produto", `Produto: ${name}`);
+      await logAdminAudit("Cadastrou produto individual", `Produto: ${name}`);
       e.target.reset();
       document.getElementById("prodDeposit").value = "20";
-      alert("Produto cadastrado!");
+      alert("Produto cadastrado com sucesso!");
     };
 
     window.importBulkProducts = async function () {
@@ -1844,19 +1888,18 @@
       let count = 0;
 
       for (const line of lines) {
-        const [name, dep, full, cat, img] = line.split(";").map(s => s.trim());
+        const [name, dep, full, cat] = line.split(";").map(s => s.trim());
         if (!name || isNaN(Number(dep)) || isNaN(Number(full))) continue;
         await addDoc(collection(db, "products"), {
           name,
           depositPrice: Number(dep),
           fullPrice: Number(full),
           category: cat || "Geral",
-          image: img || "",
           createdAt: serverTimestamp()
         });
         count++;
       }
-      await logAdminAudit("Importação em massa de produtos", `${count} produtos importados`);
+      await logAdminAudit("Importação em lote de produtos", `${count} produtos importados`);
       document.getElementById("bulkInput").value = "";
       alert(`${count} produtos importados com sucesso!`);
     };
