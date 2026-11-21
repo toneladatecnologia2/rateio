@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nexxus Oficial BR — Rateio & Compra Coletiva</title>
+  <title>Nexxus Oficial BR — Rateio & Compra Coletiva (Somente PIX)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -54,7 +54,12 @@
           NX
         </div>
         <div>
-          <h1 class="font-bold text-base sm:text-lg leading-tight text-white">Nexxus Oficial BR</h1>
+          <div class="flex items-center gap-2">
+            <h1 class="font-bold text-base sm:text-lg leading-tight text-white">Nexxus Oficial BR</h1>
+            <span class="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-teal-500/15 text-teal-300 border border-teal-500/30">
+              ❖ Somente PIX
+            </span>
+          </div>
           <p class="text-[11px] sm:text-xs text-slate-400">Boxes contínuos de 10 peças • Aberto de Qui a Seg</p>
         </div>
       </div>
@@ -64,11 +69,15 @@
           Modo Admin (Dia Fechado)
         </span>
 
+        <button onclick="openTrackingBoardModal()" class="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition">
+          📦 Rastreios e Envios
+        </button>
+
         <!-- Botão Área do Cliente -->
         <button id="headerClientBtn" onclick="openClientAuthModal()" class="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold transition">
           Entrar / Cadastrar
         </button>
-        <button id="headerMyOrdersBtn" onclick="openMyOrdersModal()" class="hidden px-3 py-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs sm:text-sm font-semibold transition">
+        <button id="headerMyOrdersBtn" onclick="openMyOrdersModal('active')" class="hidden px-3 py-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs sm:text-sm font-semibold transition">
           Meus Pedidos (<span id="headerOrderCount">0</span>)
         </button>
         <button id="headerLogoutBtn" onclick="logoutClient()" class="hidden px-2.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs border border-slate-700" title="Sair da conta">
@@ -90,12 +99,15 @@
         <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
         <span class="text-slate-300">Logado como: <strong id="loggedClientName" class="text-white"></strong> (<span id="loggedClientEmail" class="text-slate-400"></span>)</span>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-3">
         <span id="loggedClientCreditBadge" class="hidden px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
           Crédito p/ Abatimento: R$ 0,00
         </span>
-        <button onclick="openMyOrdersModal()" class="text-blue-400 hover:underline font-semibold">
-          Ver minhas reservas e cancelamentos &rarr;
+        <button onclick="openMyOrdersModal('paid')" class="text-emerald-400 hover:underline font-semibold">
+          Compras Pagas (<span id="loggedClientPaidCount">0</span>)
+        </button>
+        <button onclick="openMyOrdersModal('tracking')" class="text-indigo-300 hover:underline font-semibold">
+          📦 Rastreios e Envios &rarr;
         </button>
       </div>
     </div>
@@ -106,24 +118,24 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
-          <span class="w-7 h-7 rounded-lg bg-blue-600/20 text-blue-400 font-bold text-sm flex items-center justify-center shrink-0">1</span>
+          <span class="w-7 h-7 rounded-lg bg-teal-500/20 text-teal-300 font-bold text-sm flex items-center justify-center shrink-0">❖</span>
           <div>
-            <h3 class="font-semibold text-sm text-white">Reserve Sempre pelo Sinal Fixo</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Cadastre-se e garanta sua peça pelo valor fixo de reserva (ex: R$ 20,00), sem bloquear.</p>
+            <h3 class="font-semibold text-sm text-white">Pagamento Exclusivo via PIX</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Todas as reservas e quitações são feitas exclusivamente via PIX direto para a chave oficial.</p>
           </div>
         </div>
         <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
-          <span class="w-7 h-7 rounded-lg bg-emerald-600/20 text-emerald-400 font-bold text-sm flex items-center justify-center shrink-0">2</span>
+          <span class="w-7 h-7 rounded-lg bg-emerald-600/20 text-emerald-400 font-bold text-sm flex items-center justify-center shrink-0">10</span>
           <div>
             <h3 class="font-semibold text-sm text-white">A Cada 10 Peças, Libera um Box</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Completou 10 reservas (Box #1), os 10 participantes pagam o restante. O 11º abre o Box #2.</p>
+            <p class="text-xs text-slate-400 mt-0.5">Completou 10 reservas (Box #1), os 10 participantes quitam o restante via PIX. O 11º abre o Box #2.</p>
           </div>
         </div>
         <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
-          <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 font-bold text-sm flex items-center justify-center shrink-0">3</span>
+          <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-300 font-bold text-sm flex items-center justify-center shrink-0">📦</span>
           <div>
-            <h3 class="font-semibold text-sm text-white">Cancelamento & Crédito</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Pode cancelar antes de fechar 10/10; o sinal fica retido como crédito para abater em outros produtos.</p>
+            <h3 class="font-semibold text-sm text-white">Rastreios e Envios por Fechamento</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Acompanhe as informações de envio atualizadas pelos administradores separadas pela data de fechamento.</p>
           </div>
         </div>
       </div>
@@ -144,6 +156,9 @@
           <option value="HAS_COMPLETED">Com Box já Fechado (10+)</option>
           <option value="ALMOST_FULL">Quase Fechando Box (7 a 9/10)</option>
         </select>
+        <button onclick="openTrackingBoardModal()" class="sm:hidden px-4 py-2.5 rounded-xl bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 text-xs font-semibold">
+          📦 Consultar Rastreios e Envios
+        </button>
       </div>
     </div>
   </section>
@@ -227,13 +242,16 @@
     </div>
   </div>
 
-  <!-- MODAL 2: CONFIRMAR RESERVA (CLIENTE LOGADO) -->
+  <!-- MODAL 2: CONFIRMAR RESERVA SOMENTE VIA PIX (CLIENTE LOGADO) -->
   <div id="reserveModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl max-h-[92vh] overflow-y-auto custom-scrollbar">
       <div class="flex justify-between items-start gap-3">
         <div>
-          <span id="modalBoxTag" class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-blue-600/20 text-blue-400">Box #1</span>
-          <h2 id="modalProductName" class="text-lg font-bold text-white mt-1">Nome do Produto</h2>
+          <div class="flex items-center gap-2">
+            <span id="modalBoxTag" class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-blue-600/20 text-blue-400">Box #1</span>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">❖ Somente PIX</span>
+          </div>
+          <h2 id="modalProductName" class="text-lg font-bold text-white mt-1.5">Nome do Produto</h2>
         </div>
         <button onclick="closeReserveModal()" class="text-slate-400 hover:text-white text-xl leading-none">&times;</button>
       </div>
@@ -244,6 +262,10 @@
           <span id="modalClientDisplay" class="font-semibold text-white"></span>
         </div>
         <div class="flex justify-between">
+          <span class="text-slate-400">Forma de Pagamento:</span>
+          <span class="font-bold text-teal-400">PIX (Transferência / Copia e Cola)</span>
+        </div>
+        <div class="flex justify-between">
           <span class="text-slate-400">Sinal fixo da reserva (agora):</span>
           <span id="modalDepositPrice" class="font-extrabold text-blue-400">R$ 20,00</span>
         </div>
@@ -252,7 +274,7 @@
           <span id="modalFullPrice" class="font-bold text-white">R$ 0,00</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-slate-400">Restante após fechar o Box (10/10):</span>
+          <span class="text-slate-400">Restante via PIX após fechar Box:</span>
           <span id="modalRemainingPrice" class="font-bold text-emerald-400">R$ 0,00</span>
         </div>
         <div class="flex justify-between border-t border-slate-800 pt-2">
@@ -261,37 +283,105 @@
         </div>
       </div>
 
-      <div id="pixInstructionBox" class="hidden mt-3 bg-blue-950/40 border border-blue-800/60 rounded-lg p-3 text-xs text-blue-200">
-        <p class="font-semibold text-blue-300">Chave PIX para pagamento do sinal:</p>
-        <p id="displayPixKey" class="font-mono mt-1 select-all bg-slate-950 px-2 py-1 rounded border border-blue-900/50"></p>
+      <!-- Bloco PIX Oficial -->
+      <div id="pixInstructionBox" class="mt-3 bg-teal-950/35 border border-teal-700/50 rounded-xl p-3.5 text-xs space-y-2.5">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-teal-300">❖ Dados PIX para Recebimento</span>
+          <span id="displayPixTypeBadge" class="text-[10px] px-2 py-0.5 rounded bg-teal-500/20 text-teal-200 uppercase font-semibold">Chave PIX</span>
+        </div>
+
+        <div id="pixConfiguredArea" class="space-y-2">
+          <div class="text-[11px] text-slate-300">
+            Favorecido: <strong id="displayPixReceiver" class="text-white">Nexxus Oficial BR</strong>
+          </div>
+          <div>
+            <p class="text-[11px] text-slate-400 mb-1">Chave PIX:</p>
+            <div class="flex items-center gap-2">
+              <code id="displayPixKey" class="flex-1 font-mono text-xs select-all bg-slate-950 px-2.5 py-1.5 rounded border border-teal-800/60 text-teal-200 truncate"></code>
+              <button type="button" onclick="copyTextToClipboard(document.getElementById('displayPixKey').textContent, 'Chave PIX copiada!')"
+                class="px-2.5 py-1.5 rounded bg-teal-600 hover:bg-teal-500 text-white font-semibold text-[11px] shrink-0">
+                Copiar Chave
+              </button>
+            </div>
+          </div>
+
+          <div class="pt-1 flex flex-col sm:flex-row items-center gap-3">
+            <img id="displayPixQrCode" src="" alt="QR Code PIX" class="w-28 h-28 rounded-lg bg-white p-1.5 shrink-0 border border-teal-700/40" />
+            <div class="flex-1 w-full space-y-1.5">
+              <p class="text-[11px] text-slate-400">Ou use o PIX Copia e Cola com valor exato:</p>
+              <textarea id="displayPixPayload" readonly rows="2" class="w-full font-mono text-[10px] bg-slate-950 p-1.5 rounded border border-slate-800 text-slate-300 resize-none"></textarea>
+              <button type="button" onclick="copyTextToClipboard(document.getElementById('displayPixPayload').value, 'Código PIX Copia e Cola copiado!')"
+                class="w-full py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-700/40 font-semibold text-[11px]">
+                Copiar Código PIX Copia e Cola
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="pixMissingWarning" class="hidden text-amber-300 bg-amber-950/50 border border-amber-700/50 rounded-lg p-2.5 text-[11px]">
+          ⚠️ A chave PIX oficial ainda não foi cadastrada pelo administrador. Entre em contato pelo WhatsApp após reservar.
+        </div>
       </div>
 
       <p class="mt-3 text-[11px] text-slate-400 leading-relaxed">
-        * Caso desista antes de o Box completar 10 peças, o sinal não é estornado, mas fica como crédito para abater na sua conta caso tenha outros produtos.
+        * Pagamento aceito <strong>somente via PIX</strong>. Caso desista antes de o Box completar 10 peças, o sinal não é estornado, mas fica como crédito para abater na sua conta caso tenha outros produtos.
       </p>
 
       <form id="reserveForm" onsubmit="submitReservation(event)" class="mt-4">
         <input type="hidden" id="modalProductId" />
         <button id="confirmReserveBtn" type="submit"
-          class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition shadow-lg shadow-blue-600/20">
-          Confirmar Reserva
+          class="w-full py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-sm transition shadow-lg shadow-teal-600/20">
+          Já fiz o PIX / Confirmar Reserva
         </button>
       </form>
     </div>
   </div>
 
-  <!-- MODAL 3: MEUS PEDIDOS, CANCELAMENTO E CRÉDITOS DO CLIENTE -->
+  <!-- MODAL 3: ÁREA DO CLIENTE (RESERVAS, COMPRAS PAGAS & RASTREIOS E ENVIOS) -->
   <div id="myOrdersModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
         <div>
-          <h2 class="text-lg font-bold text-white">Meus Pedidos & Saldo de Conta — Nexxus Oficial BR</h2>
+          <h2 class="text-lg font-bold text-white">Minha Conta — Nexxus Oficial BR</h2>
           <p id="myOrdersSubtitle" class="text-xs text-slate-400"></p>
         </div>
         <button onclick="closeMyOrdersModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
+      <!-- Sub-abas da Área do Cliente -->
+      <div class="flex border-b border-slate-800 px-6 gap-4 overflow-x-auto bg-slate-950/60">
+        <button onclick="switchClientPortalTab('active')" id="clientTab-active" class="client-portal-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-blue-500 text-blue-400 whitespace-nowrap">
+          Minhas Reservas & Pagamento PIX
+        </button>
+        <button onclick="switchClientPortalTab('paid')" id="clientTab-paid" class="client-portal-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
+          ✅ Lista de Compras Pagas
+        </button>
+        <button onclick="switchClientPortalTab('tracking')" id="clientTab-tracking" class="client-portal-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
+          📦 Rastreios e Envios por Fechamento
+        </button>
+      </div>
+
       <div id="myOrdersBody" class="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-5"></div>
+    </div>
+  </div>
+
+  <!-- MODAL 3B: MURAL DE RASTREIOS E ENVIOS POR DATA DE FECHAMENTO DO RATEIO -->
+  <div id="trackingBoardModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold text-white">📦 Rastreios e Envios por Data de Fechamento</h2>
+          <p class="text-xs text-slate-400">Consulte as informações de envio atualizadas pelos administradores separadas pela data de fechamento de cada rateio.</p>
+        </div>
+        <button onclick="closeTrackingBoardModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+      </div>
+
+      <div class="px-6 py-3 bg-slate-950/60 border-b border-slate-800 flex flex-col sm:flex-row gap-3">
+        <input id="publicTrackingSearch" type="text" oninput="renderPublicTrackingBoard()" placeholder="Filtrar por nome do produto, data de fechamento ou informação..."
+          class="flex-1 bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-lg px-3.5 py-2 text-xs text-white outline-none" />
+      </div>
+
+      <div id="publicTrackingBody" class="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-5"></div>
     </div>
   </div>
 
@@ -332,14 +422,17 @@
       <!-- Conteúdo Admin Logado -->
       <div id="adminDashboardView" class="hidden flex-1 flex flex-col overflow-hidden">
         <div class="flex border-b border-slate-800 px-6 gap-4 overflow-x-auto bg-slate-950/50">
-          <button onclick="switchAdminTab('weekly')" id="tab-weekly" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-blue-500 text-blue-400 whitespace-nowrap">
-            Arrecadação Semanal (Ter–Dom)
-          </button>
-          <button onclick="switchAdminTab('clients')" id="tab-clients" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
-            Pedidos por Cliente (Add/Excluir)
+          <button onclick="switchAdminTab('tracking')" id="tab-tracking" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-indigo-500 text-indigo-400 whitespace-nowrap">
+            📦 Rastreios e Envios
           </button>
           <button onclick="switchAdminTab('closings')" id="tab-closings" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
-            Boxes & Cobrança
+            Boxes & Cobrança PIX
+          </button>
+          <button onclick="switchAdminTab('clients')" id="tab-clients" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
+            Pedidos por Cliente
+          </button>
+          <button onclick="switchAdminTab('weekly')" id="tab-weekly" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
+            Arrecadação Semanal (Ter–Dom)
           </button>
           <button onclick="switchAdminTab('products')" id="tab-products" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
             Cadastrar Produto (1 a 1)
@@ -347,20 +440,108 @@
           <button onclick="switchAdminTab('bulk')" id="tab-bulk" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
             Cadastro em Lote (+100)
           </button>
+          <button onclick="switchAdminTab('settings')" id="tab-settings" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
+            ❖ Chave PIX & Config
+          </button>
           <button onclick="switchAdminTab('admins')" id="tab-admins" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
             Admins & Auditoria
-          </button>
-          <button onclick="switchAdminTab('settings')" id="tab-settings" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
-            Configurações & E-mail
           </button>
         </div>
 
         <div class="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-6">
-          <!-- ABA 1: ARRECADAÇÃO SEMANAL -->
-          <div id="view-weekly" class="space-y-5">
+          <!-- ABA 0: RASTREIOS E ENVIOS POR DATA DE FECHAMENTO DO RATEIO -->
+          <div id="view-tracking" class="space-y-5">
+            <div class="bg-indigo-950/35 border border-indigo-800/60 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 class="font-bold text-white text-sm">📦 Rastreios e Envios (Agrupados por Data de Fechamento do Rateio)</h3>
+                <p class="text-xs text-slate-300 mt-0.5">
+                  Escreva abaixo a informação manual de envio/andamento. Você pode aplicar a mesma informação para <strong>todos os produtos fechados naquela data</strong> de uma vez ou atualizar cada Box individualmente (sem divulgar origem/transportadora).
+                </p>
+              </div>
+              <input id="adminTrackingSearch" type="text" oninput="renderAdminTracking()" placeholder="Buscar produto, data ou status..."
+                class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white w-full sm:w-64 outline-none focus:border-indigo-500" />
+            </div>
+
+            <div id="adminTrackingList" class="space-y-5"></div>
+          </div>
+
+          <!-- ABA CHAVE PIX & CONFIGURAÇÕES -->
+          <div id="view-settings" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-slate-950 border border-teal-700/50 rounded-xl p-5 space-y-3.5">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-sm text-teal-300">❖ Cadastro da Chave PIX Recebedora (Pagamento Único Aceito)</h3>
+                <span id="pixActiveStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400">Verificando...</span>
+              </div>
+              <p class="text-xs text-slate-400">
+                Cadastre abaixo a chave PIX oficial que receberá todos os sinais de reserva e quitações dos boxes. O QR Code e o Copia e Cola serão gerados automaticamente para os clientes.
+              </p>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label class="block text-xs text-slate-400 mb-1">Tipo da Chave PIX *</label>
+                  <select id="settingPixType" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
+                    <option value="CPF">CPF</option>
+                    <option value="CNPJ">CNPJ</option>
+                    <option value="EMAIL">E-mail</option>
+                    <option value="TELEFONE">Telefone (+55)</option>
+                    <option value="ALEATORIA">Chave Aleatória (EVP)</option>
+                  </select>
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-xs text-slate-400 mb-1">Chave PIX Recebedora *</label>
+                  <input id="settingPixKey" type="text" placeholder="Ex: 12.345.678/0001-99 ou seuemail@pix.com" class="w-full bg-slate-900 border border-slate-700 focus:border-teal-500 rounded-lg px-3 py-2 text-xs text-white font-mono outline-none" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs text-slate-400 mb-1">Nome do Titular / Recebedor *</label>
+                  <input id="settingPixReceiverName" type="text" placeholder="Ex: Nexxus Oficial BR Ltda" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
+                </div>
+                <div>
+                  <label class="block text-xs text-slate-400 mb-1">Cidade do Titular *</label>
+                  <input id="settingPixCity" type="text" value="SAO PAULO" placeholder="Ex: SAO PAULO" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">WhatsApp de Suporte / Comprovantes</label>
+                <input id="settingStoreWhatsapp" type="text" placeholder="Ex: 5511999998888" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
+              </div>
+
+              <button onclick="saveSettings()" class="w-full py-2.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs transition">
+                Salvar Chave PIX Recebedora (Exige Senha Admin)
+              </button>
+            </div>
+
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-3">
+              <h3 class="font-bold text-sm text-white">Envio de E-mail Automático (Fechamento Domingo 23:59)</h3>
+              <p class="text-[11px] text-slate-400 leading-relaxed">
+                Crie uma conta grátis em <strong>emailjs.com</strong>, crie um template com <code class="text-blue-400">{{to_email}}</code>, <code class="text-blue-400">{{subject}}</code> e <code class="text-blue-400">{{message}}</code> e cole os 3 códigos abaixo:
+              </p>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">EmailJS Public Key</label>
+                <input id="settingEmailJsPublicKey" type="text" placeholder="Ex: user_xxxxxxxxxxxx" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono" />
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">EmailJS Service ID</label>
+                <input id="settingEmailJsServiceId" type="text" placeholder="Ex: service_xxxxxxx" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono" />
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">EmailJS Template ID</label>
+                <input id="settingEmailJsTemplateId" type="text" placeholder="Ex: template_xxxxxxx" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono" />
+              </div>
+              <button onclick="saveEmailJsSettings()" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs">
+                Salvar Configuração de E-mail
+              </button>
+            </div>
+          </div>
+
+          <!-- ABA ARRECADAÇÃO SEMANAL -->
+          <div id="view-weekly" class="hidden space-y-5">
             <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-950 border border-slate-800 rounded-xl p-4">
               <div>
-                <h3 class="font-bold text-white text-base">Fechamento Semanal (Terça 00:00 até Domingo 23:59)</h3>
+                <h3 class="font-bold text-white text-base">Fechamento Semanal PIX (Terça 00:00 até Domingo 23:59)</h3>
                 <p class="text-xs text-slate-400">Ao encerrar domingo às 23:59, a lista de todos os boxes fechados (10/10) é enviada automaticamente para o e-mail dos admins.</p>
               </div>
               <div class="flex flex-wrap items-center gap-2">
@@ -383,8 +564,8 @@
                     <tr>
                       <th class="p-3">Período (Terça a Domingo 23:59)</th>
                       <th class="p-3">Reservas na Semana</th>
-                      <th class="p-3">Sinais Arrecadados</th>
-                      <th class="p-3">Restantes Quitados</th>
+                      <th class="p-3">Sinais PIX Arrecadados</th>
+                      <th class="p-3">Restantes PIX Quitados</th>
                       <th class="p-3 text-right">Total Arrecadado</th>
                       <th class="p-3 text-center">Relatório E-mail</th>
                     </tr>
@@ -395,7 +576,7 @@
             </div>
           </div>
 
-          <!-- ABA 2: CONSULTAR CLIENTE -->
+          <!-- ABA CONSULTAR CLIENTE -->
           <div id="view-clients" class="hidden space-y-5">
             <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
               <div>
@@ -409,12 +590,12 @@
             <div id="adminClientsList" class="space-y-4"></div>
           </div>
 
-          <!-- ABA 3: BOXES E COBRANÇA -->
+          <!-- ABA BOXES E COBRANÇA PIX -->
           <div id="view-closings" class="hidden space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <h3 class="font-bold text-white">Controle de Boxes (10 peças por Box)</h3>
-                <p class="text-xs text-slate-400">Boxes completos (10/10) estão liberados para cobrar o restante (já descontando créditos retidos do cliente, se houver).</p>
+                <p class="text-xs text-slate-400">Boxes completos (10/10) estão liberados para cobrar o restante via PIX (já descontando créditos retidos do cliente, se houver).</p>
               </div>
               <select id="adminClosingFilter" onchange="renderAdminClosings()" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
                 <option value="ALL">Todos os Boxes</option>
@@ -425,7 +606,7 @@
             <div id="adminClosingsList" class="space-y-4"></div>
           </div>
 
-          <!-- ABA 4: CADASTRAR PRODUTO MANUALMENTE UM A UM (INSTRUÇÕES VISÍVEIS SOMENTE PARA ADMINS) -->
+          <!-- ABA CADASTRAR PRODUTO MANUALMENTE UM A UM -->
           <div id="view-products" class="hidden space-y-6">
             <div class="bg-blue-950/35 border border-blue-800/60 rounded-xl p-4 space-y-2 text-xs">
               <div class="flex items-center gap-2 text-blue-300 font-bold">
@@ -433,8 +614,8 @@
               </div>
               <ol class="list-decimal list-inside space-y-1 text-slate-300 leading-relaxed">
                 <li><strong>Nome do Produto:</strong> Digite o título completo do item (ex: <em>Perfume Sauvage Elixir 100ml</em> ou <em>Kit 5 Camisetas Básicas</em>).</li>
-                <li><strong>Sinal Fixo (R$):</strong> Informe o valor cobrado na reserva inicial de cada vaga (padrão <code>20</code> para R$ 20,00). Use ponto para centavos (ex: <code>25.50</code>).</li>
-                <li><strong>Valor Cheio (R$):</strong> Informe o preço final total do produto. Quando o Box atingir 10 peças, o sistema calculará automaticamente o restante (<code>Valor Cheio - Sinal</code>).</li>
+                <li><strong>Sinal Fixo PIX (R$):</strong> Informe o valor cobrado via PIX na reserva inicial de cada vaga (padrão <code>20</code> para R$ 20,00). Use ponto para centavos (ex: <code>25.50</code>).</li>
+                <li><strong>Valor Cheio (R$):</strong> Informe o preço final total do produto. Quando o Box atingir 10 peças, o sistema calculará automaticamente o restante via PIX (<code>Valor Cheio - Sinal</code>).</li>
                 <li><strong>Categoria:</strong> Informe o grupo do produto (ex: <em>Perfumes</em>, <em>Eletrônicos</em>, <em>Moda</em>) para criar filtros automáticos na loja.</li>
                 <li>Clique em <strong>Salvar</strong> — ele aparecerá imediatamente no catálogo da <strong>Nexxus Oficial BR</strong> no <strong>Box #1 (0/10)</strong>.</li>
               </ol>
@@ -446,7 +627,7 @@
                 <input id="prodName" type="text" required placeholder="Ex: Perfume Importado 100ml" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
               </div>
               <div>
-                <label class="block text-[11px] text-slate-400 mb-1">Sinal Fixo (R$) *</label>
+                <label class="block text-[11px] text-slate-400 mb-1">Sinal Fixo PIX (R$) *</label>
                 <input id="prodDeposit" type="number" step="0.01" value="20" required placeholder="20.00" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
               </div>
               <div>
@@ -468,7 +649,7 @@
                   <tr>
                     <th class="p-3">Produto</th>
                     <th class="p-3">Categoria</th>
-                    <th class="p-3">Sinal</th>
+                    <th class="p-3">Sinal PIX</th>
                     <th class="p-3">Valor Cheio</th>
                     <th class="p-3">Boxes / Reservas Ativas</th>
                     <th class="p-3 text-right">Ações</th>
@@ -479,7 +660,7 @@
             </div>
           </div>
 
-          <!-- ABA 5: CADASTRO EM LOTE / MASSA (INSTRUÇÕES VISÍVEIS SOMENTE PARA ADMINS) -->
+          <!-- ABA CADASTRO EM LOTE / MASSA -->
           <div id="view-bulk" class="hidden space-y-4">
             <div class="bg-emerald-950/30 border border-emerald-800/60 rounded-xl p-4 space-y-2 text-xs">
               <div class="flex items-center gap-2 text-emerald-300 font-bold">
@@ -510,7 +691,7 @@
             </div>
           </div>
 
-          <!-- ABA 6: ADMINS & AUDITORIA -->
+          <!-- ABA ADMINS & AUDITORIA -->
           <div id="view-admins" class="hidden space-y-6">
             <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
               <div>
@@ -561,46 +742,6 @@
               </div>
             </div>
           </div>
-
-          <!-- ABA 7: CONFIGURAÇÕES -->
-          <div id="view-settings" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
-              <h3 class="font-bold text-sm text-white">Dados da Loja & Pagamento</h3>
-              <div>
-                <label class="block text-xs text-slate-400 mb-1">Chave PIX (exibida ao reservar e nas cobranças)</label>
-                <input id="settingPixKey" type="text" placeholder="Ex: seuemail@pix.com ou CNPJ" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
-              </div>
-              <div>
-                <label class="block text-xs text-slate-400 mb-1">WhatsApp da Loja (para contato)</label>
-                <input id="settingStoreWhatsapp" type="text" placeholder="Ex: 5511999998888" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
-              </div>
-              <button onclick="saveSettings()" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs">
-                Salvar Dados da Loja
-              </button>
-            </div>
-
-            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
-              <h3 class="font-bold text-sm text-white">Configuração de Envio de E-mail Automático (Domingo 23:59)</h3>
-              <p class="text-[11px] text-slate-400 leading-relaxed">
-                Crie uma conta grátis em <strong>emailjs.com</strong>, crie um template com <code class="text-blue-400">{{to_email}}</code>, <code class="text-blue-400">{{subject}}</code> e <code class="text-blue-400">{{message}}</code> e cole os 3 códigos abaixo:
-              </p>
-              <div>
-                <label class="block text-xs text-slate-400 mb-1">EmailJS Public Key</label>
-                <input id="settingEmailJsPublicKey" type="text" placeholder="Ex: user_xxxxxxxxxxxx" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono" />
-              </div>
-              <div>
-                <label class="block text-xs text-slate-400 mb-1">EmailJS Service ID</label>
-                <input id="settingEmailJsServiceId" type="text" placeholder="Ex: service_xxxxxxx" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono" />
-              </div>
-              <div>
-                <label class="block text-xs text-slate-400 mb-1">EmailJS Template ID</label>
-                <input id="settingEmailJsTemplateId" type="text" placeholder="Ex: template_xxxxxxx" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono" />
-              </div>
-              <button onclick="saveEmailJsSettings()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs">
-                Salvar Configuração de E-mail
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -633,8 +774,12 @@
     let admins = [];
     let auditLogs = [];
     let weeklyReports = {};
+    let boxTrackings = {}; // chave: `${productId}_box_${boxNumber}`
     let storeConfig = {
+      pixType: "CPF",
       pixKey: "",
+      pixReceiverName: "Nexxus Oficial BR",
+      pixCity: "SAO PAULO",
       storeWhatsapp: "",
       emailJsPublicKey: "",
       emailJsServiceId: "",
@@ -644,9 +789,76 @@
     let currentUser = null;
     let currentAdmin = null;
     let pendingProductAfterAuth = null;
+    let activeClientPortalTab = "active";
 
     const formatBRL = (val) => Number(val || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     const formatDateTime = (ms) => ms ? new Date(ms).toLocaleString("pt-BR") : "-";
+    const formatDateOnly = (ms) => {
+      if (!ms) return "Data não registrada";
+      const d = new Date(ms);
+      return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+    };
+
+    window.copyTextToClipboard = function (text, successMsg) {
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        alert(successMsg || "Copiado!");
+      }).catch(() => {
+        prompt("Copie abaixo:", text);
+      });
+    };
+
+    // --- GERADOR DE PIX COPIA E COLA (BR CODE EMV PADRÃO BACEN) ---
+    function crc16CCITT(str) {
+      let crc = 0xFFFF;
+      for (let i = 0; i < str.length; i++) {
+        crc ^= str.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+          if ((crc & 0x8000) !== 0) crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+          else crc = (crc << 1) & 0xFFFF;
+        }
+      }
+      return crc.toString(16).toUpperCase().padStart(4, "0");
+    }
+
+    function emvField(id, value) {
+      const len = String(value.length).padStart(2, "0");
+      return `${id}${len}${value}`;
+    }
+
+    function normalizeAscii(str, maxLen) {
+      return (str || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9 ]/g, "")
+        .trim()
+        .toUpperCase()
+        .slice(0, maxLen) || "NEXXUS";
+    }
+
+    function generatePixPayload(pixKey, receiverName, city, amount, txid = "NEXXUS") {
+      if (!pixKey) return "";
+      const cleanKey = pixKey.trim();
+      const merchantAccount = emvField("00", "br.gov.bcb.pix") + emvField("01", cleanKey);
+      const formattedAmount = Number(amount || 0).toFixed(2);
+      const cleanName = normalizeAscii(receiverName || "Nexxus Oficial BR", 25);
+      const cleanCity = normalizeAscii(city || "SAO PAULO", 15);
+      const cleanTxid = normalizeAscii(txid, 20).replace(/\s+/g, "") || "NEXXUS";
+
+      let payload =
+        emvField("00", "01") +
+        emvField("26", merchantAccount) +
+        emvField("52", "0000") +
+        emvField("53", "986") +
+        (Number(amount) > 0 ? emvField("54", formattedAmount) : "") +
+        emvField("58", "BR") +
+        emvField("59", cleanName) +
+        emvField("60", cleanCity) +
+        emvField("62", emvField("05", cleanTxid)) +
+        "6304";
+
+      return payload + crc16CCITT(payload);
+    }
 
     // --- CONTROLE DE BLOQUEIO TOTAL ÀS TERÇAS (2) E QUARTAS (3) ---
     function getBrazilDate() {
@@ -656,7 +868,7 @@
 
     function isSiteClosedNow() {
       const brNow = getBrazilDate();
-      const day = brNow.getDay(); // 2=Terça, 3=Quarta
+      const day = brNow.getDay();
       return day === 2 || day === 3;
     }
 
@@ -671,6 +883,7 @@
         document.getElementById("clientAuthModal").classList.add("hidden");
         document.getElementById("reserveModal").classList.add("hidden");
         document.getElementById("myOrdersModal").classList.add("hidden");
+        document.getElementById("trackingBoardModal").classList.add("hidden");
       } else {
         overlay.classList.add("hidden");
         if (closed && currentAdmin) {
@@ -759,14 +972,40 @@
     };
     window.closeClientAuthModal = () => document.getElementById("clientAuthModal").classList.add("hidden");
     window.closeReserveModal = () => document.getElementById("reserveModal").classList.add("hidden");
-    window.openMyOrdersModal = () => {
+    window.openMyOrdersModal = (initialTab = "active") => {
       if (isSiteClosedNow() && !currentAdmin) return;
-      renderMyOrders();
+      activeClientPortalTab = initialTab;
+      switchClientPortalTab(initialTab);
       document.getElementById("myOrdersModal").classList.remove("hidden");
     };
     window.closeMyOrdersModal = () => document.getElementById("myOrdersModal").classList.add("hidden");
+    window.openTrackingBoardModal = () => {
+      if (isSiteClosedNow() && !currentAdmin) return;
+      renderPublicTrackingBoard();
+      document.getElementById("trackingBoardModal").classList.remove("hidden");
+    };
+    window.closeTrackingBoardModal = () => document.getElementById("trackingBoardModal").classList.add("hidden");
     window.openAdminModal = () => document.getElementById("adminModal").classList.remove("hidden");
     window.closeAdminModal = () => document.getElementById("adminModal").classList.add("hidden");
+
+    window.switchClientPortalTab = function (tab) {
+      activeClientPortalTab = tab;
+      document.querySelectorAll(".client-portal-tab").forEach(el => {
+        el.classList.remove("border-blue-500", "text-blue-400", "border-emerald-500", "text-emerald-400", "border-indigo-500", "text-indigo-400");
+        el.classList.add("border-transparent", "text-slate-400");
+      });
+      const activeEl = document.getElementById(`clientTab-${tab}`);
+      if (activeEl) {
+        const cls = tab === "paid"
+          ? ["border-emerald-500", "text-emerald-400"]
+          : tab === "tracking"
+          ? ["border-indigo-500", "text-indigo-400"]
+          : ["border-blue-500", "text-blue-400"];
+        activeEl.classList.add(...cls);
+        activeEl.classList.remove("border-transparent", "text-slate-400");
+      }
+      renderMyOrders();
+    };
 
     window.switchAuthMode = function (mode) {
       const isLogin = mode === "login";
@@ -781,7 +1020,7 @@
         : "text-sm font-bold text-slate-400 hover:text-white pb-1";
     };
 
-    // --- LOGIN / LOGOUT ADMIN INDIVIDUAL (COM FALLBACK GARANTIDO) ---
+    // --- LOGIN / LOGOUT ADMIN INDIVIDUAL ---
     window.loginAdmin = async function () {
       const email = document.getElementById("adminEmailInput").value.trim().toLowerCase();
       const pass = document.getElementById("adminPasswordInput").value;
@@ -805,7 +1044,7 @@
       }
 
       if (!found) {
-        alert("E-mail ou senha de administrador inválidos! (Verifique se há espaços extras ou se já foi cadastrado outro admin no Firebase).");
+        alert("E-mail ou senha de administrador inválidos!");
         return;
       }
 
@@ -813,6 +1052,7 @@
       localStorage.setItem("rateio_admin_id", found.id);
       updateAdminHeaderState();
       updateSiteScheduleLock();
+      renderAdminTracking();
       renderWeeklyRevenue();
       renderAdminClients();
       renderAdminsAndAudit();
@@ -848,16 +1088,22 @@
 
     window.switchAdminTab = function (tab) {
       document.querySelectorAll(".admin-tab").forEach(el => {
-        el.classList.remove("border-blue-500", "text-blue-400");
+        el.classList.remove("border-blue-500", "text-blue-400", "border-teal-500", "text-teal-400", "border-indigo-500", "text-indigo-400");
         el.classList.add("border-transparent", "text-slate-400");
       });
-      document.getElementById(`tab-${tab}`).classList.add("border-blue-500", "text-blue-400");
+      const activeColor = tab === "settings"
+        ? ["border-teal-500", "text-teal-400"]
+        : tab === "tracking"
+        ? ["border-indigo-500", "text-indigo-400"]
+        : ["border-blue-500", "text-blue-400"];
+      document.getElementById(`tab-${tab}`).classList.add(...activeColor);
       document.getElementById(`tab-${tab}`).classList.remove("border-transparent", "text-slate-400");
 
-      ["weekly", "clients", "closings", "products", "bulk", "admins", "settings"].forEach(v => {
+      ["tracking", "settings", "weekly", "clients", "closings", "products", "bulk", "admins"].forEach(v => {
         document.getElementById(`view-${v}`).classList.toggle("hidden", v !== tab);
       });
 
+      if (tab === "tracking") renderAdminTracking();
       if (tab === "weekly") renderWeeklyRevenue();
       if (tab === "clients") renderAdminClients();
       if (tab === "admins") renderAdminsAndAudit();
@@ -867,15 +1113,41 @@
     onSnapshot(doc(db, "config", "store"), (snap) => {
       if (snap.exists()) {
         storeConfig = { ...storeConfig, ...snap.data() };
-        document.getElementById("settingPixKey").value = storeConfig.pixKey || "";
-        document.getElementById("settingStoreWhatsapp").value = storeConfig.storeWhatsapp || "";
-        document.getElementById("settingEmailJsPublicKey").value = storeConfig.emailJsPublicKey || "";
-        document.getElementById("settingEmailJsServiceId").value = storeConfig.emailJsServiceId || "";
-        document.getElementById("settingEmailJsTemplateId").value = storeConfig.emailJsTemplateId || "";
-        if (storeConfig.emailJsPublicKey && window.emailjs) {
-          window.emailjs.init({ publicKey: storeConfig.emailJsPublicKey });
+      }
+      document.getElementById("settingPixType").value = storeConfig.pixType || "CPF";
+      document.getElementById("settingPixKey").value = storeConfig.pixKey || "";
+      document.getElementById("settingPixReceiverName").value = storeConfig.pixReceiverName || "Nexxus Oficial BR";
+      document.getElementById("settingPixCity").value = storeConfig.pixCity || "SAO PAULO";
+      document.getElementById("settingStoreWhatsapp").value = storeConfig.storeWhatsapp || "";
+      document.getElementById("settingEmailJsPublicKey").value = storeConfig.emailJsPublicKey || "";
+      document.getElementById("settingEmailJsServiceId").value = storeConfig.emailJsServiceId || "";
+      document.getElementById("settingEmailJsTemplateId").value = storeConfig.emailJsTemplateId || "";
+
+      const pixBadge = document.getElementById("pixActiveStatusBadge");
+      if (pixBadge) {
+        if (storeConfig.pixKey) {
+          pixBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+          pixBadge.textContent = `Ativa (${storeConfig.pixType || "PIX"})`;
+        } else {
+          pixBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30";
+          pixBadge.textContent = "Não cadastrada";
         }
       }
+
+      if (storeConfig.emailJsPublicKey && window.emailjs) {
+        window.emailjs.init({ publicKey: storeConfig.emailJsPublicKey });
+      }
+      renderMyOrders();
+    });
+
+    onSnapshot(collection(db, "box_trackings"), (snapshot) => {
+      boxTrackings = {};
+      snapshot.docs.forEach(d => {
+        boxTrackings[d.id] = d.data();
+      });
+      renderMyOrders();
+      renderPublicTrackingBoard();
+      renderAdminTracking();
     });
 
     onSnapshot(collection(db, "admins"), async (snapshot) => {
@@ -901,8 +1173,6 @@
         updateSiteScheduleLock();
       }
       renderAdminsAndAudit();
-    }, (err) => {
-      console.error("Erro ao ler coleção admins:", err);
     });
 
     onSnapshot(query(collection(db, "audit_logs"), orderBy("createdAtMs", "desc")), (snapshot) => {
@@ -936,6 +1206,8 @@
       renderCatalog();
       renderAdminProducts();
       renderAdminClosings();
+      renderAdminTracking();
+      renderPublicTrackingBoard();
     }, (err) => {
       console.error("Erro Firestore:", err);
       document.getElementById("loadingState").innerHTML = `<p class="text-red-400 text-sm">Erro ao conectar ao banco de dados. Verifique as Regras do Firestore.</p>`;
@@ -950,6 +1222,8 @@
       renderAdminClosings();
       renderAdminClients();
       renderWeeklyRevenue();
+      renderAdminTracking();
+      renderPublicTrackingBoard();
     });
 
     // --- RELATÓRIO SEMANAL DOMINGO 23:59 ---
@@ -960,15 +1234,14 @@
         const info = getBoxesInfo(p.id);
         info.boxes.forEach(box => {
           if (!box.isComplete) return;
-          const tenthMember = box.members[9];
-          const closedWeek = getTueSunWeekInfo(tenthMember?.createdAtMs || Date.now());
+          const closedWeek = getTueSunWeekInfo(box.closedAtMs || Date.now());
           if (closedWeek.key === weekObj.key) {
             completedBoxesReport.push({ product: p, box });
           }
         });
       });
 
-      let body = `RELATÓRIO DE FECHAMENTO SEMANAL — NEXXUS OFICIAL BR\n`;
+      let body = `RELATÓRIO DE FECHAMENTO SEMANAL — NEXXUS OFICIAL BR (SOMENTE PIX)\n`;
       body += `Período: ${weekObj.label}\n`;
       body += `Total de Boxes Fechados (10/10) nesta semana: ${completedBoxesReport.length}\n`;
       body += `====================================================\n\n`;
@@ -978,8 +1251,8 @@
       } else {
         completedBoxesReport.forEach(({ product: p, box }) => {
           const remaining = Math.max(0, Number(p.fullPrice) - Number(p.depositPrice));
-          body += `PRODUTO: ${p.name} — BOX #${box.boxNumber} (10/10 COMPLETO)\n`;
-          body += `Sinal: ${formatBRL(p.depositPrice)} | Cheio: ${formatBRL(p.fullPrice)} | Restante: ${formatBRL(remaining)}\n`;
+          body += `PRODUTO: ${p.name} — BOX #${box.boxNumber} (10/10 COMPLETO - Fechado em ${formatDateOnly(box.closedAtMs)})\n`;
+          body += `Sinal PIX: ${formatBRL(p.depositPrice)} | Cheio: ${formatBRL(p.fullPrice)} | Restante PIX: ${formatBRL(remaining)}\n`;
           box.members.forEach((m, idx) => {
             body += `  #${idx + 1} - ${m.clientName} | Tel: ${m.clientWhatsapp} | E-mail: ${m.clientEmail || '-'}\n`;
           });
@@ -1132,7 +1405,7 @@
     };
 
     function getClientFinancialSummary(user) {
-      if (!user) return { activeRes: [], cancelledRes: [], totalRetainedCredit: 0, totalClosedRemaining: 0, netToPay: 0 };
+      if (!user) return { activeRes: [], paidRes: [], unpaidActiveRes: [], cancelledRes: [], totalRetainedCredit: 0, totalClosedRemaining: 0, netToPay: 0 };
 
       const userMatch = (r) =>
         (r.userId && r.userId === user.id) ||
@@ -1141,6 +1414,8 @@
 
       const userReservations = reservations.filter(userMatch);
       const activeRes = userReservations.filter(r => r.status !== "CANCELLED");
+      const paidRes = activeRes.filter(r => !!r.paidFull);
+      const unpaidActiveRes = activeRes.filter(r => !r.paidFull);
       const cancelledRes = userReservations.filter(r => r.status === "CANCELLED");
 
       const totalRetainedCredit = cancelledRes.reduce((acc, r) => acc + Number(r.depositPrice || 0), 0);
@@ -1159,6 +1434,8 @@
 
       return {
         activeRes,
+        paidRes,
+        unpaidActiveRes,
         cancelledRes,
         totalRetainedCredit,
         totalClosedRemaining,
@@ -1189,6 +1466,7 @@
       document.getElementById("headerOrderCount").textContent = summary.activeRes.length;
       document.getElementById("loggedClientName").textContent = currentUser.name;
       document.getElementById("loggedClientEmail").textContent = currentUser.email;
+      document.getElementById("loggedClientPaidCount").textContent = summary.paidRes.length;
 
       const creditBadge = document.getElementById("loggedClientCreditBadge");
       if (summary.totalRetainedCredit > 0) {
@@ -1199,7 +1477,7 @@
       }
     }
 
-    // --- LÓGICA DE BOXES CONTÍNUOS ---
+    // --- LÓGICA DE BOXES CONTÍNUOS E DATA DE FECHAMENTO ---
     function getActiveProductReservations(productId) {
       return reservations.filter(r => r.productId === productId && r.status !== "CANCELLED");
     }
@@ -1216,10 +1494,19 @@
       for (let i = 0; i < total; i += 10) {
         const boxNum = Math.floor(i / 10) + 1;
         const members = allActive.slice(i, i + 10);
+        const isComplete = members.length === 10;
+        const closedAtMs = isComplete ? (members[9]?.createdAtMs || null) : null;
+        const trackingKey = `${productId}_box_${boxNum}`;
+        const trackingData = boxTrackings[trackingKey] || null;
+
         boxes.push({
           boxNumber: boxNum,
           members,
-          isComplete: members.length === 10
+          isComplete,
+          closedAtMs,
+          closedDateStr: closedAtMs ? formatDateOnly(closedAtMs) : null,
+          trackingKey,
+          trackingData
         });
       }
 
@@ -1243,7 +1530,7 @@
       if (cats.includes(current)) select.value = current;
     }
 
-    // --- RENDERIZAÇÃO DO CATÁLOGO (SEM IMAGENS) ---
+    // --- RENDERIZAÇÃO DO CATÁLOGO (SEM IMAGENS / SOMENTE PIX) ---
     window.renderCatalog = function () {
       const search = document.getElementById("searchInput").value.toLowerCase().trim();
       const cat = document.getElementById("categoryFilter").value;
@@ -1272,7 +1559,7 @@
         const pct = (info.activeBoxCount / 10) * 100;
 
         return `
-          <div class="bg-slate-900 border border-slate-800 hover:border-blue-500/40 rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-lg transition">
+          <div class="bg-slate-900 border border-slate-800 hover:border-teal-500/40 rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-lg transition">
             <div>
               <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800/80">
                 <span class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30">
@@ -1298,8 +1585,8 @@
 
               <div class="mt-3.5 grid grid-cols-2 gap-2 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
                 <div>
-                  <p class="text-[11px] text-slate-400">Reserva (Sinal)</p>
-                  <p class="font-extrabold text-blue-400 text-sm">${formatBRL(p.depositPrice)}</p>
+                  <p class="text-[11px] text-slate-400">Reserva PIX (Sinal)</p>
+                  <p class="font-extrabold text-teal-400 text-sm">${formatBRL(p.depositPrice)}</p>
                 </div>
                 <div>
                   <p class="text-[11px] text-slate-400">Valor Cheio</p>
@@ -1331,8 +1618,8 @@
               ` : ''}
 
               <button onclick="openReserveModal('${p.id}')"
-                class="mt-4 w-full py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20">
-                Reservar no Box #${info.activeBoxNumber} (${formatBRL(p.depositPrice)})
+                class="mt-4 w-full py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition bg-teal-600 hover:bg-teal-500 text-white shadow-lg shadow-teal-600/20">
+                ❖ Reservar via PIX (${formatBRL(p.depositPrice)})
               </button>
             </div>
           </div>
@@ -1366,12 +1653,29 @@
       document.getElementById("modalRemainingPrice").textContent = formatBRL(remaining);
       document.getElementById("modalBoxProgress").textContent = `${info.activeBoxCount + 1} de 10`;
 
-      const pixBox = document.getElementById("pixInstructionBox");
+      const configuredArea = document.getElementById("pixConfiguredArea");
+      const missingWarn = document.getElementById("pixMissingWarning");
+
       if (storeConfig.pixKey) {
-        pixBox.classList.remove("hidden");
+        configuredArea.classList.remove("hidden");
+        missingWarn.classList.add("hidden");
+        document.getElementById("displayPixTypeBadge").textContent = `Chave ${storeConfig.pixType || "PIX"}`;
+        document.getElementById("displayPixReceiver").textContent = storeConfig.pixReceiverName || "Nexxus Oficial BR";
         document.getElementById("displayPixKey").textContent = storeConfig.pixKey;
+
+        const payload = generatePixPayload(
+          storeConfig.pixKey,
+          storeConfig.pixReceiverName,
+          storeConfig.pixCity,
+          p.depositPrice,
+          `BOX${info.activeBoxNumber}V${info.activeBoxCount + 1}`
+        );
+        document.getElementById("displayPixPayload").value = payload;
+        document.getElementById("displayPixQrCode").src =
+          `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payload)}`;
       } else {
-        pixBox.classList.add("hidden");
+        configuredArea.classList.add("hidden");
+        missingWarn.classList.remove("hidden");
       }
 
       document.getElementById("reserveModal").classList.remove("hidden");
@@ -1391,7 +1695,7 @@
       if (!p) return;
 
       btn.disabled = true;
-      btn.textContent = "Registrando reserva...";
+      btn.textContent = "Registrando reserva PIX...";
 
       try {
         const infoBefore = getBoxesInfo(productId);
@@ -1407,6 +1711,8 @@
           clientName: currentUser.name,
           clientEmail: currentUser.email,
           clientWhatsapp: currentUser.phone,
+          paymentMethod: "PIX",
+          pixKeyUsed: storeConfig.pixKey || "",
           depositPrice: Number(p.depositPrice),
           fullPrice: Number(p.fullPrice),
           status: "ACTIVE",
@@ -1423,25 +1729,25 @@
           alert(
             `🎉 PARABÉNS ${currentUser.name}!\n\n` +
             `Você completou a 10ª peça (#10/10) do BOX #${boxNumber} de "${p.name}"!\n` +
-            `O BOX #${boxNumber} está LIBERADO para todos os 10 participantes pagarem o valor restante!`
+            `O BOX #${boxNumber} está LIBERADO para todos os 10 participantes pagarem o valor restante via PIX!`
           );
         } else {
           alert(
-            `✅ Reserva confirmada (${formatBRL(p.depositPrice)})!\n\n` +
+            `✅ Reserva PIX confirmada (${formatBRL(p.depositPrice)})!\n\n` +
             `Produto: ${p.name}\n` +
             `Posição: #${posInBox}/10 no BOX #${boxNumber}.\n` +
-            `Assim que o Box #${boxNumber} fechar 10 peças, o pagamento do restante será liberado.`
+            `Assim que o Box #${boxNumber} fechar 10 peças, o pagamento do restante via PIX será liberado.`
           );
         }
       } catch (err) {
         alert("Erro ao registrar reserva: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = "Confirmar Reserva";
+        btn.textContent = "Já fiz o PIX / Confirmar Reserva";
       }
     };
 
-    // --- MEUS PEDIDOS & CANCELAMENTO PELO CLIENTE ---
+    // --- MEUS PEDIDOS, COMPRAS PAGAS & RASTREIOS E ENVIOS DO CLIENTE ---
     window.cancelClientReservation = async function (resId) {
       if (isSiteClosedNow() && !currentAdmin) {
         alert("O site está fechado às terças e quartas-feiras.");
@@ -1459,7 +1765,7 @@
       }
 
       const ok = confirm(
-        `Atenção: Ao cancelar "${res.productName}", o valor da reserva (${formatBRL(res.depositPrice)}) NÃO será devolvido, ` +
+        `Atenção: Ao cancelar "${res.productName}", o valor da reserva PIX (${formatBRL(res.depositPrice)}) NÃO será devolvido, ` +
         `mas ficará retido como CRÉDITO para ser abatido da sua conta total caso você tenha outros produtos.\n\nDeseja confirmar o cancelamento?`
       );
       if (!ok) return;
@@ -1470,12 +1776,199 @@
       });
     };
 
+    // Exibe os rateios fechados agrupados pela data de fechamento com a informação manual inserida pelo Admin
+    function buildGroupedTrackingHtml(filterText = "") {
+      const q = (filterText || "").toLowerCase().trim();
+      const completedBoxes = [];
+
+      products.forEach(p => {
+        const info = getBoxesInfo(p.id);
+        info.boxes.forEach(box => {
+          if (!box.isComplete) return;
+          const infoText = box.trackingData?.infoText || "";
+          const dateLabel = box.closedDateStr || "Sem data";
+
+          if (
+            q &&
+            !p.name.toLowerCase().includes(q) &&
+            !dateLabel.includes(q) &&
+            !infoText.toLowerCase().includes(q)
+          ) {
+            return;
+          }
+
+          completedBoxes.push({
+            product: p,
+            box,
+            dateLabel,
+            closedAtMs: box.closedAtMs || 0
+          });
+        });
+      });
+
+      if (completedBoxes.length === 0) {
+        return `<div class="bg-slate-950 border border-slate-800 rounded-xl p-6 text-center text-xs text-slate-400">
+          Nenhum rateio fechado (10/10) encontrado no momento.
+        </div>`;
+      }
+
+      completedBoxes.sort((a, b) => b.closedAtMs - a.closedAtMs);
+      const groupsByDate = new Map();
+      completedBoxes.forEach(item => {
+        if (!groupsByDate.has(item.dateLabel)) {
+          groupsByDate.set(item.dateLabel, []);
+        }
+        groupsByDate.get(item.dateLabel).push(item);
+      });
+
+      return Array.from(groupsByDate.entries()).map(([dateStr, items]) => `
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden">
+          <div class="px-4 py-3 bg-indigo-950/40 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-indigo-400 font-bold text-xs">📅 Data de Fechamento do Rateio:</span>
+              <span class="px-2.5 py-0.5 rounded-md bg-indigo-600/25 text-indigo-200 border border-indigo-500/30 font-bold text-xs">${dateStr}</span>
+            </div>
+            <span class="text-[11px] text-slate-400">${items.length} ${items.length === 1 ? 'produto/box fechado' : 'produtos/boxes fechados'}</span>
+          </div>
+
+          <div class="divide-y divide-slate-900">
+            ${items.map(({ product: p, box }) => {
+              const trk = box.trackingData;
+              const hasInfo = trk && trk.infoText;
+              return `
+                <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">Box #${box.boxNumber} (10/10)</span>
+                      <span class="font-bold text-white text-sm">${p.name}</span>
+                    </div>
+                    <p class="text-slate-400 mt-1">
+                      Participantes: ${box.members.map((m, idx) => `#${idx + 1} ${m.clientName.split(' ')[0]}`).join(' • ')}
+                    </p>
+                  </div>
+
+                  <div class="sm:max-w-md w-full sm:text-right">
+                    ${hasInfo ? `
+                      <div class="inline-block text-left w-full bg-slate-900 border border-indigo-500/40 rounded-xl px-3.5 py-2.5 space-y-1">
+                        <span class="text-[10px] uppercase tracking-wider text-indigo-300 font-bold block">📦 Rastreios e Envios</span>
+                        <p class="text-xs font-semibold text-white whitespace-pre-line leading-relaxed">${trk.infoText}</p>
+                        <span class="text-[10px] text-slate-500 block">Atualizado em ${formatDateOnly(trk.updatedAtMs)}</span>
+                      </div>
+                    ` : `
+                      <span class="inline-block px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] font-semibold">
+                        ⏳ Aguardando atualização de envio
+                      </span>
+                    `}
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    window.renderPublicTrackingBoard = function () {
+      const body = document.getElementById("publicTrackingBody");
+      if (!body) return;
+      const q = document.getElementById("publicTrackingSearch")?.value || "";
+      body.innerHTML = buildGroupedTrackingHtml(q);
+    };
+
     function renderMyOrders() {
       const container = document.getElementById("myOrdersBody");
       if (!container || !currentUser) return;
 
       document.getElementById("myOrdersSubtitle").textContent = `${currentUser.name} • ${currentUser.email} • ${currentUser.phone}`;
       const summary = getClientFinancialSummary(currentUser);
+
+      // ABA 3 DO CLIENTE: RASTREIOS E ENVIOS POR DATA DE FECHAMENTO
+      if (activeClientPortalTab === "tracking") {
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div class="bg-indigo-950/30 border border-indigo-800/50 rounded-xl p-3.5 text-xs text-indigo-200">
+              Consulte abaixo todos os rateios fechados separados pela <strong>data de fechamento (10/10)</strong> com as informações atualizadas de rastreios e envios.
+            </div>
+            ${buildGroupedTrackingHtml("")}
+          </div>
+        `;
+        return;
+      }
+
+      // ABA 2 DO CLIENTE: LISTA DE COMPRAS PAGAS
+      if (activeClientPortalTab === "paid") {
+        const totalPaidAmount = summary.paidRes.reduce((acc, r) => acc + Number(r.fullPrice || 0), 0);
+
+        container.innerHTML = `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="bg-slate-950 border border-emerald-500/40 rounded-xl p-4">
+              <p class="text-[11px] text-emerald-300">Total de Produtos Pagos (Quitados via PIX)</p>
+              <p class="text-xl font-extrabold text-white mt-0.5">${summary.paidRes.length} ${summary.paidRes.length === 1 ? 'produto pago' : 'produtos pagos'}</p>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+              <p class="text-[11px] text-slate-400">Valor Total em Compras Quitadas</p>
+              <p class="text-xl font-extrabold text-emerald-400 mt-0.5">${formatBRL(totalPaidAmount)}</p>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-3">✅ Minha Lista de Compras Pagas</h3>
+            ${summary.paidRes.length === 0 ? `
+              <div class="bg-slate-950 border border-slate-800 rounded-xl p-6 text-center text-xs text-slate-400">
+                Você ainda não possui compras com quitação integral confirmada. Assim que um Box fechar 10/10 e o pagamento PIX for confirmado, o produto aparecerá aqui.
+              </div>
+            ` : `
+              <div class="space-y-3">
+                ${summary.paidRes.map(r => {
+                  const info = getBoxesInfo(r.productId);
+                  const myBox = info.boxes.find(b => b.members.some(m => m.id === r.id));
+                  const boxNum = myBox ? myBox.boxNumber : 1;
+                  const closedDate = myBox?.closedDateStr || "Aguardando fechamento";
+                  const trk = myBox?.trackingData;
+
+                  return `
+                    <div class="bg-slate-950 border border-emerald-500/35 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div class="space-y-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                          <span class="px-2 py-0.5 rounded bg-emerald-600 text-white font-bold text-[10px]">PAGO INTEGRAL ✓</span>
+                          <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-semibold text-[10px]">Box #${boxNum}</span>
+                          <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold text-[10px]">
+                            Fechado em: ${closedDate}
+                          </span>
+                        </div>
+                        <h4 class="font-bold text-white text-sm pt-0.5">${r.productName}</h4>
+                        <p class="text-xs text-slate-400">
+                          Valor total pago: <strong class="text-emerald-400">${formatBRL(r.fullPrice)}</strong>
+                          ${r.paidFullAtMs ? ` • Quitado em ${formatDateOnly(r.paidFullAtMs)}` : ''}
+                        </p>
+                      </div>
+
+                      <div class="sm:max-w-sm w-full">
+                        ${trk && trk.infoText ? `
+                          <div class="bg-slate-900 border border-indigo-500/40 rounded-xl p-3 text-xs space-y-1">
+                            <p class="text-[10px] font-bold uppercase text-indigo-300">📦 Rastreios e Envios</p>
+                            <p class="font-semibold text-white whitespace-pre-line leading-relaxed">${trk.infoText}</p>
+                          </div>
+                        ` : `
+                          <span class="inline-block px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold">
+                            ⏳ Aguardando atualização de envio pelo Admin
+                          </span>
+                        `}
+                      </div>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
+            `}
+          </div>
+        `;
+        return;
+      }
+
+      // ABA 1 DO CLIENTE: MINHAS RESERVAS ATIVAS & PAGAMENTO PIX
+      const pixNetPayload = (storeConfig.pixKey && summary.netToPay > 0)
+        ? generatePixPayload(storeConfig.pixKey, storeConfig.pixReceiverName, storeConfig.pixCity, summary.netToPay, "QUITACAO")
+        : "";
 
       container.innerHTML = `
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1489,13 +1982,33 @@
             <p class="text-[10px] text-slate-500 mt-0.5">Abatido automaticamente na conta total</p>
           </div>
           <div class="bg-slate-950 border border-emerald-500/40 rounded-xl p-3.5">
-            <p class="text-[11px] text-emerald-300">Saldo Líquido a Pagar (Conta Total)</p>
+            <p class="text-[11px] text-emerald-300">Saldo Líquido a Pagar via PIX</p>
             <p class="text-base font-extrabold text-emerald-400 mt-0.5">${formatBRL(summary.netToPay)}</p>
           </div>
         </div>
 
+        ${summary.netToPay > 0 && storeConfig.pixKey ? `
+          <div class="bg-teal-950/35 border border-teal-700/50 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="space-y-1 text-xs">
+              <p class="font-bold text-teal-300">❖ Quitação via PIX — Chave Oficial (${storeConfig.pixType || "PIX"})</p>
+              <p class="text-slate-300">Favorecido: <strong class="text-white">${storeConfig.pixReceiverName || "Nexxus Oficial BR"}</strong></p>
+              <p class="font-mono text-teal-200 select-all">${storeConfig.pixKey}</p>
+            </div>
+            <div class="flex flex-wrap gap-2 shrink-0">
+              <button onclick="copyTextToClipboard('${storeConfig.pixKey}', 'Chave PIX copiada!')"
+                class="px-3.5 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-semibold text-xs">
+                Copiar Chave PIX
+              </button>
+              <button onclick="copyTextToClipboard('${pixNetPayload}', 'Código PIX Copia e Cola do saldo líquido copiado!')"
+                class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-700/50 font-semibold text-xs">
+                PIX Copia e Cola (${formatBRL(summary.netToPay)})
+              </button>
+            </div>
+          </div>
+        ` : ''}
+
         <div>
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2.5">Minhas Reservas Ativas (${summary.activeRes.length})</h3>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2.5">Todas as Minhas Reservas Ativas (${summary.activeRes.length})</h3>
           ${summary.activeRes.length === 0 ? `<p class="text-xs text-slate-500">Você não possui reservas ativas no momento.</p>` : `
             <div class="space-y-2.5">
               ${summary.activeRes.map(r => {
@@ -1505,30 +2018,36 @@
                 const boxCount = myBox ? myBox.members.length : 1;
                 const isComplete = myBox ? myBox.isComplete : false;
                 const remaining = Math.max(0, Number(r.fullPrice) - Number(r.depositPrice));
+                const trk = myBox?.trackingData;
 
                 return `
                   <div class="bg-slate-950 border ${isComplete ? 'border-emerald-500/40' : 'border-slate-800'} rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <div class="flex items-center gap-2">
+                      <div class="flex flex-wrap items-center gap-2">
                         <span class="text-[11px] font-bold px-2 py-0.5 rounded ${isComplete ? 'bg-emerald-600 text-white' : 'bg-blue-600/20 text-blue-400'}">
                           Box #${boxNum} (${boxCount}/10)
                         </span>
                         <span class="text-xs font-semibold ${isComplete ? 'text-emerald-400' : 'text-amber-300'}">
-                          ${isComplete ? 'LIBERADO P/ PAGAR RESTANTE' : 'Aguardando completar 10 peças'}
+                          ${isComplete ? `LIBERADO (Fechado em ${myBox.closedDateStr})` : 'Aguardando completar 10 peças'}
                         </span>
                       </div>
                       <h4 class="font-bold text-white text-sm mt-1">${r.productName}</h4>
                       <p class="text-xs text-slate-400 mt-0.5">
-                        Sinal pago: <strong class="text-blue-400">${formatBRL(r.depositPrice)}</strong> •
+                        Sinal PIX pago: <strong class="text-teal-400">${formatBRL(r.depositPrice)}</strong> •
                         Valor cheio: <strong class="text-white">${formatBRL(r.fullPrice)}</strong> •
-                        Restante: <strong class="text-emerald-400">${formatBRL(remaining)}</strong>
+                        Restante PIX: <strong class="text-emerald-400">${formatBRL(remaining)}</strong>
                       </p>
+                      ${trk && trk.infoText ? `
+                        <p class="text-xs text-indigo-300 mt-1.5 font-semibold">
+                          📦 Rastreios e Envios: <span class="text-white font-normal">${trk.infoText}</span>
+                        </p>
+                      ` : ''}
                     </div>
 
                     <div>
                       ${isComplete ? `
                         <span class="inline-block px-3 py-1.5 rounded-lg bg-emerald-950/70 border border-emerald-700/50 text-emerald-300 text-xs font-semibold">
-                          ${r.paidFull ? 'Quitado ✓' : 'Box Fechado (Não cancelável)'}
+                          ${r.paidFull ? 'Quitado via PIX ✓' : 'Box Fechado (Não cancelável)'}
                         </span>
                       ` : `
                         <button onclick="cancelClientReservation('${r.id}')"
@@ -1546,7 +2065,7 @@
 
         ${summary.cancelledRes.length > 0 ? `
           <div>
-            <h3 class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">Reservas Canceladas (Sinais Retidos como Crédito)</h3>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">Reservas Canceladas (Sinais PIX Retidos como Crédito)</h3>
             <div class="space-y-2">
               ${summary.cancelledRes.map(r => `
                 <div class="bg-slate-950/60 border border-amber-500/20 rounded-xl p-3 flex items-center justify-between text-xs">
@@ -1562,6 +2081,176 @@
         ` : ''}
       `;
     }
+
+    // --- ADMIN: ATUALIZAR INFORMAÇÃO MANUAL DE RASTREIOS E ENVIOS ---
+    window.saveBoxTracking = async function (productId, boxNumber, productName, closedDateStr) {
+      if (!verifyCurrentAdminPassword()) return;
+
+      const trackingKey = `${productId}_box_${boxNumber}`;
+      const infoInput = document.getElementById(`trk-info-${trackingKey}`);
+      const infoText = (infoInput?.value || "").trim();
+
+      if (!infoText) {
+        alert("Digite a informação de rastreios e envios antes de salvar.");
+        return;
+      }
+
+      await setDoc(doc(db, "box_trackings", trackingKey), {
+        productId,
+        productName,
+        boxNumber,
+        closedDateStr,
+        infoText,
+        updatedByAdmin: currentAdmin.name,
+        updatedByEmail: currentAdmin.email,
+        updatedAtMs: Date.now()
+      }, { merge: true });
+
+      await logAdminAudit(
+        "Atualizou Rastreios e Envios",
+        `Produto: ${productName} | Box #${boxNumber} (Fechado em ${closedDateStr}) | Info: ${infoText}`
+      );
+      alert(`Informação salva para ${productName} (Box #${boxNumber})!`);
+    };
+
+    // Aplica a mesma informação manual para TODOS os produtos/boxes fechados naquela data
+    window.saveBulkTrackingForDate = async function (dateStr, safeDateId) {
+      if (!verifyCurrentAdminPassword()) return;
+
+      const bulkInput = document.getElementById(`bulk-trk-${safeDateId}`);
+      const infoText = (bulkInput?.value || "").trim();
+      if (!infoText) {
+        alert("Digite a informação que deseja aplicar para todos os produtos desta data.");
+        return;
+      }
+
+      let updatedCount = 0;
+      for (const p of products) {
+        const info = getBoxesInfo(p.id);
+        for (const box of info.boxes) {
+          if (box.isComplete && box.closedDateStr === dateStr) {
+            await setDoc(doc(db, "box_trackings", box.trackingKey), {
+              productId: p.id,
+              productName: p.name,
+              boxNumber: box.boxNumber,
+              closedDateStr: dateStr,
+              infoText,
+              updatedByAdmin: currentAdmin.name,
+              updatedByEmail: currentAdmin.email,
+              updatedAtMs: Date.now()
+            }, { merge: true });
+            updatedCount++;
+          }
+        }
+      }
+
+      await logAdminAudit(
+        "Atualizou Rastreios e Envios em lote por data",
+        `Data: ${dateStr} (${updatedCount} Boxes atualizados) | Info: ${infoText}`
+      );
+      alert(`Informação aplicada com sucesso para todos os ${updatedCount} produto(s)/box(es) fechados em ${dateStr}!`);
+    };
+
+    window.renderAdminTracking = function () {
+      const container = document.getElementById("adminTrackingList");
+      if (!container) return;
+
+      const q = (document.getElementById("adminTrackingSearch")?.value || "").toLowerCase().trim();
+      const completedBoxes = [];
+
+      products.forEach(p => {
+        const info = getBoxesInfo(p.id);
+        info.boxes.forEach(box => {
+          if (!box.isComplete) return;
+          const dateLabel = box.closedDateStr || "Sem data";
+          const infoText = box.trackingData?.infoText || "";
+
+          if (
+            q &&
+            !p.name.toLowerCase().includes(q) &&
+            !dateLabel.includes(q) &&
+            !infoText.toLowerCase().includes(q)
+          ) {
+            return;
+          }
+
+          completedBoxes.push({
+            product: p,
+            box,
+            dateLabel,
+            closedAtMs: box.closedAtMs || 0
+          });
+        });
+      });
+
+      if (completedBoxes.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500">Nenhum Box fechado (10/10) encontrado para lançar informação de rastreios e envios.</p>`;
+        return;
+      }
+
+      completedBoxes.sort((a, b) => b.closedAtMs - a.closedAtMs);
+      const groupsByDate = new Map();
+      completedBoxes.forEach(item => {
+        if (!groupsByDate.has(item.dateLabel)) groupsByDate.set(item.dateLabel, []);
+        groupsByDate.get(item.dateLabel).push(item);
+      });
+
+      container.innerHTML = Array.from(groupsByDate.entries()).map(([dateStr, items]) => {
+        const safeDateId = dateStr.replace(/\//g, "-");
+        return `
+          <div class="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden">
+            <div class="px-4 py-3 bg-indigo-950/35 border-b border-slate-800 space-y-2.5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="text-xs font-bold text-indigo-300">📅 Data de Fechamento do Rateio: <strong class="text-white">${dateStr}</strong></span>
+                <span class="text-[11px] text-slate-400">${items.length} produto(s)/box(es) fechado(s) nesta data</span>
+              </div>
+
+              <!-- Atualização em lote para todos os produtos daquela mesma data -->
+              <div class="flex flex-col sm:flex-row gap-2">
+                <input id="bulk-trk-${safeDateId}" type="text" placeholder="Escreva a informação para aplicar a TODOS os produtos fechados em ${dateStr}..."
+                  class="flex-1 bg-slate-900 border border-indigo-700/50 focus:border-indigo-400 rounded-lg px-3 py-2 text-xs text-white outline-none" />
+                <button onclick="saveBulkTrackingForDate('${dateStr}', '${safeDateId}')"
+                  class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shrink-0">
+                  Aplicar a Todos desta Data
+                </button>
+              </div>
+            </div>
+
+            <div class="divide-y divide-slate-900">
+              ${items.map(({ product: p, box }) => {
+                const trk = box.trackingData || {};
+                const paidCount = box.members.filter(m => m.paidFull).length;
+
+                return `
+                  <div class="p-4 space-y-2.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">Box #${box.boxNumber} (10/10)</span>
+                        <span class="font-bold text-white text-sm ml-1.5">${p.name}</span>
+                        <span class="text-xs text-slate-400 ml-2">(${paidCount}/10 quitados via PIX)</span>
+                      </div>
+                      ${trk.infoText
+                        ? `<span class="text-[11px] text-emerald-400 font-semibold">✓ Informação publicada</span>`
+                        : `<span class="text-[11px] text-amber-400">Aguardando informação</span>`
+                      }
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-2.5">
+                      <input id="trk-info-${box.trackingKey}" type="text" value="${trk.infoText || ''}" placeholder="Informação de rastreios e envios para ${p.name} (Box #${box.boxNumber})..."
+                        class="flex-1 bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-lg px-3 py-2 text-xs text-white outline-none" />
+                      <button onclick="saveBoxTracking('${p.id}', ${box.boxNumber}, '${p.name.replace(/'/g, "")}', '${dateStr}')"
+                        class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-indigo-600 text-white font-semibold text-xs transition shrink-0">
+                        Salvar Individual
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `;
+      }).join("");
+    };
 
     // --- ADMIN: ARRECADAÇÃO SEMANAL ---
     window.renderWeeklyRevenue = function () {
@@ -1614,15 +2303,15 @@
 
       cardsEl.innerHTML = `
         <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
-          <p class="text-xs text-slate-400">Sinais Arrecadados (${selectedWeek.reservationsCount} reservas)</p>
-          <p class="text-xl font-extrabold text-blue-400 mt-1">${formatBRL(selectedWeek.depositsTotal)}</p>
+          <p class="text-xs text-slate-400">Sinais PIX Arrecadados (${selectedWeek.reservationsCount} reservas)</p>
+          <p class="text-xl font-extrabold text-teal-400 mt-1">${formatBRL(selectedWeek.depositsTotal)}</p>
         </div>
         <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
-          <p class="text-xs text-slate-400">Restantes Quitados na Semana</p>
+          <p class="text-xs text-slate-400">Restantes PIX Quitados na Semana</p>
           <p class="text-xl font-extrabold text-purple-400 mt-1">${formatBRL(selectedWeek.fullPaymentsTotal)}</p>
         </div>
         <div class="bg-slate-950 border border-emerald-500/40 rounded-xl p-4">
-          <p class="text-xs text-emerald-300 font-semibold">Total Geral Arrecadado (Ter–Dom 23:59)</p>
+          <p class="text-xs text-emerald-300 font-semibold">Total Geral PIX (Ter–Dom 23:59)</p>
           <p class="text-2xl font-extrabold text-emerald-400 mt-1">${formatBRL(selectedWeek.grandTotal)}</p>
         </div>
       `;
@@ -1636,7 +2325,7 @@
               ${w.key === currentWeek.key ? '<span class="ml-2 text-[10px] px-2 py-0.5 rounded bg-blue-600 text-white font-bold">Atual</span>' : ''}
             </td>
             <td class="p-3 text-slate-300">${w.reservationsCount}</td>
-            <td class="p-3 text-blue-400">${formatBRL(w.depositsTotal)}</td>
+            <td class="p-3 text-teal-400">${formatBRL(w.depositsTotal)}</td>
             <td class="p-3 text-purple-400">${formatBRL(w.fullPaymentsTotal)}</td>
             <td class="p-3 text-right font-extrabold text-emerald-400">${formatBRL(w.grandTotal)}</td>
             <td class="p-3 text-center">
@@ -1673,6 +2362,8 @@
         clientName: user.name,
         clientEmail: user.email,
         clientWhatsapp: user.phone,
+        paymentMethod: "PIX",
+        pixKeyUsed: storeConfig.pixKey || "",
         depositPrice: Number(prod.depositPrice),
         fullPrice: Number(prod.fullPrice),
         status: "ACTIVE",
@@ -1711,7 +2402,7 @@
         return;
       }
 
-      const productOptions = products.map(p => `<option value="${p.id}">${p.name} (Sinal: ${formatBRL(p.depositPrice)} | Cheio: ${formatBRL(p.fullPrice)})</option>`).join("");
+      const productOptions = products.map(p => `<option value="${p.id}">${p.name} (Sinal PIX: ${formatBRL(p.depositPrice)} | Cheio: ${formatBRL(p.fullPrice)})</option>`).join("");
 
       container.innerHTML = filteredUsers.map(u => {
         const summary = getClientFinancialSummary(u);
@@ -1725,7 +2416,7 @@
               <div class="text-right text-xs space-y-0.5">
                 <p class="text-slate-400">Restante Boxes Fechados: <strong class="text-white">${formatBRL(summary.totalClosedRemaining)}</strong></p>
                 <p class="text-amber-400">Crédito Retido (Cancelados): <strong>- ${formatBRL(summary.totalRetainedCredit)}</strong></p>
-                <p class="text-emerald-400 font-bold">Total Líquido a Cobrar: ${formatBRL(summary.netToPay)}</p>
+                <p class="text-emerald-400 font-bold">Total Líquido PIX a Cobrar: ${formatBRL(summary.netToPay)}</p>
               </div>
             </div>
 
@@ -1755,12 +2446,12 @@
                           Box #${boxNum} (${boxCount}/10)
                         </span>
                         <span class="font-semibold text-white ml-1.5">${r.productName}</span>
-                        <span class="text-slate-400 ml-2">Sinal: ${formatBRL(r.depositPrice)} | Cheio: ${formatBRL(r.fullPrice)}</span>
+                        <span class="text-slate-400 ml-2">Sinal PIX: ${formatBRL(r.depositPrice)} | Cheio: ${formatBRL(r.fullPrice)}</span>
                       </div>
                       <div class="flex items-center gap-2">
                         <button onclick="togglePaidFull('${r.id}', ${!!r.paidFull})"
                           class="px-2.5 py-1 rounded font-semibold ${r.paidFull ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-300'}">
-                          ${r.paidFull ? 'Quitado ✓' : 'Marcar Quitado'}
+                          ${r.paidFull ? 'PIX Quitado ✓' : 'Marcar PIX Quitado'}
                         </button>
                         <button onclick="adminDeleteClientReservation('${r.id}', '${r.productName.replace(/'/g, "")}', '${u.name.replace(/'/g, "")}')"
                           class="px-2.5 py-1 rounded bg-red-950 hover:bg-red-900 text-red-300 font-semibold">
@@ -1777,7 +2468,7 @@
       }).join("");
     };
 
-    // --- ADMIN: BOXES & COBRANÇA ---
+    // --- ADMIN: BOXES & COBRANÇA PIX ---
     window.togglePaidFull = async function (resId, currentStatus) {
       const res = reservations.find(r => r.id === resId);
       await updateDoc(doc(db, "reservations", resId), {
@@ -1786,7 +2477,7 @@
       });
       if (res) {
         await logAdminAudit(
-          !currentStatus ? "Marcou pagamento integral como Quitado" : "Desmarcou pagamento integral",
+          !currentStatus ? "Confirmou quitação PIX integral" : "Desmarcou quitação PIX",
           `Cliente: ${res.clientName} | Produto: ${res.productName}`
         );
       }
@@ -1822,13 +2513,13 @@
             <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
               <div>
                 <span class="text-xs font-bold ${box.isComplete ? 'text-emerald-400' : 'text-blue-400'}">
-                  ${box.isComplete ? `✅ BOX #${box.boxNumber} COMPLETO (10/10) — LIBERADO P/ PAGAR RESTANTE` : `⏳ BOX #${box.boxNumber} EM ANDAMENTO (${box.members.length}/10)`}
+                  ${box.isComplete ? `✅ BOX #${box.boxNumber} COMPLETO (10/10) — FECHADO EM ${box.closedDateStr}` : `⏳ BOX #${box.boxNumber} EM ANDAMENTO (${box.members.length}/10)`}
                 </span>
                 <h4 class="font-bold text-white text-sm">${p.name}</h4>
               </div>
               <div class="text-right text-xs">
                 <span class="text-slate-400">Cheio: <strong class="text-white">${formatBRL(p.fullPrice)}</strong></span> |
-                <span class="text-slate-400">Sinal: <strong class="text-blue-400">${formatBRL(p.depositPrice)}</strong></span> |
+                <span class="text-slate-400">Sinal PIX: <strong class="text-teal-400">${formatBRL(p.depositPrice)}</strong></span> |
                 <span class="text-slate-400">Restante base: <strong class="text-emerald-400">${formatBRL(remaining)}</strong></span>
               </div>
             </div>
@@ -1839,16 +2530,20 @@
                 const clientSummary = clientObj ? getClientFinancialSummary(clientObj) : { totalRetainedCredit: 0 };
                 const creditAvailable = clientSummary.totalRetainedCredit;
                 const finalToCharge = Math.max(0, remaining - creditAvailable);
+                const pixCopiaCola = (storeConfig.pixKey && finalToCharge > 0)
+                  ? generatePixPayload(storeConfig.pixKey, storeConfig.pixReceiverName, storeConfig.pixCity, finalToCharge, `BOX${box.boxNumber}P${idx + 1}`)
+                  : "";
 
                 const msg = encodeURIComponent(
                   `Olá ${r.clientName}! Ótima notícia da *Nexxus Oficial BR*! 🎉\n\n` +
-                  `O *Box #${box.boxNumber}* do produto *${p.name}* completou 10/10 e está *LIBERADO*!\n\n` +
+                  `O *Box #${box.boxNumber}* do produto *${p.name}* completou 10/10 e está *LIBERADO* para pagamento via PIX!\n\n` +
                   `• Sua vaga: #${idx + 1}/10 do Box #${box.boxNumber}\n` +
                   `• Valor Cheio: ${formatBRL(p.fullPrice)}\n` +
-                  `• Sinal já pago: -${formatBRL(p.depositPrice)}\n` +
+                  `• Sinal PIX já pago: -${formatBRL(p.depositPrice)}\n` +
                   (creditAvailable > 0 ? `• Crédito retido abatido: -${formatBRL(creditAvailable)}\n` : '') +
-                  `• *Valor Restante a Pagar: ${formatBRL(finalToCharge)}*\n` +
-                  (storeConfig.pixKey ? `\nChave PIX: ${storeConfig.pixKey}` : '')
+                  `• *Valor Restante a Pagar (Somente PIX): ${formatBRL(finalToCharge)}*\n` +
+                  (storeConfig.pixKey ? `\n❖ Chave PIX (${storeConfig.pixType || "PIX"}): ${storeConfig.pixKey}\nFavorecido: ${storeConfig.pixReceiverName || "Nexxus Oficial BR"}` : '') +
+                  (pixCopiaCola ? `\n\nPIX Copia e Cola:\n${pixCopiaCola}` : '')
                 );
 
                 return `
@@ -1868,11 +2563,11 @@
                     <div class="flex items-center gap-2">
                       <button onclick="togglePaidFull('${r.id}', ${!!r.paidFull})"
                         class="px-2.5 py-1 rounded font-semibold ${r.paidFull ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-300'}">
-                        ${r.paidFull ? 'Restante Pago ✓' : 'Marcar Pago'}
+                        ${r.paidFull ? 'PIX Pago ✓' : 'Marcar PIX Pago'}
                       </button>
                       <a href="https://wa.me/55${r.clientWhatsapp}?text=${msg}" target="_blank"
-                        class="px-3 py-1 rounded ${box.isComplete ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'} font-semibold">
-                        ${box.isComplete ? `Cobrar ${formatBRL(finalToCharge)}` : 'WhatsApp'}
+                        class="px-3 py-1 rounded ${box.isComplete ? 'bg-teal-600 hover:bg-teal-500 text-white' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'} font-semibold">
+                        ${box.isComplete ? `Cobrar PIX ${formatBRL(finalToCharge)}` : 'WhatsApp'}
                       </a>
                     </div>
                   </div>
@@ -1939,7 +2634,7 @@
           <tr>
             <td class="p-3 font-medium text-white">${p.name}</td>
             <td class="p-3 text-slate-400">${p.category || '-'}</td>
-            <td class="p-3 text-blue-400 font-semibold">${formatBRL(p.depositPrice)}</td>
+            <td class="p-3 text-teal-400 font-semibold">${formatBRL(p.depositPrice)}</td>
             <td class="p-3 text-white">${formatBRL(p.fullPrice)}</td>
             <td class="p-3">
               <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400">
@@ -2030,15 +2725,34 @@
       }
     }
 
-    // --- CONFIGURAÇÕES ---
+    // --- CONFIGURAÇÕES DA CHAVE PIX RECEBEDORA & EMAILJS ---
     window.saveSettings = async function () {
       if (!verifyCurrentAdminPassword()) return;
+
+      const pixType = document.getElementById("settingPixType").value;
       const pixKey = document.getElementById("settingPixKey").value.trim();
+      const pixReceiverName = document.getElementById("settingPixReceiverName").value.trim() || "Nexxus Oficial BR";
+      const pixCity = document.getElementById("settingPixCity").value.trim() || "SAO PAULO";
       const storeWhatsapp = document.getElementById("settingStoreWhatsapp").value.trim();
 
-      await setDoc(doc(db, "config", "store"), { pixKey, storeWhatsapp }, { merge: true });
-      await logAdminAudit("Alterou dados da loja / PIX", `PIX: ${pixKey || 'vazio'}`);
-      alert("Dados da loja salvos!");
+      if (!pixKey) {
+        alert("Informe a Chave PIX que será responsável pelo recebimento.");
+        return;
+      }
+
+      await setDoc(doc(db, "config", "store"), {
+        pixType,
+        pixKey,
+        pixReceiverName,
+        pixCity,
+        storeWhatsapp
+      }, { merge: true });
+
+      await logAdminAudit(
+        "Cadastrou/Alterou Chave PIX Recebedora",
+        `Tipo: ${pixType} | Chave: ${pixKey} | Titular: ${pixReceiverName}`
+      );
+      alert("Chave PIX recebedora salva com sucesso!");
     };
 
     window.saveEmailJsSettings = async function () {
