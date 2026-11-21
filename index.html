@@ -273,7 +273,13 @@
       </div>
     </div>
   </div>
-
+<script>
+  window.openAdminModal = function () {
+    const modal = document.getElementById('adminModal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+  };
+</script>
   <!-- Firebase SDK + Lógica do Rateio em Tempo Real -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
