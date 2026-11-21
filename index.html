@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RateioPro — Compra Coletiva & Reservas Inteligentes</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            900: '#064e3b',
+                        },
+                        slate: {
+                            850: '#151e2e',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar for smooth high-volume catalog browsing */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .progress-stripe {
+            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+            background-size: 1rem 1rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Toast Notification Container (Replaces alert()) -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- Header / Navbar -->
+    <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-lg border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Brand Logo -->
+                <div class="flex items-center gap-3 cursor-pointer" onclick="resetFilters()">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-md shadow-emerald-500/20">
+                        <i class="fa-solid fa-layer-group text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                            Rateio<span class="text-emerald-400">Pro</span>
+                        </h1>
+                        <p class="text-[11px] text-slate-400 hidden sm:block">Reserve com sinal fixo • Feche o grupo de 10</p>
+                    </div>
+                </div>
+
+                <!-- Header Stats & Admin Trigger -->
+                <div class="flex items-center gap-3 sm:gap-5">
+                    <div class="hidden md:flex items-center gap-4 text-xs bg-slate-800/80 px-3.5 py-2 rounded-xl border border-slate-700/80">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span class="text-slate-300">Grupos Abertos:</span>
+                            <strong id="header-open-count" class="text-white font-bold">0</strong>
+                        </div>
+                        <span class="text-slate-600">|</span>
+                        <div class="flex items-center gap-1.5">
+                            <i class="fa-solid fa-trophy text-amber-400"></i>
+                            <span class="text-slate-300">Metas Batidas:</span>
+                            <strong id="header-closed-count" class="text-amber-400 font-bold">0</strong>
+                        </div>
+                    </div>
+
+                    <button id="btn-admin-toggle" onclick="handleAdminAccess()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-2 shadow-sm">
+                        <i id="admin-icon" class="fa-solid fa-lock text-emerald-400"></i>
+                        <span id="admin-btn-text">Painel Admin</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- How it Works Banner -->
+    <section class="bg-gradient-to-r from-slate-900 via-slate-850 to-emerald-950 text-white border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div class="max-w-2xl">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 mb-3">
+                        <i class="fa-solid fa-bolt"></i> Compra Coletiva Inteligente
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+                        Garanta sua peça pagando apenas o sinal da reserva.
+                    </h2>
+                    <p class="text-sm sm:text-base text-slate-300 mt-2 leading-relaxed">
+                        Escolha os produtos abaixo e reserve sua cota. Assim que o grupo atingir <strong class="text-emerald-400">10 peças reservadas</strong>, o lote é fechado e enviamos a cobrança do valor cheio via WhatsApp!
+                    </p>
+                </div>
+
+                <!-- 3 Step Mini Guide -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:max-w-xl w-full">
+                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3.5">
+                        <div class="text-emerald-400 font-bold text-xs uppercase tracking-wider mb-1">Passo 1</div>
+                        <div class="font-semibold text-sm text-white">Pague o Sinal</div>
+                        <p class="text-xs text-slate-400 mt-0.5">Valor fixo baixo para travar sua vaga no rateio.</p>
+                    </div>
+                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3.5">
+                        <div class="text-emerald-400 font-bold text-xs uppercase tracking-wider mb-1">Passo 2</div>
+                        <div class="font-semibold text-sm text-white">Junte 10 Peças</div>
+                        <p class="text-xs text-slate-400 mt-0.5">Acompanhe a barra de progresso em tempo real.</p>
+                    </div>
+                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-3.5">
+                        <div class="text-amber-400 font-bold text-xs uppercase tracking-wider mb-1">Passo 3</div>
+                        <div class="font-semibold text-sm text-white">Fechamento</div>
+                        <p class="text-xs text-slate-400 mt-0.5">Bateu 10/10? Cobramos o valor total do produto.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ADMIN PANEL (Hidden by default, unlocked via password) -->
+    <section id="admin-panel" class="hidden bg-slate-100 border-b-2 border-emerald-500 shadow-inner">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900">Painel de Gestão & Catálogo (+100 Produtos)</h3>
+                        <p class="text-xs text-slate-500">Cadastre em massa, gerencie reservas e exporte seu JSON para o GitHub Pages.</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="exportJSON()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold flex items-center gap-2 transition shadow-sm">
+                        <i class="fa-solid fa-download text-emerald-400"></i> Exportar JSON (Backup/GitHub)
+                    </button>
+                    <label class="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold flex items-center gap-2 cursor-pointer transition shadow-sm">
+                        <i class="fa-solid fa-upload text-blue-600"></i> Importar JSON
+                        <input type="file" id="import-json-input" accept=".json" class="hidden" onchange="importJSON(event)">
+                    </label>
+                    <button onclick="logoutAdmin()" class="px-3.5 py-2 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-semibold transition">
+                        <i class="fa-solid fa-right-from-bracket"></i> Sair do Admin
+                    </button>
+                </div>
+            </div>
+
+            <!-- Admin Tabs -->
+            <div class="flex flex-wrap gap-2 mb-6">
+                <button onclick="switchAdminTab('single')" id="tab-btn-single" class="admin-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-600 text-white shadow-sm transition">
+                    <i class="fa-solid fa-plus-circle mr-1.5"></i> Cadastrar 1 Produto
+                </button>
+                <button onclick="switchAdminTab('bulk')" id="tab-btn-bulk" class="admin-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white text-slate-600 hover:bg-slate-200 transition">
+                    <i class="fa-solid fa-table-list mr-1.5"></i> Cadastro em Massa (+100 Itens)
+                </button>
+                <button onclick="switchAdminTab('settings')" id="tab-btn-settings" class="admin-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white text-slate-600 hover:bg-slate-200 transition">
+                    <i class="fa-brands fa-whatsapp mr-1.5"></i> Configurações & WhatsApp
+                </button>
+            </div>
+
+            <!-- Tab 1: Single Product Form -->
+            <div id="admin-tab-single" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <form id="form-add-product" onsubmit="addSingleProduct(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+                    <div class="lg:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Nome do Produto *</label>
+                        <input type="text" id="prod-name" required placeholder="Ex: Kit Camisetas Oversized Premium" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Categoria / Código</label>
+                        <input type="text" id="prod-category" placeholder="Ex: Vestuário • #104" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Sinal Reserva (R$) *</label>
+                        <input type="number" step="0.01" min="1" id="prod-reserve-price" required value="20.00" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Valor Cheio (R$) *</label>
+                        <input type="number" step="0.01" min="1" id="prod-full-price" required placeholder="189.90" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Meta de Peças *</label>
+                        <input type="number" min="2" max="100" id="prod-goal" required value="10" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div class="sm:col-span-2 lg:col-span-5">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">URL da Imagem (Opcional)</label>
+                        <input type="url" id="prod-image" placeholder="https://exemplo.com/foto-produto.jpg" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition shadow-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Adicionar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Tab 2: Bulk Import (CSV / Text) -->
+            <div id="admin-tab-bulk" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 mb-3">
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-800">Importação Rápida de Lista (Cole dezenas ou centenas de produtos)</h4>
+                        <p class="text-xs text-slate-500">Formato por linha: <code class="bg-slate-100 px-1.5 py-0.5 rounded text-emerald-700 font-mono">Nome do Produto; Valor Reserva; Valor Cheio; Categoria; URL Imagem</code></p>
+                    </div>
+                    <button onclick="fillBulkExample()" class="text-xs text-emerald-600 hover:underline font-medium">
+                        Preencher exemplo de 5 produtos
+                    </button>
+                </div>
+                <textarea id="bulk-textarea" rows="5" placeholder="Perfume Importado 100ml; 25.00; 349.90; Perfumaria; https://images.unsplash.com/photo-1541643600914-78b084683601?w=500&#10;Fone Bluetooth ANC Pro; 15.00; 189.00; Eletrônicos; " class="w-full p-3.5 rounded-xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-emerald-500 outline-none"></textarea>
+                <div class="flex justify-end gap-3 mt-3">
+                    <button onclick="processBulkImport()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold shadow-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> Importar Todos os Produtos
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab 3: Settings & GitHub Pages Guide -->
+            <div id="admin-tab-settings" class="hidden bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-800 mb-3">Configurações do Administrador</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">WhatsApp do Administrador (com DDD, apenas números)</label>
+                                <input type="text" id="setting-whatsapp" placeholder="5511999999999" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Chave PIX para receber o Sinal da Reserva</label>
+                                <input type="text" id="setting-pix" placeholder="CPF, E-mail ou Chave Aleatória" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Alterar Senha do Painel Admin</label>
+                                <input type="text" id="setting-password" placeholder="admin123" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm">
+                            </div>
+                            <button onclick="saveSettings()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition">
+                                Salvar Configurações
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-2">
+                        <h4 class="font-bold text-slate-800 flex items-center gap-1.5">
+                            <i class="fa-brands fa-github text-base"></i> Como publicar no GitHub Pages:
+                        </h4>
+                        <p>1. Crie um repositório no GitHub e suba este arquivo renomeado para <strong>index.html</strong>.</p>
+                        <p>2. Como o GitHub Pages é estático, seus clientes salvam reservas no navegador deles e enviam o comprovante direto no seu WhatsApp.</p>
+                        <p>3. Para atualizar o catálogo oficial para todos os clientes: cadastre seus +100 produtos aqui, clique em <strong>Exportar JSON</strong> e suba o arquivo <code class="bg-white px-1 py-0.5 border rounded">produtos.json</code> na mesma pasta do repositório!</p>
+                        <div class="pt-2">
+                            <button onclick="resetDemoData()" class="text-rose-600 hover:underline font-semibold">
+                                <i class="fa-solid fa-rotate-left"></i> Restaurar 6 produtos de demonstração
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Catalog Section -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        
+        <!-- Search, Status Filters & Sorting Bar -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 mb-6 flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center">
+            <!-- Search Input -->
+            <div class="relative flex-1">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <input type="text" id="search-input" oninput="handleSearch()" placeholder="Buscar por nome do produto, código ou categoria..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition">
+            </div>
+
+            <!-- Status Filter Pills -->
+            <div class="flex flex-wrap items-center gap-2">
+                <button onclick="setFilter('all')" id="filter-all" class="filter-pill px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white transition">
+                    Todos (<span id="count-all">0</span>)
+                </button>
+                <button onclick="setFilter('open')" id="filter-open" class="filter-pill px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block mr-1"></span> Vagas Abertas (<span id="count-open">0</span>)
+                </button>
+                <button onclick="setFilter('almost')" id="filter-almost" class="filter-pill px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+                    <i class="fa-solid fa-fire text-orange-500 mr-1"></i> Quase Fechando (<span id="count-almost">0</span>)
+                </button>
+                <button onclick="setFilter('closed')" id="filter-closed" class="filter-pill px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+                    <i class="fa-solid fa-trophy text-amber-500 mr-1"></i> Meta Batida (<span id="count-closed">0</span>)
+                </button>
+            </div>
+
+            <!-- Sort Dropdown -->
+            <div class="flex items-center gap-2">
+                <select id="sort-select" onchange="renderCatalog()" class="w-full lg:w-auto px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500">
+                    <option value="default">Ordenar: Mais recentes</option>
+                    <option value="progress-desc">Mais próximos de fechar (9/10)</option>
+                    <option value="reserve-asc">Menor valor de sinal</option>
+                    <option value="name-asc">Ordem Alfabética (A-Z)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Results Info Bar -->
+        <div class="flex justify-between items-center mb-4 text-xs text-slate-500">
+            <p>Exibindo <strong id="showing-range" class="text-slate-800">0-0</strong> de <strong id="total-filtered" class="text-slate-800">0</strong> produtos no catálogo</p>
+            <div class="flex items-center gap-2">
+                <span>Itens por página:</span>
+                <select id="per-page-select" onchange="changePerPage()" class="bg-white border border-slate-200 rounded-lg px-2 py-1 text-slate-700 font-semibold">
+                    <option value="12" selected>12</option>
+                    <option value="24">24</option>
+                    <option value="48">48</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Product cards injected dynamically via JS -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200">
+            <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fa-solid fa-box-open"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800">Nenhum produto encontrado</h3>
+            <p class="text-sm text-slate-500 mt-1">Tente limpar os filtros ou buscar por outro termo.</p>
+            <button onclick="resetFilters()" class="mt-4 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition">
+                Mostrar todos os produtos
+            </button>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div id="pagination-controls" class="mt-8 flex flex-wrap justify-center items-center gap-2">
+            <!-- Pagination buttons injected dynamically -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-white text-sm">Rateio<span class="text-emerald-400">Pro</span></span>
+                <span>• Sistema de Compra Coletiva e Reservas</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span>Ao atingir 10/10 reservas, o valor cheio é cobrado.</span>
+                <button onclick="handleAdminAccess()" class="text-slate-400 hover:text-emerald-400 underline transition">
+                    Área do Organizador
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===================================================================== -->
+    <!-- MODALS -->
+    <!-- ===================================================================== -->
+
+    <!-- 1. Reservation Modal -->
+    <div id="modal-reserve" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-200 animate-fade-in">
+            <div class="bg-slate-900 text-white px-5 py-4 flex justify-between items-center">
+                <h3 class="font-bold text-base flex items-center gap-2">
+                    <i class="fa-solid fa-ticket text-emerald-400"></i> Reservar Cota no Rateio
+                </h3>
+                <button onclick="closeModal('modal-reserve')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="form-reserve" onsubmit="submitReservation(event)" class="p-5 space-y-4">
+                <input type="hidden" id="res-product-id">
+                
+                <!-- Selected Product Summary -->
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 flex gap-3 items-center">
+                    <img id="res-prod-img" src="" alt="" class="w-14 h-14 rounded-lg object-cover bg-slate-200 flex-shrink-0">
+                    <div class="min-w-0 flex-1">
+                        <h4 id="res-prod-title" class="font-bold text-sm text-slate-900 truncate">Nome do Produto</h4>
+                        <div class="flex items-center gap-3 mt-1 text-xs">
+                            <span class="text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded-md">
+                                Sinal: <span id="res-prod-signal">R$ 20,00</span>/un
+                            </span>
+                            <span class="text-slate-500">
+                                Cheio: <strong id="res-prod-full" class="text-slate-700">R$ 250,00</strong>
+                            </span>
+                        </div>
+                        <p id="res-prod-slots" class="text-[11px] text-slate-500 mt-1">Restam 4 vagas para fechar o grupo</p>
+                    </div>
+                </div>
+
+                <!-- Buyer Details -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Seu Nome Completo *</label>
+                    <input type="text" id="res-buyer-name" required placeholder="Ex: Maria Oliveira" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Seu WhatsApp *</label>
+                        <input type="tel" id="res-buyer-phone" required placeholder="(11) 99999-9999" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Qtd. de Peças *</label>
+                        <select id="res-quantity" onchange="updateReservationTotal()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <!-- Options populated dynamically based on remaining slots -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- PIX / Total Box -->
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 space-y-2">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-emerald-900 font-medium">Total do Sinal agora:</span>
+                        <span id="res-total-signal" class="text-lg font-extrabold text-emerald-700">R$ 20,00</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-emerald-800 border-t border-emerald-200/70 pt-2">
+                        <span>Valor cheio ao atingir 10/10:</span>
+                        <strong id="res-total-full">R$ 250,00</strong>
+                    </div>
+                    <div id="pix-copy-box" class="pt-1">
+                        <div class="flex items-center justify-between bg-white px-2.5 py-1.5 rounded-lg border border-emerald-200 text-xs">
+                            <span class="truncate text-slate-600">PIX: <strong id="res-pix-key" class="text-slate-900">pix@rateiopro.com.br</strong></span>
+                            <button type="button" onclick="copyPixKey()" class="text-emerald-600 hover:text-emerald-800 font-bold ml-2 flex-shrink-0">
+                                <i class="fa-regular fa-copy"></i> Copiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2 pt-1">
+                    <button type="submit" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check-circle"></i> Confirmar Reserva & Enviar no WhatsApp
+                    </button>
+                    <button type="button" onclick="closeModal('modal-reserve')" class="w-full py-2 rounded-xl text-slate-500 hover:bg-slate-100 text-xs font-semibold transition">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. Billing / Participants List Modal (When Goal Reached or Admin View) -->
+    <div id="modal-participants" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200">
+            <div class="bg-slate-900 text-white px-5 py-4 flex justify-between items-center">
+                <div>
+                    <h3 class="font-bold text-base flex items-center gap-2">
+                        <i class="fa-solid fa-users text-amber-400"></i> Participantes & Cobrança
+                    </h3>
+                    <p id="part-modal-subtitle" class="text-xs text-slate-400 mt-0.5 truncate max-w-xs sm:max-w-sm">Produto</p>
+                </div>
+                <button onclick="closeModal('modal-participants')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
+                <!-- Status Alert -->
+                <div id="part-goal-banner" class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
+                    <i class="fa-solid fa-trophy text-amber-500 text-base mt-0.5"></i>
+                    <div>
+                        <strong class="block text-sm">Meta de 10/10 Peças Batida!</strong>
+                        <span>O grupo está fechado. Copie a lista de cobrança abaixo para cobrar o <strong>valor cheio</strong> de cada participante no WhatsApp.</span>
+                    </div>
+                </div>
+
+                <!-- Participants List -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Cotas Reservadas (<span id="part-count-label">0/10</span>)</h4>
+                        <span id="part-full-price-badge" class="text-xs font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded">Valor Cheio: R$ 0,00</span>
+                    </div>
+                    <div id="participants-list-container" class="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
+                        <!-- Participant rows injected here -->
+                    </div>
+                </div>
+
+                <!-- WhatsApp Billing Message Generator -->
+                <div class="pt-2 border-t border-slate-200">
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                        <i class="fa-brands fa-whatsapp text-emerald-600"></i> Mensagem Pronta de Cobrança (Grupo/Lista):
+                    </label>
+                    <textarea id="billing-message-box" rows="5" readonly class="w-full p-3 rounded-xl bg-slate-100 border border-slate-200 text-xs font-mono text-slate-700 outline-none"></textarea>
+                    <div class="flex flex-wrap gap-2 mt-3">
+                        <button onclick="copyBillingMessage()" class="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-regular fa-copy"></i> Copiar Lista de Cobrança
+                        </button>
+                        <a id="btn-share-wa-group" href="#" target="_blank" class="py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition flex items-center justify-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-emerald-400"></i> Abrir WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Admin Login Modal (Replaces prompt()) -->
+    <div id="modal-admin-login" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl border border-slate-200">
+            <div class="bg-slate-900 text-white px-5 py-4 flex justify-between items-center">
+                <h3 class="font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-shield-halved text-emerald-400"></i> Acesso Administrativo
+                </h3>
+                <button onclick="closeModal('modal-admin-login')" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form onsubmit="verifyAdminPassword(event)" class="p-5 space-y-4">
+                <p class="text-xs text-slate-500">Digite a senha do organizador para cadastrar produtos, importar listas e gerenciar cobranças. (Padrão: <code class="bg-slate-100 px-1 py-0.5 rounded font-bold text-slate-700">admin123</code>)</p>
+                <div>
+                    <input type="password" id="admin-password-input" required placeholder="Senha de acesso..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeModal('modal-admin-login')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm">Entrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- APPLICATION LOGIC (JavaScript) -->
+    <!-- ===================================================================== -->
+    <script>
+        // Storage Keys
+        const STORAGE_KEY_PRODUCTS = 'rateiopro_products_v1';
+        const STORAGE_KEY_SETTINGS = 'rateiopro_settings_v1';
+
+        // Application State
+        let products = [];
+        let settings = {
+            whatsapp: '5511999999999',
+            pixKey: 'pix@sualoja.com.br',
+            adminPassword: 'admin123'
+        };
+        let isAdmin = false;
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let currentPage = 1;
+        let itemsPerPage = 12;
+
+        // Initial 6 Demo Products (Covering different progress levels: 3/10, 8/10, 10/10)
+        const DEMO_PRODUCTS = [
+            {
+                id: 'prod-101',
+                name: 'Perfume Árabe Lattafa Asad 100ml Original',
+                category: 'Perfumaria • #101',
+                image: 'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=600&q=80',
+                reservePrice: 20.00,
+                fullPrice: 249.90,
+                goal: 10,
+                reservations: [
+                    { id: 'r1', name: 'Carlos Eduardo', phone: '11988881111', qty: 1, date: '20/11/2026' },
+                    { id: 'r2', name: 'Fernanda Lima', phone: '11988882222', qty: 1, date: '20/11/2026' },
+                    { id: 'r3', name: 'Juliana Costa', phone: '11988883333', qty: 1, date: '20/11/2026' },
+                    { id: 'r4', name: 'Marcos Vinicius', phone: '11988884444', qty: 1, date: '20/11/2026' },
+                    { id: 'r5', name: 'Patrícia Alves', phone: '11988885555', qty: 1, date: '20/11/2026' },
+                    { id: 'r6', name: 'Ricardo Mendes', phone: '11988886666', qty: 1, date: '20/11/2026' },
+                    { id: 'r7', name: 'Camila Rocha', phone: '11988887777', qty: 1, date: '20/11/2026' },
+                    { id: 'r8', name: 'Lucas Ferreira', phone: '11988888888', qty: 1, date: '20/11/2026' },
+                    { id: 'r9', name: 'Beatriz Santos', phone: '11988889999', qty: 1, date: '20/11/2026' },
+                    { id: 'r10', name: 'Gabriel Souza', phone: '11988880000', qty: 1, date: '20/11/2026' }
+                ]
+            },
+            {
+                id: 'prod-102',
+                name: 'Fone de Ouvido Bluetooth ANC Noise Cancelling',
+                category: 'Eletrônicos • #102',
+                image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80',
+                reservePrice: 15.00,
+                fullPrice: 189.00,
+                goal: 10,
+                reservations: [
+                    { id: 'r21', name: 'Ana Paula', phone: '11977771111', qty: 2, date: '20/11/2026' },
+                    { id: 'r22', name: 'Rodrigo Silva', phone: '11977772222', qty: 3, date: '20/11/2026' },
+                    { id: 'r23', name: 'Tatiane Gomes', phone: '11977773333', qty: 3, date: '20/11/2026' }
+                ] // 8/10
+            },
+            {
+                id: 'prod-103',
+                name: 'Garrafa Térmica Inox 1.2L Parede Dupla',
+                category: 'Utilidades • #103',
+                image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=600&q=80',
+                reservePrice: 10.00,
+                fullPrice: 119.90,
+                goal: 10,
+                reservations: [
+                    { id: 'r31', name: 'Bruno Henrique', phone: '11966661111', qty: 2, date: '20/11/2026' },
+                    { id: 'r32', name: 'Mariana Dias', phone: '11966662222', qty: 1, date: '20/11/2026' }
+                ] // 3/10
+            },
+            {
+                id: 'prod-104',
+                name: 'Smartwatch Ultra Series 9 Amoled GPS',
+                category: 'Acessórios • #104',
+                image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=600&q=80',
+                reservePrice: 25.00,
+                fullPrice: 320.00,
+                goal: 10,
+                reservations: [
+                    { id: 'r41', name: 'Felipe Martins', phone: '11955551111', qty: 4, date: '20/11/2026' },
+                    { id: 'r42', name: 'Vanessa Castro', phone: '11955552222', qty: 5, date: '20/11/2026' }
+                ] // 9/10 (Falta 1!)
+            },
+            {
+                id: 'prod-105',
+                name: 'Kit 3 Camisetas Algodão Egípcio Premium',
+                category: 'Vestuário • #105',
+                image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=600&q=80',
+                reservePrice: 15.00,
+                fullPrice: 159.90,
+                goal: 10,
+                reservations: [] // 0/10
+            },
+            {
+                id: 'prod-106',
+                name: 'Cafeteira Espresso Portátil Viagem',
+                category: 'Casa & Café • #106',
+                image: 'https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?auto=format&fit=crop&w=600&q=80',
+                reservePrice: 20.00,
+                fullPrice: 279.00,
+                goal: 10,
+                reservations: [
+                    { id: 'r61', name: 'Diego Nunes', phone: '11944441111', qty: 5, date: '20/11/2026' },
+                    { id: 'r62', name: 'Larissa Ribeiro', phone: '11944442222', qty: 5, date: '20/11/2026' }
+                ] // 10/10
+            }
+        ];
+
+        // =====================================================================
+        // INITIALIZATION & DATA PERSISTENCE
+        // =====================================================================
+        window.addEventListener('DOMContentLoaded', async () => {
+            loadSettings();
+            await loadProducts();
+            renderCatalog();
+        });
+
+        function loadSettings() {
+            const saved = localStorage.getItem(STORAGE_KEY_SETTINGS);
+            if (saved) {
+                try {
+                    settings = { ...settings, ...JSON.parse(saved) };
+                } catch (e) {
+                    console.error('Erro ao carregar configurações:', e);
+                }
+            }
+            document.getElementById('setting-whatsapp').value = settings.whatsapp;
+            document.getElementById('setting-pix').value = settings.pixKey;
+            document.getElementById('setting-password').value = settings.adminPassword;
+        }
+
+        function saveSettings() {
+            settings.whatsapp = document.getElementById('setting-whatsapp').value.replace(/\D/g, '') || '5511999999999';
+            settings.pixKey = document.getElementById('setting-pix').value.trim() || 'pix@sualoja.com.br';
+            settings.adminPassword = document.getElementById('setting-password').value.trim() || 'admin123';
+            localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings));
+            showToast('Configurações salvas com sucesso!', 'success');
+        }
+
+        async function loadProducts() {
+            const localData = localStorage.getItem(STORAGE_KEY_PRODUCTS);
+            if (localData) {
+                try {
+                    products = JSON.parse(localData);
+                    return;
+                } catch (e) {
+                    console.error('Erro no LocalStorage:', e);
+                }
+            }
+
+            // Try fetching external produtos.json if hosted on GitHub Pages
+            try {
+                const response = await fetch('./produtos.json');
+                if (response.ok) {
+                    const externalProducts = await response.json();
+                    if (Array.isArray(externalProducts) && externalProducts.length > 0) {
+                        products = externalProducts;
+                        saveProducts();
+                        return;
+                    }
+                }
+            } catch (err) {
+                // Fallback to demo data if no produtos.json exists
+            }
+
+            products = JSON.parse(JSON.stringify(DEMO_PRODUCTS));
+            saveProducts();
+        }
+
+        function saveProducts() {
+            localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
+        }
+
+        function resetDemoData() {
+            products = JSON.parse(JSON.stringify(DEMO_PRODUCTS));
+            saveProducts();
+            currentPage = 1;
+            renderCatalog();
+            showToast('Catálogo restaurado para os 6 produtos de exemplo.', 'info');
+        }
+
+        // =====================================================================
+        // HELPER FUNCTIONS
+        // =====================================================================
+        function formatCurrency(value) {
+            return Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function getReservedCount(product) {
+            return (product.reservations || []).reduce((sum, r) => sum + Number(r.qty || 1), 0);
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-slate-900 border-emerald-500 text-white',
+                error: 'bg-rose-950 border-rose-500 text-white',
+                info: 'bg-slate-800 border-blue-400 text-white'
+            };
+            const icons = {
+                success: '<i class="fa-solid fa-circle-check text-emerald-400"></i>',
+                error: '<i class="fa-solid fa-circle-exclamation text-rose-400"></i>',
+                info: '<i class="fa-solid fa-circle-info text-blue-400"></i>'
+            };
+
+            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border-l-4 shadow-xl text-xs sm:text-sm font-medium transition-all transform translate-y-0 ${colors[type] || colors.success}`;
+            toast.innerHTML = `${icons[type] || icons.success} <span>${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // =====================================================================
+        // CATALOG RENDERING, SEARCH, FILTER & PAGINATION
+        // =====================================================================
+        function setFilter(filterType) {
+            currentFilter = filterType;
+            currentPage = 1;
+
+            document.querySelectorAll('.filter-pill').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white');
+                btn.classList.add('bg-slate-100', 'text-slate-600');
+            });
+            const activeBtn = document.getElementById(`filter-${filterType}`);
+            activeBtn.classList.remove('bg-slate-100', 'text-slate-600');
+            activeBtn.classList.add('bg-slate-900', 'text-white');
+
+            renderCatalog();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+            currentPage = 1;
+            renderCatalog();
+        }
+
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            searchQuery = '';
+            setFilter('all');
+        }
+
+        function changePerPage() {
+            itemsPerPage = Number(document.getElementById('per-page-select').value);
+            currentPage = 1;
+            renderCatalog();
+        }
+
+        function renderCatalog() {
+            // Update counters
+            let openCount = 0;
+            let closedCount = 0;
+            let almostCount = 0;
+
+            products.forEach(p => {
+                const reserved = getReservedCount(p);
+                const goal = Number(p.goal || 10);
+                if (reserved >= goal) {
+                    closedCount++;
+                } else {
+                    openCount++;
+                    if (goal - reserved <= 3) almostCount++;
+                }
+            });
+
+            document.getElementById('header-open-count').textContent = openCount;
+            document.getElementById('header-closed-count').textContent = closedCount;
+            document.getElementById('count-all').textContent = products.length;
+            document.getElementById('count-open').textContent = openCount;
+            document.getElementById('count-almost').textContent = almostCount;
+            document.getElementById('count-closed').textContent = closedCount;
+
+            // Filter products
+            let filtered = products.filter(p => {
+                const reserved = getReservedCount(p);
+                const goal = Number(p.goal || 10);
+                const isClosed = reserved >= goal;
+
+                if (currentFilter === 'open' && isClosed) return false;
+                if (currentFilter === 'closed' && !isClosed) return false;
+                if (currentFilter === 'almost' && (isClosed || (goal - reserved > 3))) return false;
+
+                if (searchQuery) {
+                    const matchName = (p.name || '').toLowerCase().includes(searchQuery);
+                    const matchCat = (p.category || '').toLowerCase().includes(searchQuery);
+                    if (!matchName && !matchCat) return false;
+                }
+                return true;
+            });
+
+            // Sort products
+            const sortBy = document.getElementById('sort-select').value;
+            if (sortBy === 'progress-desc') {
+                filtered.sort((a, b) => {
+                    const remA = a.goal - getReservedCount(a);
+                    const remB = b.goal - getReservedCount(b);
+                    // Put open items closest to 0 remaining first, closed items at the end
+                    if (remA <= 0 && remB > 0) return 1;
+                    if (remB <= 0 && remA > 0) return -1;
+                    return remA - remB;
+                });
+            } else if (sortBy === 'reserve-asc') {
+                filtered.sort((a, b) => a.reservePrice - b.reservePrice);
+            } else if (sortBy === 'name-asc') {
+                filtered.sort((a, b) => a.name.localeCompare(b.name));
+            }
+
+            // Pagination math
+            const totalItems = filtered.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const endIdx = Math.min(startIdx + itemsPerPage, totalItems);
+            const paginatedItems = filtered.slice(startIdx, endIdx);
+
+            document.getElementById('showing-range').textContent = totalItems === 0 ? '0-0' : `${startIdx + 1}-${endIdx}`;
+            document.getElementById('total-filtered').textContent = totalItems;
+
+            const grid = document.getElementById('products-grid');
+            const emptyState = document.getElementById('empty-state');
+
+            if (paginatedItems.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                document.getElementById('pagination-controls').innerHTML = '';
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.innerHTML = paginatedItems.map(product => buildProductCard(product)).join('');
+            renderPagination(totalPages);
+        }
+
+        function buildProductCard(product) {
+            const reserved = getReservedCount(product);
+            const goal = Number(product.goal || 10);
+            const remaining = Math.max(0, goal - reserved);
+            const isGoalReached = reserved >= goal;
+            const percentage = Math.min(100, Math.round((reserved / goal) * 100));
+
+            const fallbackImg = `https://placehold.co/600x450/e2e8f0/475569?text=${encodeURIComponent(product.name.substring(0, 18))}`;
+            const imgSrc = product.image && product.image.trim() !== '' ? product.image : fallbackImg;
+
+            // Status Badge & Progress Colors
+            let badgeHTML = '';
+            let progressColor = 'bg-emerald-500';
+            let statusText = `${reserved} de ${goal} reservadas — faltam ${remaining}!`;
+
+            if (isGoalReached) {
+                badgeHTML = `
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 shadow-sm">
+                        <i class="fa-solid fa-trophy"></i> META BATIDA (${goal}/${goal})
+                    </span>`;
+                progressColor = 'bg-amber-500 progress-stripe';
+                statusText = `Grupo fechado! Cobrar valor cheio.`;
+            } else if (remaining <= 3) {
+                badgeHTML = `
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-orange-500 text-white shadow-sm animate-pulse">
+                        <i class="fa-solid fa-fire"></i> ÚLTIMAS ${remaining} VAGAS!
+                    </span>`;
+                progressColor = 'bg-orange-500';
+            } else {
+                badgeHTML = `
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-900/80 backdrop-blur-sm text-emerald-300">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Rateio Aberto
+                    </span>`;
+            }
+
+            return `
+                <article class="bg-white rounded-2xl border ${isGoalReached ? 'border-amber-400 ring-2 ring-amber-400/20' : 'border-slate-200/90'} shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden group">
+                    <!-- Product Image & Badges -->
+                    <div class="relative aspect-[4/3] bg-slate-100 overflow-hidden">
+                        <img src="${imgSrc}" onerror="this.onerror=null;this.src='${fallbackImg}';" alt="${product.name}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${isGoalReached ? 'opacity-90' : ''}">
+                        <div class="absolute top-3 left-3">
+                            ${badgeHTML}
+                        </div>
+                        ${isAdmin ? `
+                            <button onclick="deleteProduct('${product.id}')" title="Excluir Produto" class="absolute top-3 right-3 w-8 h-8 rounded-xl bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center shadow-md transition">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                                ${product.category || 'Catálogo Geral'}
+                            </div>
+                            <h3 class="font-bold text-slate-900 text-base leading-snug line-clamp-2 min-h-[2.75rem]" title="${product.name}">
+                                ${product.name}
+                            </h3>
+
+                            <!-- Pricing Box -->
+                            <div class="mt-3 p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                                <div>
+                                    <span class="block text-[10px] font-bold uppercase text-emerald-700 tracking-wide">Sinal Reserva</span>
+                                    <span class="text-lg font-extrabold text-emerald-600">${formatCurrency(product.reservePrice)}</span>
+                                </div>
+                                <div class="text-right border-l border-slate-200 pl-3">
+                                    <span class="block text-[10px] font-semibold uppercase text-slate-400">Valor Cheio (10/10)</span>
+                                    <span class="text-sm font-bold text-slate-700">${formatCurrency(product.fullPrice)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar & CTA -->
+                        <div class="mt-4 pt-3 border-t border-slate-100">
+                            <div class="flex justify-between items-center text-xs mb-1.5">
+                                <span class="font-semibold ${isGoalReached ? 'text-amber-700' : 'text-slate-700'}">${statusText}</span>
+                                <span class="font-bold text-slate-900">${percentage}%</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                                <div class="h-full ${progressColor} rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="mt-4 flex gap-2">
+                                ${isGoalReached ? `
+                                    <button onclick="openParticipantsModal('${product.id}')" class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 font-extrabold text-xs shadow-sm transition flex items-center justify-center gap-1.5">
+                                        <i class="fa-brands fa-whatsapp text-sm"></i> Ver Lista & Cobrar Cheio
+                                    </button>
+                                ` : `
+                                    <button onclick="openReserveModal('${product.id}')" class="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition flex items-center justify-center gap-1.5">
+                                        <i class="fa-solid fa-ticket"></i> Reservar (${formatCurrency(product.reservePrice)})
+                                    </button>
+                                    <button onclick="openParticipantsModal('${product.id}')" title="Ver quem já reservou" class="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1">
+                                        <i class="fa-solid fa-users"></i> ${reserved}/${goal}
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderPagination(totalPages) {
+            const container = document.getElementById('pagination-controls');
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = `
+                <button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 disabled:opacity-40 hover:bg-slate-50">
+                    <i class="fa-solid fa-chevron-left"></i> Anterior
+                </button>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    const activeClass = i === currentPage ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50';
+                    html += `<button onclick="goToPage(${i})" class="w-9 h-9 rounded-xl border text-xs font-bold transition ${activeClass}">${i}</button>`;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    html += `<span class="text-slate-400 px-1">...</span>`;
+                }
+            }
+
+            html += `
+                <button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-700 disabled:opacity-40 hover:bg-slate-50">
+                    Próxima <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderCatalog();
+            window.scrollTo({ top: 220, behavior: 'smooth' });
+        }
+
+        // =====================================================================
+        // RESERVATION FLOW
+        // =====================================================================
+        function openReserveModal(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const reserved = getReservedCount(product);
+            const remaining = Math.max(0, product.goal - reserved);
+            if (remaining <= 0) {
+                showToast('Este grupo já atingiu a meta de 10 reservas!', 'info');
+                return;
+            }
+
+            const fallbackImg = `https://placehold.co/200x200/e2e8f0/475569?text=Produto`;
+            document.getElementById('res-product-id').value = product.id;
+            document.getElementById('res-prod-img').src = product.image || fallbackImg;
+            document.getElementById('res-prod-title').textContent = product.name;
+            document.getElementById('res-prod-signal').textContent = formatCurrency(product.reservePrice);
+            document.getElementById('res-prod-full').textContent = formatCurrency(product.fullPrice);
+            document.getElementById('res-prod-slots').textContent = `Restam ${remaining} vaga(s) de ${product.goal} para fechar o grupo`;
+            document.getElementById('res-pix-key').textContent = settings.pixKey;
+
+            // Populate quantity dropdown up to remaining slots
+            const qtySelect = document.getElementById('res-quantity');
+            qtySelect.innerHTML = '';
+            for (let i = 1; i <= remaining; i++) {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = `${i} ${i === 1 ? 'peça' : 'peças'}`;
+                qtySelect.appendChild(opt);
+            }
+
+            updateReservationTotal();
+            document.getElementById('modal-reserve').classList.remove('hidden');
+        }
+
+        function updateReservationTotal() {
+            const productId = document.getElementById('res-product-id').value;
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const qty = Number(document.getElementById('res-quantity').value || 1);
+            document.getElementById('res-total-signal').textContent = formatCurrency(product.reservePrice * qty);
+            document.getElementById('res-total-full').textContent = formatCurrency(product.fullPrice * qty);
+        }
+
+        function copyPixKey() {
+            const tempInput = document.createElement('input');
+            tempInput.value = settings.pixKey;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast('Chave PIX copiada para a área de transferência!', 'success');
+        }
+
+        function submitReservation(event) {
+            event.preventDefault();
+            const productId = document.getElementById('res-product-id').value;
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const buyerName = document.getElementById('res-buyer-name').value.trim();
+            const buyerPhone = document.getElementById('res-buyer-phone').value.trim();
+            const qty = Number(document.getElementById('res-quantity').value);
+
+            const reserved = getReservedCount(product);
+            if (reserved + qty > product.goal) {
+                showToast('Quantidade maior que as vagas restantes!', 'error');
+                return;
+            }
+
+            const newReservation = {
+                id: 'res-' + Date.now(),
+                name: buyerName,
+                phone: buyerPhone,
+                qty: qty,
+                date: new Date().toLocaleDateString('pt-BR')
+            };
+
+            if (!product.reservations) product.reservations = [];
+            product.reservations.push(newReservation);
+            saveProducts();
+
+            const newTotalReserved = getReservedCount(product);
+            const totalSignal = formatCurrency(product.reservePrice * qty);
+            const totalFull = formatCurrency(product.fullPrice * qty);
+
+            closeModal('modal-reserve');
+            document.getElementById('form-reserve').reset();
+            renderCatalog();
+
+            if (newTotalReserved >= product.goal) {
+                showToast(`🎉 META BATIDA (${product.goal}/${product.goal})! O grupo fechou!`, 'success');
+            } else {
+                showToast(`Reserva confirmada! (${newTotalReserved}/${product.goal} peças)`, 'success');
+            }
+
+            // Open WhatsApp message to Admin with reservation details
+            const waText = encodeURIComponent(
+                `Olá! Acabei de reservar no *RateioPro*:\n\n` +
+                `📦 *Produto:* ${product.name}\n` +
+                `👤 *Nome:* ${buyerName}\n` +
+                `🎟️ *Cotas:* ${qty} peça(s)\n` +
+                `💰 *Sinal da Reserva:* ${totalSignal}\n` +
+                `📊 *Progresso:* ${newTotalReserved}/${product.goal}\n\n` +
+                `_Estou ciente que ao atingir ${product.goal}/${product.goal} será cobrado o valor cheio de ${totalFull}. Segue comprovante do sinal:_`
+            );
+            window.open(`https://wa.me/${settings.whatsapp}?text=${waText}`, '_blank');
+        }
+
+        // =====================================================================
+        // PARTICIPANTS & BILLING LIST MODAL
+        // =====================================================================
+        function openParticipantsModal(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const reserved = getReservedCount(product);
+            const goal = Number(product.goal || 10);
+            const isGoalReached = reserved >= goal;
+
+            document.getElementById('part-modal-subtitle').textContent = product.name;
+            document.getElementById('part-count-label').textContent = `${reserved}/${goal} peças`;
+            document.getElementById('part-full-price-badge').textContent = `Valor Cheio: ${formatCurrency(product.fullPrice)}/un`;
+
+            const banner = document.getElementById('part-goal-banner');
+            if (isGoalReached) {
+                banner.classList.remove('hidden');
+            } else {
+                banner.classList.add('hidden');
+            }
+
+            const listContainer = document.getElementById('participants-list-container');
+            if (!product.reservations || product.reservations.length === 0) {
+                listContainer.innerHTML = `<div class="p-4 text-center text-xs text-slate-500">Nenhuma cota reservada ainda. Seja o primeiro!</div>`;
+            } else {
+                listContainer.innerHTML = product.reservations.map((r, index) => `
+                    <div class="p-3 flex items-center justify-between gap-2 bg-white text-xs">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center flex-shrink-0">
+                                ${index + 1}
+                            </span>
+                            <div class="truncate">
+                                <p class="font-bold text-slate-800 truncate">${r.name} <span class="text-emerald-600 font-extrabold">(${r.qty}x)</span></p>
+                                <p class="text-[11px] text-slate-400">${isAdmin ? r.phone : maskPhone(r.phone)} • ${r.date || ''}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <span class="font-bold text-slate-700">${formatCurrency(product.fullPrice * r.qty)}</span>
+                            ${isAdmin ? `
+                                <button onclick="removeReservation('${product.id}', '${r.id}')" title="Remover reserva" class="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 transition">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Build WhatsApp Billing Message
+            let msg = isGoalReached
+                ? `🎉 *META BATIDA (${reserved}/${goal}) — RATEIO FECHADO!* 🎉\n\n`
+                : `📊 *PARCIAL DO RATEIO (${reserved}/${goal})*\n\n`;
+
+            msg += `📦 *Produto:* ${product.name}\n`;
+            msg += `💵 *Valor Cheio:* ${formatCurrency(product.fullPrice)} por peça\n`;
+            msg += `🔑 *Chave PIX:* ${settings.pixKey}\n\n`;
+            msg += `👥 *Lista de Participantes:*\n`;
+
+            if (product.reservations && product.reservations.length > 0) {
+                product.reservations.forEach((r, i) => {
+                    msg += `${i + 1}. ${r.name} (${r.qty}x) — Total: ${formatCurrency(product.fullPrice * r.qty)}\n`;
+                });
+            } else {
+                msg += `(Nenhuma reserva ainda)\n`;
+            }
+
+            if (isGoalReached) {
+                msg += `\n✅ *Por favor, realizem o pagamento do valor cheio para fecharmos o pedido!*`;
+            }
+
+            document.getElementById('billing-message-box').value = msg;
+            document.getElementById('btn-share-wa-group').href = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+
+            document.getElementById('modal-participants').classList.remove('hidden');
+        }
+
+        function maskPhone(phone) {
+            if (!phone || phone.length < 4) return '****';
+            return '••••-' + phone.slice(-4);
+        }
+
+        function copyBillingMessage() {
+            const box = document.getElementById('billing-message-box');
+            box.select();
+            document.execCommand('copy');
+            showToast('Lista de cobrança copiada! Cole no seu grupo do WhatsApp.', 'success');
+        }
+
+        function removeReservation(productId, reservationId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            product.reservations = product.reservations.filter(r => r.id !== reservationId);
+            saveProducts();
+            renderCatalog();
+            openParticipantsModal(productId);
+            showToast('Reserva removida com sucesso.', 'info');
+        }
+
+        // =====================================================================
+        // ADMIN PANEL & BULK IMPORT / EXPORT (+100 PRODUCTS)
+        // =====================================================================
+        function handleAdminAccess() {
+            if (isAdmin) {
+                const panel = document.getElementById('admin-panel');
+                panel.classList.toggle('hidden');
+            } else {
+                document.getElementById('admin-password-input').value = '';
+                document.getElementById('modal-admin-login').classList.remove('hidden');
+                setTimeout(() => document.getElementById('admin-password-input').focus(), 100);
+            }
+        }
+
+        function verifyAdminPassword(event) {
+            event.preventDefault();
+            const input = document.getElementById('admin-password-input').value;
+            if (input === settings.adminPassword) {
+                isAdmin = true;
+                closeModal('modal-admin-login');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                document.getElementById('admin-icon').className = 'fa-solid fa-unlock text-emerald-400';
+                document.getElementById('admin-btn-text').textContent = 'Admin Ativo';
+                renderCatalog();
+                showToast('Modo Administrador desbloqueado!', 'success');
+            } else {
+                showToast('Senha incorreta! Tente novamente.', 'error');
+            }
+        }
+
+        function logoutAdmin() {
+            isAdmin = false;
+            document.getElementById('admin-panel').classList.add('hidden');
+            document.getElementById('admin-icon').className = 'fa-solid fa-lock text-emerald-400';
+            document.getElementById('admin-btn-text').textContent = 'Painel Admin';
+            renderCatalog();
+            showToast('Você saiu do modo administrador.', 'info');
+        }
+
+        function switchAdminTab(tabName) {
+            ['single', 'bulk', 'settings'].forEach(t => {
+                document.getElementById(`admin-tab-${t}`).classList.add('hidden');
+                const btn = document.getElementById(`tab-btn-${t}`);
+                btn.classList.remove('bg-emerald-600', 'text-white');
+                btn.classList.add('bg-white', 'text-slate-600');
+            });
+
+            document.getElementById(`admin-tab-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            activeBtn.classList.remove('bg-white', 'text-slate-600');
+            activeBtn.classList.add('bg-emerald-600', 'text-white');
+        }
+
+        function addSingleProduct(event) {
+            event.preventDefault();
+            const name = document.getElementById('prod-name').value.trim();
+            const category = document.getElementById('prod-category').value.trim() || 'Catálogo';
+            const reservePrice = parseFloat(document.getElementById('prod-reserve-price').value);
+            const fullPrice = parseFloat(document.getElementById('prod-full-price').value);
+            const goal = parseInt(document.getElementById('prod-goal').value) || 10;
+            const image = document.getElementById('prod-image').value.trim();
+
+            const newProd = {
+                id: 'prod-' + Date.now(),
+                name,
+                category,
+                reservePrice,
+                fullPrice,
+                goal,
+                image,
+                reservations: []
+            };
+
+            products.unshift(newProd);
+            saveProducts();
+            document.getElementById('form-add-product').reset();
+            document.getElementById('prod-reserve-price').value = '20.00';
+            document.getElementById('prod-goal').value = '10';
+            renderCatalog();
+            showToast(`Produto "${name}" cadastrado com sucesso!`, 'success');
+        }
+
+        function deleteProduct(productId) {
+            products = products.filter(p => p.id !== productId);
+            saveProducts();
+            renderCatalog();
+            showToast('Produto removido do catálogo.', 'info');
+        }
+
+        function fillBulkExample() {
+            document.getElementById('bulk-textarea').value =
+                `Tênis Corrida UltraBoost Pro; 30.00; 389.90; Calçados; https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600\n` +
+                `Mochila Executiva Impermeável Notebook; 15.00; 179.00; Acessórios; https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600\n` +
+                `Óculos de Sol Polarizado Clássico; 12.00; 139.90; Moda; https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600\n` +
+                `Teclado Mecânico RGB Compacto 60%; 25.00; 299.00; Eletrônicos; https://images.unsplash.com/photo-1595225476474-87563907a212?w=600\n` +
+                `Luminária de Mesa LED Touch Recarregável; 10.00; 99.90; Casa & Decor; `;
+        }
+
+        function processBulkImport() {
+            const rawText = document.getElementById('bulk-textarea').value.trim();
+            if (!rawText) {
+                showToast('Cole a lista de produtos antes de importar.', 'error');
+                return;
+            }
+
+            const lines = rawText.split('\n');
+            let addedCount = 0;
+
+            lines.forEach((line, idx) => {
+                const parts = line.split(';').map(item => item.trim());
+                if (parts.length >= 3 && parts[0]) {
+                    const name = parts[0];
+                    const reservePrice = parseFloat(parts[1].replace(',', '.')) || 15.00;
+                    const fullPrice = parseFloat(parts[2].replace(',', '.')) || 150.00;
+                    const category = parts[3] || `Lote #${products.length + addedCount + 1}`;
+                    const image = parts[4] || '';
+
+                    products.unshift({
+                        id: `prod-bulk-${Date.now()}-${idx}`,
+                        name,
+                        category,
+                        reservePrice,
+                        fullPrice,
+                        goal: 10,
+                        image,
+                        reservations: []
+                    });
+                    addedCount++;
+                }
+            });
+
+            if (addedCount > 0) {
+                saveProducts();
+                document.getElementById('bulk-textarea').value = '';
+                renderCatalog();
+                showToast(`${addedCount} produtos importados com sucesso!`, 'success');
+            } else {
+                showToast('Formato inválido. Use: Nome; Valor Reserva; Valor Cheio', 'error');
+            }
+        }
+
+        function exportJSON() {
+            const dataStr = JSON.stringify(products, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'produtos.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showToast('Arquivo produtos.json exportado! Suba no seu GitHub Pages.', 'success');
+        }
+
+        function importJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        products = imported;
+                        saveProducts();
+                        currentPage = 1;
+                        renderCatalog();
+                        showToast(`${imported.length} produtos carregados do JSON!`, 'success');
+                    } else {
+                        showToast('Arquivo JSON inválido.', 'error');
+                    }
+                } catch (err) {
+                    showToast('Erro ao ler o arquivo JSON.', 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+    </script>
+</body>
+</html>
