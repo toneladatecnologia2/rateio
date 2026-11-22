@@ -45,240 +45,285 @@
     </div>
   </div>
 
-  <!-- Navbar -->
-  <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur border-b border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-3">
-      <div class="flex items-center gap-2.5 sm:gap-3">
-        <img
-          src="logo-nexxus.jpg"
-          alt="Nexxus Oficial BR Logo"
-          class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl object-cover border border-blue-500/40 shadow-lg shadow-blue-600/20 shrink-0"
-        />
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="font-bold text-sm sm:text-lg leading-tight text-white">Nexxus Oficial BR</h1>
-            <span class="hidden md:inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-teal-500/15 text-teal-300 border border-teal-500/30">
-              ❖ Somente PIX
-            </span>
+  <!-- TELA / BANNER DE BOAS-VINDAS (BLOQUEIA CATÁLOGO ANTES DO CADASTRO/LOGIN PARA EVITAR CURIOSOS) -->
+  <section id="welcomeGateScreen" class="flex-1 flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950/60">
+    <div class="max-w-4xl w-full bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+      <!-- Banner Esquerdo com Logo e Boas-vindas -->
+      <div class="lg:col-span-6 bg-gradient-to-br from-blue-600 to-blue-800 text-white p-8 sm:p-10 flex flex-col justify-between space-y-6">
+        <div class="space-y-4">
+          <div class="flex items-center gap-3">
+            <img src="logo-nexxus.jpg" alt="Nexxus Oficial BR" class="w-16 h-16 rounded-2xl object-cover border-2 border-white/80 shadow-lg" />
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-white/15 text-blue-100">
+                Acesso Exclusivo Membros
+              </span>
+              <h1 class="text-xl font-extrabold tracking-tight mt-1">Nexxus Oficial BR</h1>
+            </div>
           </div>
-          <p class="text-[10px] sm:text-xs text-slate-400">Boxes de 10 peças • Aberto Qui a Seg</p>
+
+          <div class="pt-2">
+            <h2 class="text-2xl sm:text-3xl font-extrabold leading-tight">
+              Sejam bem-vindos!
+            </h2>
+            <p class="text-sm text-blue-100 mt-3 leading-relaxed">
+              Bem-vindos ao portal oficial de rateio e compra coletiva da <strong>Nexxus Oficial BR</strong>. Para visualizar nosso catálogo exclusivo de produtos, valores e acompanhar os Boxes em andamento, crie seu cadastro gratuito ou entre com sua conta.
+            </p>
+          </div>
+
+          <div class="space-y-2 pt-2 text-xs text-blue-50">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center font-bold">✓</span>
+              <span>Catálogo fechado exclusivo para clientes cadastrados</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center font-bold">✓</span>
+              <span>Pagamento rápido e seguro exclusivamente via PIX</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center font-bold">✓</span>
+              <span>Acompanhamento de pedidos e rastreios em tempo real</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-white/20 flex items-center justify-between text-[11px] text-blue-100">
+          <span>Aberto de Quinta a Segunda</span>
+          <button onclick="openAdminModal()" class="underline hover:text-white font-semibold">
+            Área Admin
+          </button>
         </div>
       </div>
 
-      <div class="flex items-center gap-1.5 sm:gap-2">
-        <span id="adminBypassBadge" class="hidden px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold">
-          Modo Admin
-        </span>
+      <!-- Formulário Direito (Cadastro / Login direto no Banner) -->
+      <div class="lg:col-span-6 p-6 sm:p-8 flex flex-col justify-center bg-slate-900">
+        <div class="flex gap-4 border-b border-slate-800 pb-3">
+          <button id="gateTabRegister" onclick="switchGateAuthMode('register')" class="text-sm font-bold text-blue-400 border-b-2 border-blue-500 pb-1">
+            Criar Cadastro
+          </button>
+          <button id="gateTabLogin" onclick="switchGateAuthMode('login')" class="text-sm font-bold text-slate-400 hover:text-white pb-1">
+            Já tenho conta
+          </button>
+        </div>
 
-        <!-- Botão Carrinho PIX Unificado -->
-        <button onclick="openCartModal()" class="relative inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs sm:text-sm font-bold transition shadow-lg shadow-teal-600/20">
-          🛒 <span class="hidden sm:inline">Carrinho PIX</span>
-          <span id="headerCartCount" class="px-1.5 py-0.5 text-[10px] font-extrabold rounded-full bg-slate-950 text-teal-300">0</span>
-        </button>
-
-        <button onclick="openTrackingBoardModal()" class="hidden lg:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition">
-          📦 Rastreios
-        </button>
-
-        <!-- Botão Área do Cliente -->
-        <button id="headerClientBtn" onclick="openClientAuthModal()" class="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold transition">
-          Entrar
-        </button>
-        <button id="headerMyOrdersBtn" onclick="openMyOrdersModal('summary')" class="hidden px-3 py-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs sm:text-sm font-semibold transition">
-          Meus Pedidos (<span id="headerOrderCount">0</span>)
-        </button>
-        <button id="headerLogoutBtn" onclick="logoutClient()" class="hidden px-2.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs border border-slate-700" title="Sair da conta">
-          Sair
-        </button>
-
-        <!-- Botão Admin -->
-        <button onclick="openAdminModal()" class="px-2.5 sm:px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium border border-slate-700 transition">
-          Admin
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Barra de Boas-vindas do Cliente Logado -->
-  <div id="loggedClientBar" class="hidden bg-blue-950/50 border-b border-blue-900/60">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
-      <div class="flex flex-wrap items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-        <span class="text-slate-300">Logado: <strong id="loggedClientName" class="text-white"></strong></span>
-        <span id="loggedClientTotalSignalsBadge" class="px-2.5 py-0.5 rounded-full bg-slate-900 text-teal-300 border border-teal-500/30 font-bold">
-          Sinais: 0 pçs (R$ 0,00)
-        </span>
-        <span id="loggedClientReadyBadge" class="hidden px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">
-          🔓 Habilitado p/ Quitar: R$ 0,00
-        </span>
-      </div>
-      <div class="flex flex-wrap items-center gap-3">
-        <span id="loggedClientCreditBadge" class="hidden px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold">
-          Crédito: R$ 0,00
-        </span>
-        <button onclick="openMyOrdersModal('summary')" class="text-blue-400 hover:underline font-bold">
-          📊 Extrato Completo do Pedido &rarr;
-        </button>
-        <button onclick="openMyOrdersModal('paid')" class="text-emerald-400 hover:underline font-semibold">
-          Quitados (<span id="loggedClientPaidCount">0</span>)
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Hero / Regras -->
-  <section class="bg-gradient-to-b from-slate-900 to-slate-950 border-b border-slate-800/80 py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
-          <span class="w-7 h-7 rounded-lg bg-teal-500/20 text-teal-300 font-bold text-sm flex items-center justify-center shrink-0">🛒</span>
+        <!-- Form Cadastro no Banner -->
+        <form id="gateRegisterForm" onsubmit="handleGateRegister(event)" class="mt-5 space-y-3">
           <div>
-            <h3 class="font-semibold text-sm text-white">Carrinho Único com PIX Somado</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Escolha quantas peças quiser de vários produtos e pague o sinal de tudo em um único PIX.</p>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Nome Completo *</label>
+            <input id="gateRegName" type="text" required placeholder="Digite seu nome completo"
+              class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none" />
           </div>
-        </div>
-        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
-          <span class="w-7 h-7 rounded-lg bg-emerald-600/20 text-emerald-400 font-bold text-sm flex items-center justify-center shrink-0">10</span>
           <div>
-            <h3 class="font-semibold text-sm text-white">A Cada 10 Peças, Libera um Box</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Completou 10 reservas (Box #1), os participantes quitam o restante via PIX. O 11º abre o Box #2.</p>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">E-mail *</label>
+            <input id="gateRegEmail" type="email" required placeholder="seuemail@exemplo.com"
+              class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none" />
           </div>
-        </div>
-        <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
-          <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-300 font-bold text-sm flex items-center justify-center shrink-0">📊</span>
           <div>
-            <h3 class="font-semibold text-sm text-white">Extrato Completo de Sinais & Quitações</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Acompanhe em "Meus Pedidos" os sinais pagos, itens habilitados para quitação e compras pagas integralmente.</p>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Telefone / WhatsApp (com DDD) *</label>
+            <input id="gateRegPhone" type="tel" required placeholder="Ex: 11999998888"
+              class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none" />
           </div>
-        </div>
-      </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Crie uma Senha *</label>
+            <input id="gateRegPassword" type="password" required minlength="4" placeholder="Mínimo 4 caracteres"
+              class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none" />
+          </div>
+          <button type="submit" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition shadow-lg shadow-emerald-600/20">
+            Cadastrar e Ver Produtos &rarr;
+          </button>
+        </form>
 
-      <!-- Filtros e Busca -->
-      <div class="mt-6 flex flex-col sm:flex-row gap-3">
-        <div class="relative flex-1">
-          <input id="searchInput" type="text" placeholder="Buscar produto por nome ou categoria..." oninput="renderCatalog()"
-            class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-400 outline-none" />
-        </div>
-        <select id="categoryFilter" onchange="renderCatalog()"
-          class="bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-2.5 text-sm text-white outline-none">
-          <option value="ALL">Todas as Categorias</option>
-        </select>
-        <select id="statusFilter" onchange="renderCatalog()"
-          class="bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-2.5 text-sm text-white outline-none">
-          <option value="ALL">Todos os Produtos</option>
-          <option value="HAS_COMPLETED">Com Box já Fechado (10+)</option>
-          <option value="ALMOST_FULL">Quase Fechando Box (7 a 9/10)</option>
-        </select>
-        <button onclick="openTrackingBoardModal()" class="lg:hidden px-4 py-2.5 rounded-xl bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 text-xs font-semibold">
-          📦 Consultar Rastreios e Envios
-        </button>
+        <!-- Form Login no Banner -->
+        <form id="gateLoginForm" onsubmit="handleGateLogin(event)" class="hidden mt-5 space-y-3.5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">E-mail cadastrado *</label>
+            <input id="gateLoginEmail" type="email" required placeholder="seuemail@exemplo.com"
+              class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Senha *</label>
+            <input id="gateLoginPassword" type="password" required placeholder="Sua senha"
+              class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none" />
+          </div>
+          <button type="submit" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm transition shadow-lg shadow-blue-600/20">
+            Entrar e Ver Produtos &rarr;
+          </button>
+          <p class="text-center text-xs text-slate-400 pt-1">
+            Primeiro acesso? <button type="button" onclick="switchGateAuthMode('register')" class="text-blue-400 font-semibold underline">Crie seu cadastro agora</button>
+          </p>
+        </form>
       </div>
     </div>
   </section>
 
-  <!-- Catálogo de Produtos -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
-    <div id="loadingState" class="text-center py-16">
-      <div class="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-      <p class="text-slate-400 text-sm mt-3">Sincronizando produtos, clientes e boxes em tempo real...</p>
-    </div>
-
-    <div id="emptyState" class="hidden text-center py-16 bg-slate-900/50 border border-slate-800 rounded-2xl">
-      <p class="text-slate-300 font-semibold">Nenhum produto encontrado</p>
-      <p class="text-slate-500 text-sm mt-1">Aguarde o cadastro de produtos ou ajuste os filtros de busca.</p>
-    </div>
-
-    <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
-  </main>
-
-  <!-- BARRA FLUTUANTE DO CARRINHO -->
-  <div id="floatingCartBar" class="hidden fixed bottom-4 inset-x-4 z-40 max-w-3xl mx-auto">
-    <div class="bg-slate-900 text-white rounded-2xl p-3.5 sm:px-5 shadow-2xl border border-teal-500/50 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center font-extrabold text-base shrink-0">
-          🛒
+  <!-- CONTEÚDO PRINCIPAL DA LOJA (OCULTO ATÉ O CLIENTE FAZER CADASTRO/LOGIN) -->
+  <div id="mainAppContainer" class="hidden flex-1 flex flex-col">
+    <!-- Navbar -->
+    <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur border-b border-slate-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-3">
+        <div class="flex items-center gap-2.5 sm:gap-3">
+          <img
+            src="logo-nexxus.jpg"
+            alt="Nexxus Oficial BR Logo"
+            class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl object-cover border border-blue-500/40 shadow-lg shadow-blue-600/20 shrink-0"
+          />
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="font-bold text-sm sm:text-lg leading-tight text-white">Nexxus Oficial BR</h1>
+              <span class="hidden md:inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-teal-500/15 text-teal-300 border border-teal-500/30">
+                ❖ Somente PIX
+              </span>
+            </div>
+            <p class="text-[10px] sm:text-xs text-slate-400">Boxes de 10 peças • Aberto Qui a Seg</p>
+          </div>
         </div>
-        <div>
-          <p class="text-xs text-teal-300 font-semibold">
-            <span id="floatingCartPieces">0</span> peça(s) selecionada(s) no carrinho
-          </p>
-          <p class="text-sm sm:text-base font-extrabold text-white">
-            Total do Sinal PIX: <span id="floatingCartTotal" class="text-teal-400">R$ 0,00</span>
-          </p>
-        </div>
-      </div>
-      <button onclick="openCartModal()" class="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-teal-600/20">
-        Finalizar Reserva & Gerar PIX Único &rarr;
-      </button>
-    </div>
-  </div>
 
-  <!-- MODAL 1: LOGIN E CADASTRO DO CLIENTE -->
-  <div id="clientAuthModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <div class="flex gap-4">
-          <button id="authTabLogin" onclick="switchAuthMode('login')" class="text-sm font-bold text-blue-400 border-b-2 border-blue-500 pb-1">
-            Já tenho cadastro
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <span id="adminBypassBadge" class="hidden px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold">
+            Modo Admin
+          </span>
+
+          <button onclick="openCartModal()" class="relative inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs sm:text-sm font-bold transition shadow-lg shadow-teal-600/20">
+            🛒 <span class="hidden sm:inline">Carrinho PIX</span>
+            <span id="headerCartCount" class="px-1.5 py-0.5 text-[10px] font-extrabold rounded-full bg-slate-950 text-teal-300">0</span>
           </button>
-          <button id="authTabRegister" onclick="switchAuthMode('register')" class="text-sm font-bold text-slate-400 hover:text-white pb-1">
-            Criar conta
+
+          <button onclick="openTrackingBoardModal()" class="hidden lg:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition">
+            📦 Rastreios
+          </button>
+
+          <button id="headerMyOrdersBtn" onclick="openMyOrdersModal('summary')" class="px-3 py-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs sm:text-sm font-semibold transition">
+            Meus Pedidos (<span id="headerOrderCount">0</span>)
+          </button>
+          <button id="headerLogoutBtn" onclick="logoutClient()" class="px-2.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs border border-slate-700" title="Sair da conta">
+            Sair
+          </button>
+
+          <button onclick="openAdminModal()" class="px-2.5 sm:px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium border border-slate-700 transition">
+            Admin
           </button>
         </div>
-        <button onclick="closeClientAuthModal()" class="text-slate-400 hover:text-white text-xl leading-none">&times;</button>
+      </div>
+    </header>
+
+    <!-- Barra de Boas-vindas do Cliente Logado -->
+    <div id="loggedClientBar" class="hidden bg-blue-950/50 border-b border-blue-900/60">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span class="text-slate-300">Logado: <strong id="loggedClientName" class="text-white"></strong></span>
+          <span id="loggedClientTotalSignalsBadge" class="px-2.5 py-0.5 rounded-full bg-slate-900 text-teal-300 border border-teal-500/30 font-bold">
+            Sinais: 0 pçs (R$ 0,00)
+          </span>
+          <span id="loggedClientReadyBadge" class="hidden px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">
+            🔓 Habilitado p/ Quitar: R$ 0,00
+          </span>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <span id="loggedClientCreditBadge" class="hidden px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold">
+            Crédito: R$ 0,00
+          </span>
+          <button onclick="openMyOrdersModal('summary')" class="text-blue-400 hover:underline font-bold">
+            📊 Extrato Completo do Pedido &rarr;
+          </button>
+          <button onclick="openMyOrdersModal('paid')" class="text-emerald-400 hover:underline font-semibold">
+            Quitados (<span id="loggedClientPaidCount">0</span>)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero / Regras -->
+    <section class="bg-gradient-to-b from-slate-900 to-slate-950 border-b border-slate-800/80 py-6">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
+            <span class="w-7 h-7 rounded-lg bg-teal-500/20 text-teal-300 font-bold text-sm flex items-center justify-center shrink-0">🛒</span>
+            <div>
+              <h3 class="font-semibold text-sm text-white">Carrinho Único com PIX Somado</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Escolha quantas peças quiser de vários produtos e pague o sinal de tudo em um único PIX.</p>
+            </div>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
+            <span class="w-7 h-7 rounded-lg bg-emerald-600/20 text-emerald-400 font-bold text-sm flex items-center justify-center shrink-0">10</span>
+            <div>
+              <h3 class="font-semibold text-sm text-white">A Cada 10 Peças, Libera um Box</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Completou 10 reservas (Box #1), os participantes quitam o restante via PIX. O 11º abre o Box #2.</p>
+            </div>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
+            <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-300 font-bold text-sm flex items-center justify-center shrink-0">📊</span>
+            <div>
+              <h3 class="font-semibold text-sm text-white">Extrato Completo de Sinais & Quitações</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Acompanhe em "Meus Pedidos" os sinais pagos, itens habilitados para quitação e compras pagas integralmente.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filtros e Busca -->
+        <div class="mt-6 flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-1">
+            <input id="searchInput" type="text" placeholder="Buscar produto por nome ou categoria..." oninput="renderCatalog()"
+              class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-400 outline-none" />
+          </div>
+          <select id="categoryFilter" onchange="renderCatalog()"
+            class="bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-2.5 text-sm text-white outline-none">
+            <option value="ALL">Todas as Categorias</option>
+          </select>
+          <select id="statusFilter" onchange="renderCatalog()"
+            class="bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-4 py-2.5 text-sm text-white outline-none">
+            <option value="ALL">Todos os Produtos</option>
+            <option value="HAS_COMPLETED">Com Box já Fechado (10+)</option>
+            <option value="ALMOST_FULL">Quase Fechando Box (7 a 9/10)</option>
+          </select>
+          <button onclick="openTrackingBoardModal()" class="lg:hidden px-4 py-2.5 rounded-xl bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 text-xs font-semibold">
+            📦 Consultar Rastreios e Envios
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Catálogo de Produtos -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
+      <div id="loadingState" class="text-center py-16">
+        <div class="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-slate-400 text-sm mt-3">Sincronizando produtos, clientes e boxes em tempo real...</p>
       </div>
 
-      <form id="clientLoginForm" onsubmit="handleClientLogin(event)" class="mt-4 space-y-3">
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">E-mail cadastrado *</label>
-          <input id="loginEmail" type="email" required placeholder="seuemail@exemplo.com"
-            class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">Senha *</label>
-          <input id="loginPassword" type="password" required placeholder="Sua senha"
-            class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
-        </div>
-        <button type="submit" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition">
-          Entrar na Minha Conta
-        </button>
-        <p class="text-center text-xs text-slate-400 pt-1">
-          Ainda não tem conta? <button type="button" onclick="switchAuthMode('register')" class="text-blue-400 underline">Cadastre-se agora</button>
-        </p>
-      </form>
+      <div id="emptyState" class="hidden text-center py-16 bg-slate-900/50 border border-slate-800 rounded-2xl">
+        <p class="text-slate-300 font-semibold">Nenhum produto encontrado</p>
+        <p class="text-slate-500 text-sm mt-1">Aguarde o cadastro de produtos ou ajuste os filtros de busca.</p>
+      </div>
 
-      <form id="clientRegisterForm" onsubmit="handleClientRegister(event)" class="hidden mt-4 space-y-3">
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">Nome Completo *</label>
-          <input id="regName" type="text" required placeholder="Ex: João da Silva"
-            class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
+      <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+    </main>
+
+    <!-- BARRA FLUTUANTE DO CARRINHO -->
+    <div id="floatingCartBar" class="hidden fixed bottom-4 inset-x-4 z-40 max-w-3xl mx-auto">
+      <div class="bg-slate-900 text-white rounded-2xl p-3.5 sm:px-5 shadow-2xl border border-teal-500/50 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center font-extrabold text-base shrink-0">
+            🛒
+          </div>
+          <div>
+            <p class="text-xs text-teal-300 font-semibold">
+              <span id="floatingCartPieces">0</span> peça(s) selecionada(s) no carrinho
+            </p>
+            <p class="text-sm sm:text-base font-extrabold text-white">
+              Total do Sinal PIX: <span id="floatingCartTotal" class="text-teal-400">R$ 0,00</span>
+            </p>
+          </div>
         </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">E-mail *</label>
-          <input id="regEmail" type="email" required placeholder="seuemail@exemplo.com"
-            class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">Telefone / WhatsApp (com DDD) *</label>
-          <input id="regPhone" type="tel" required placeholder="Ex: 11999998888"
-            class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">Crie uma Senha *</label>
-          <input id="regPassword" type="password" required minlength="4" placeholder="Mínimo 4 caracteres"
-            class="w-full bg-slate-950 border border-slate-700 focus:border-blue-500 rounded-lg px-3.5 py-2 text-sm text-white outline-none" />
-        </div>
-        <button type="submit" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition">
-          Concluir Cadastro e Continuar
+        <button onclick="openCartModal()" class="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-teal-600/20">
+          Finalizar Reserva & Gerar PIX Único &rarr;
         </button>
-      </form>
+      </div>
     </div>
   </div>
 
   <!-- MODAL 2: CARRINHO UNIFICADO & PAGAMENTO PIX TOTAL DOS SINAIS -->
   <div id="cartModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl max-h-[92vh] flex flex-col overflow-hidden">
-      <div class="flex justify-between items-start gap-3 border-b border-slate-800 pb-3.5">
+      <div class="flex justify-between items-start gap-3 border-b border-slate-800 pb-3.5 shrink-0">
         <div>
           <div class="flex items-center gap-2">
             <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-blue-600/20 text-blue-400">🛒 Carrinho de Reservas</span>
@@ -289,14 +334,14 @@
         <button onclick="closeCartModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
-      <div id="cartModalBody" class="flex-1 overflow-y-auto py-4 space-y-4 custom-scrollbar"></div>
+      <div id="cartModalBody" class="flex-1 min-h-0 overflow-y-auto py-4 space-y-4 custom-scrollbar"></div>
     </div>
   </div>
 
   <!-- MODAL 3: ÁREA DO CLIENTE -->
   <div id="myOrdersModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between shrink-0">
         <div>
           <h2 class="text-lg font-bold text-white">Minha Conta — Nexxus Oficial BR</h2>
           <p id="myOrdersSubtitle" class="text-xs text-slate-400"></p>
@@ -304,7 +349,7 @@
         <button onclick="closeMyOrdersModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
-      <div class="flex border-b border-slate-800 px-6 gap-4 overflow-x-auto bg-slate-950/60">
+      <div class="flex flex-wrap border-b border-slate-800 px-6 gap-x-5 gap-y-1 bg-slate-950/60 shrink-0">
         <button onclick="switchClientPortalTab('summary')" id="clientTab-summary" class="client-portal-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-blue-500 text-blue-400 whitespace-nowrap">
           📊 Extrato Consolidado (Sinais, Habilitados & Pagos)
         </button>
@@ -319,14 +364,14 @@
         </button>
       </div>
 
-      <div id="myOrdersBody" class="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-5"></div>
+      <div id="myOrdersBody" class="flex-1 min-h-0 overflow-y-auto p-6 custom-scrollbar space-y-5"></div>
     </div>
   </div>
 
   <!-- MODAL 3B: MURAL DE RASTREIOS E ENVIOS -->
   <div id="trackingBoardModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between shrink-0">
         <div>
           <h2 class="text-lg font-bold text-white">📦 Rastreios e Envios por Data de Fechamento</h2>
           <p class="text-xs text-slate-400">Consulte as informações de envio atualizadas pelos administradores separadas pela data de fechamento de cada rateio.</p>
@@ -334,19 +379,19 @@
         <button onclick="closeTrackingBoardModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
-      <div class="px-6 py-3 bg-slate-950/60 border-b border-slate-800 flex flex-col sm:flex-row gap-3">
+      <div class="px-6 py-3 bg-slate-950/60 border-b border-slate-800 flex flex-col sm:flex-row gap-3 shrink-0">
         <input id="publicTrackingSearch" type="text" oninput="renderPublicTrackingBoard()" placeholder="Filtrar por nome do produto, data de fechamento ou informação..."
           class="flex-1 bg-slate-900 border border-slate-700 focus:border-indigo-500 rounded-lg px-3.5 py-2 text-xs text-white outline-none" />
       </div>
 
-      <div id="publicTrackingBody" class="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-5"></div>
+      <div id="publicTrackingBody" class="flex-1 min-h-0 overflow-y-auto p-6 custom-scrollbar space-y-5"></div>
     </div>
   </div>
 
   <!-- MODAL 4: PAINEL ADMINISTRATIVO -->
   <div id="adminModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-6xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between gap-2">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between gap-2 shrink-0">
         <div>
           <h2 class="text-lg font-bold text-white">Painel Administrativo — Nexxus Oficial BR</h2>
           <p id="loggedAdminBanner" class="hidden text-xs text-emerald-400"></p>
@@ -378,35 +423,35 @@
       </div>
 
       <!-- Conteúdo Admin Logado -->
-      <div id="adminDashboardView" class="hidden flex-1 flex flex-col overflow-hidden">
-        <div class="flex border-b border-slate-800 px-6 gap-4 overflow-x-auto bg-slate-950/50">
-          <button onclick="switchAdminTab('tracking')" id="tab-tracking" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-indigo-500 text-indigo-400 whitespace-nowrap">
+      <div id="adminDashboardView" class="hidden flex-1 min-h-0 flex flex-col overflow-hidden">
+        <div class="flex flex-wrap items-center border-b border-slate-800 px-4 sm:px-6 py-2 gap-1.5 sm:gap-2 bg-slate-950 shrink-0">
+          <button onclick="switchAdminTab('tracking')" id="tab-tracking" class="admin-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold border border-blue-500 bg-blue-600 text-white transition">
             📦 Rastreios e Envios
           </button>
-          <button onclick="switchAdminTab('closings')" id="tab-closings" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
+          <button onclick="switchAdminTab('closings')" id="tab-closings" class="admin-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800 transition">
             Boxes & Cobrança PIX
           </button>
-          <button onclick="switchAdminTab('clients')" id="tab-clients" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
+          <button onclick="switchAdminTab('clients')" id="tab-clients" class="admin-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800 transition">
             Pedidos por Cliente
           </button>
-          <button onclick="switchAdminTab('weekly')" id="tab-weekly" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
+          <button onclick="switchAdminTab('weekly')" id="tab-weekly" class="admin-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800 transition">
             Arrecadação Semanal (Ter–Dom)
           </button>
-          <button onclick="switchAdminTab('products')" id="tab-products" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
+          <button onclick="switchAdminTab('products')" id="tab-products" class="admin-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800 transition">
             Cadastrar Produto (1 a 1)
           </button>
-          <button onclick="switchAdminTab('bulk')" id="tab-bulk" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
+          <button onclick="switchAdminTab('bulk')" id="tab-bulk" class="admin-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800 transition">
             Cadastro em Lote (+100)
           </button>
-          <button onclick="switchAdminTab('settings')" id="tab-settings" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
+          <button onclick="switchAdminTab('settings')" id="tab-settings" class="admin-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800 transition">
             ❖ Chave PIX & Config
           </button>
-          <button onclick="switchAdminTab('admins')" id="tab-admins" class="admin-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
+          <button onclick="switchAdminTab('admins')" id="tab-admins" class="admin-tab shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800 transition">
             Admins & Auditoria
           </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-6">
+        <div class="flex-1 min-h-0 overflow-y-auto p-6 custom-scrollbar space-y-6">
           <!-- ABA 0: RASTREIOS E ENVIOS -->
           <div id="view-tracking" class="space-y-5">
             <div class="bg-indigo-950/35 border border-indigo-800/60 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
@@ -773,7 +818,6 @@
 
     let currentUser = null;
     let currentAdmin = null;
-    let openCartAfterAuth = false;
     let activeClientPortalTab = "summary";
 
     const formatBRL = (val) => Number(val || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -813,7 +857,6 @@
       });
     };
 
-    // --- GERADOR DE PIX COPIA E COLA ---
     function crc16CCITT(str) {
       let crc = 0xFFFF;
       for (let i = 0; i < str.length; i++) {
@@ -865,7 +908,6 @@
       return payload + crc16CCITT(payload);
     }
 
-    // --- BLOQUEIO TERÇA E QUARTA ---
     function getBrazilDate() {
       const str = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
       return new Date(str);
@@ -885,7 +927,6 @@
       if (closed && !currentAdmin) {
         overlay.classList.remove("hidden");
         bypassBadge.classList.add("hidden");
-        document.getElementById("clientAuthModal").classList.add("hidden");
         document.getElementById("cartModal").classList.add("hidden");
         document.getElementById("myOrdersModal").classList.add("hidden");
         document.getElementById("trackingBoardModal").classList.add("hidden");
@@ -922,6 +963,94 @@
 
     setInterval(updateSiteScheduleLock, 1000);
     updateSiteScheduleLock();
+
+    // --- CONTROLE DO BANNER DE BOAS-VINDAS (BLOQUEIA CATÁLOGO SEM CADASTRO) ---
+    function updateWelcomeGateVisibility() {
+      const gate = document.getElementById("welcomeGateScreen");
+      const mainApp = document.getElementById("mainAppContainer");
+      const canSeeCatalog = Boolean(currentUser || currentAdmin);
+
+      if (canSeeCatalog) {
+        gate.classList.add("hidden");
+        mainApp.classList.remove("hidden");
+      } else {
+        gate.classList.remove("hidden");
+        mainApp.classList.add("hidden");
+      }
+      updateCartUI();
+    }
+
+    window.switchGateAuthMode = function (mode) {
+      const isRegister = mode === "register";
+      document.getElementById("gateRegisterForm").classList.toggle("hidden", !isRegister);
+      document.getElementById("gateLoginForm").classList.toggle("hidden", isRegister);
+
+      document.getElementById("gateTabRegister").className = isRegister
+        ? "text-sm font-bold text-blue-400 border-b-2 border-blue-500 pb-1"
+        : "text-sm font-bold text-slate-400 hover:text-white pb-1";
+      document.getElementById("gateTabLogin").className = !isRegister
+        ? "text-sm font-bold text-blue-400 border-b-2 border-blue-500 pb-1"
+        : "text-sm font-bold text-slate-400 hover:text-white pb-1";
+    };
+
+    window.handleGateRegister = async function (e) {
+      e.preventDefault();
+      if (isSiteClosedNow() && !currentAdmin) {
+        alert("O site está fechado às terças e quartas-feiras.");
+        return;
+      }
+      const name = document.getElementById("gateRegName").value.trim();
+      const email = document.getElementById("gateRegEmail").value.trim().toLowerCase();
+      const phone = document.getElementById("gateRegPhone").value.replace(/\D/g, "");
+      const password = document.getElementById("gateRegPassword").value;
+
+      if (phone.length < 10) {
+        alert("Informe um telefone/WhatsApp válido com DDD.");
+        return;
+      }
+      if (users.some(u => (u.email || "").toLowerCase() === email)) {
+        alert("Este e-mail já está cadastrado. Entre na aba 'Já tenho conta'.");
+        switchGateAuthMode("login");
+        return;
+      }
+
+      const newUserRef = await addDoc(collection(db, COL.users), {
+        name,
+        email,
+        phone,
+        password,
+        createdAtMs: Date.now(),
+        createdAt: serverTimestamp()
+      });
+
+      currentUser = { id: newUserRef.id, name, email, phone, password };
+      localStorage.setItem("rateio_user_id", newUserRef.id);
+      document.getElementById("gateRegisterForm").reset();
+      updateClientHeaderUI();
+      updateWelcomeGateVisibility();
+    };
+
+    window.handleGateLogin = function (e) {
+      e.preventDefault();
+      if (isSiteClosedNow() && !currentAdmin) {
+        alert("O site está fechado às terças e quartas-feiras.");
+        return;
+      }
+      const email = document.getElementById("gateLoginEmail").value.trim().toLowerCase();
+      const password = document.getElementById("gateLoginPassword").value;
+
+      const found = users.find(u => (u.email || "").toLowerCase() === email && u.password === password);
+      if (!found) {
+        alert("E-mail ou senha inválidos.");
+        return;
+      }
+
+      currentUser = found;
+      localStorage.setItem("rateio_user_id", found.id);
+      document.getElementById("gateLoginForm").reset();
+      updateClientHeaderUI();
+      updateWelcomeGateVisibility();
+    };
 
     function getTueSunWeekInfo(timestampMs) {
       const d = new Date(timestampMs);
@@ -969,11 +1098,6 @@
     }
 
     // --- MODAIS ---
-    window.openClientAuthModal = () => {
-      if (isSiteClosedNow() && !currentAdmin) return;
-      document.getElementById("clientAuthModal").classList.remove("hidden");
-    };
-    window.closeClientAuthModal = () => document.getElementById("clientAuthModal").classList.add("hidden");
     window.openCartModal = () => {
       if (isSiteClosedNow() && !currentAdmin) return;
       renderCartModal();
@@ -1015,20 +1139,7 @@
       renderMyOrders();
     };
 
-    window.switchAuthMode = function (mode) {
-      const isLogin = mode === "login";
-      document.getElementById("clientLoginForm").classList.toggle("hidden", !isLogin);
-      document.getElementById("clientRegisterForm").classList.toggle("hidden", isLogin);
-
-      document.getElementById("authTabLogin").className = isLogin
-        ? "text-sm font-bold text-blue-400 border-b-2 border-blue-500 pb-1"
-        : "text-sm font-bold text-slate-400 hover:text-white pb-1";
-      document.getElementById("authTabRegister").className = !isLogin
-        ? "text-sm font-bold text-emerald-400 border-b-2 border-emerald-500 pb-1"
-        : "text-sm font-bold text-slate-400 hover:text-white pb-1";
-    };
-
-    // --- CARRINHO UNIFICADO ---
+    // --- CARRINHO ---
     function saveCartState() {
       localStorage.setItem("nexxus_cart", JSON.stringify(cart));
       updateCartUI();
@@ -1067,11 +1178,12 @@
       const { totalPieces, totalDeposit } = getCartSummary();
       const headerBadge = document.getElementById("headerCartCount");
       const floatingBar = document.getElementById("floatingCartBar");
+      const canSeeCatalog = Boolean(currentUser || currentAdmin);
 
       if (headerBadge) headerBadge.textContent = totalPieces;
 
       if (floatingBar) {
-        if (totalPieces > 0 && (!isSiteClosedNow() || currentAdmin)) {
+        if (totalPieces > 0 && canSeeCatalog && (!isSiteClosedNow() || currentAdmin)) {
           floatingBar.classList.remove("hidden");
           document.getElementById("floatingCartPieces").textContent = totalPieces;
           document.getElementById("floatingCartTotal").textContent = formatBRL(totalDeposit);
@@ -1272,10 +1384,7 @@
 
         <button id="confirmCartCheckoutBtn" onclick="submitCartCheckout()"
           class="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-sm transition shadow-lg shadow-teal-600/20">
-          ${currentUser
-            ? `Já fiz o PIX de ${formatBRL(summary.totalDeposit)} / Confirmar ${summary.totalPieces} Peça(s)`
-            : `Entrar / Cadastrar para Confirmar Pedido (${formatBRL(summary.totalDeposit)})`
-          }
+          Já fiz o PIX de ${formatBRL(summary.totalDeposit)} / Confirmar ${summary.totalPieces} Peça(s)
         </button>
       `;
     };
@@ -1290,10 +1399,7 @@
       if (summary.items.length === 0) return;
 
       if (!currentUser) {
-        openCartAfterAuth = true;
-        closeCartModal();
-        switchAuthMode("register");
-        openClientAuthModal();
+        alert("Crie seu cadastro ou entre na sua conta para confirmar o pedido.");
         return;
       }
 
@@ -1395,6 +1501,7 @@
       localStorage.setItem("rateio_admin_id", found.id);
       updateAdminHeaderState();
       updateSiteScheduleLock();
+      updateWelcomeGateVisibility();
       renderAdminTracking();
       renderWeeklyRevenue();
       renderAdminClients();
@@ -1406,6 +1513,7 @@
       localStorage.removeItem("rateio_admin_id");
       updateAdminHeaderState();
       updateSiteScheduleLock();
+      updateWelcomeGateVisibility();
     };
 
     function updateAdminHeaderState() {
@@ -1431,16 +1539,14 @@
 
     window.switchAdminTab = function (tab) {
       document.querySelectorAll(".admin-tab").forEach(el => {
-        el.classList.remove("border-blue-500", "text-blue-400", "border-teal-500", "text-teal-400", "border-indigo-500", "text-indigo-400");
-        el.classList.add("border-transparent", "text-slate-400");
+        el.classList.remove("border-blue-500", "bg-blue-600", "text-white");
+        el.classList.add("border-slate-700", "bg-slate-900", "text-slate-300");
       });
-      const activeColor = tab === "settings"
-        ? ["border-teal-500", "text-teal-400"]
-        : tab === "tracking"
-        ? ["border-indigo-500", "text-indigo-400"]
-        : ["border-blue-500", "text-blue-400"];
-      document.getElementById(`tab-${tab}`).classList.add(...activeColor);
-      document.getElementById(`tab-${tab}`).classList.remove("border-transparent", "text-slate-400");
+      const activeTabEl = document.getElementById(`tab-${tab}`);
+      if (activeTabEl) {
+        activeTabEl.classList.remove("border-slate-700", "bg-slate-900", "text-slate-300");
+        activeTabEl.classList.add("border-blue-500", "bg-blue-600", "text-white");
+      }
 
       ["tracking", "settings", "weekly", "clients", "closings", "products", "bulk", "admins"].forEach(v => {
         document.getElementById(`view-${v}`).classList.toggle("hidden", v !== tab);
@@ -1515,6 +1621,7 @@
         currentAdmin = admins.find(a => a.id === savedAdminId) || null;
         updateAdminHeaderState();
         updateSiteScheduleLock();
+        updateWelcomeGateVisibility();
       }
       renderAdminsAndAudit();
     });
@@ -1540,6 +1647,7 @@
         currentUser = users.find(u => u.id === savedUserId) || null;
       }
       updateClientHeaderUI();
+      updateWelcomeGateVisibility();
       renderAdminClients();
     });
 
@@ -1669,82 +1777,11 @@
 
     setInterval(checkSunday2359Closing, 30000);
 
-    // --- AUTENTICAÇÃO DO CLIENTE ---
-    window.handleClientRegister = async function (e) {
-      e.preventDefault();
-      if (isSiteClosedNow() && !currentAdmin) {
-        alert("O site está fechado às terças e quartas-feiras.");
-        return;
-      }
-      const name = document.getElementById("regName").value.trim();
-      const email = document.getElementById("regEmail").value.trim().toLowerCase();
-      const phone = document.getElementById("regPhone").value.replace(/\D/g, "");
-      const password = document.getElementById("regPassword").value;
-
-      if (phone.length < 10) {
-        alert("Informe um telefone/WhatsApp válido com DDD.");
-        return;
-      }
-      if (users.some(u => (u.email || "").toLowerCase() === email)) {
-        alert("Este e-mail já está cadastrado. Faça login na aba 'Já tenho cadastro'.");
-        switchAuthMode("login");
-        return;
-      }
-
-      const newUserRef = await addDoc(collection(db, COL.users), {
-        name,
-        email,
-        phone,
-        password,
-        createdAtMs: Date.now(),
-        createdAt: serverTimestamp()
-      });
-
-      currentUser = { id: newUserRef.id, name, email, phone, password };
-      localStorage.setItem("rateio_user_id", newUserRef.id);
-      document.getElementById("clientRegisterForm").reset();
-      closeClientAuthModal();
-      updateClientHeaderUI();
-
-      if (openCartAfterAuth) {
-        openCartAfterAuth = false;
-        openCartModal();
-      } else {
-        alert(`Bem-vindo(a) à Nexxus Oficial BR, ${name}! Cadastro realizado com sucesso.`);
-      }
-    };
-
-    window.handleClientLogin = function (e) {
-      e.preventDefault();
-      if (isSiteClosedNow() && !currentAdmin) {
-        alert("O site está fechado às terças e quartas-feiras.");
-        return;
-      }
-      const email = document.getElementById("loginEmail").value.trim().toLowerCase();
-      const password = document.getElementById("loginPassword").value;
-
-      const found = users.find(u => (u.email || "").toLowerCase() === email && u.password === password);
-      if (!found) {
-        alert("E-mail ou senha inválidos.");
-        return;
-      }
-
-      currentUser = found;
-      localStorage.setItem("rateio_user_id", found.id);
-      document.getElementById("clientLoginForm").reset();
-      closeClientAuthModal();
-      updateClientHeaderUI();
-
-      if (openCartAfterAuth) {
-        openCartAfterAuth = false;
-        openCartModal();
-      }
-    };
-
     window.logoutClient = function () {
       currentUser = null;
       localStorage.removeItem("rateio_user_id");
       updateClientHeaderUI();
+      updateWelcomeGateVisibility();
     };
 
     function getClientFinancialSummary(user) {
@@ -1842,13 +1879,11 @@
     }
 
     function updateClientHeaderUI() {
-      const authBtn = document.getElementById("headerClientBtn");
       const ordersBtn = document.getElementById("headerMyOrdersBtn");
       const logoutBtn = document.getElementById("headerLogoutBtn");
       const bar = document.getElementById("loggedClientBar");
 
       if (!currentUser) {
-        authBtn.classList.remove("hidden");
         ordersBtn.classList.add("hidden");
         logoutBtn.classList.add("hidden");
         bar.classList.add("hidden");
@@ -1856,7 +1891,6 @@
       }
 
       const summary = getClientFinancialSummary(currentUser);
-      authBtn.classList.add("hidden");
       ordersBtn.classList.remove("hidden");
       logoutBtn.classList.remove("hidden");
       bar.classList.remove("hidden");
