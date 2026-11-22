@@ -47,38 +47,44 @@
 
   <!-- Navbar -->
   <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur border-b border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-3">
+      <div class="flex items-center gap-2.5 sm:gap-3">
         <img
           src="logo-nexxus.jpg"
           alt="Nexxus Oficial BR Logo"
-          class="w-11 h-11 rounded-xl object-cover border border-blue-500/40 shadow-lg shadow-blue-600/20 shrink-0"
+          class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl object-cover border border-blue-500/40 shadow-lg shadow-blue-600/20 shrink-0"
         />
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="font-bold text-base sm:text-lg leading-tight text-white">Nexxus Oficial BR</h1>
-            <span class="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-teal-500/15 text-teal-300 border border-teal-500/30">
+            <h1 class="font-bold text-sm sm:text-lg leading-tight text-white">Nexxus Oficial BR</h1>
+            <span class="hidden md:inline-flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-teal-500/15 text-teal-300 border border-teal-500/30">
               ❖ Somente PIX
             </span>
           </div>
-          <p class="text-[11px] sm:text-xs text-slate-400">Boxes contínuos de 10 peças • Aberto de Qui a Seg</p>
+          <p class="text-[10px] sm:text-xs text-slate-400">Boxes de 10 peças • Aberto Qui a Seg</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5 sm:gap-2">
         <span id="adminBypassBadge" class="hidden px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold">
-          Modo Admin (Dia Fechado)
+          Modo Admin
         </span>
 
-        <button onclick="openTrackingBoardModal()" class="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition">
-          📦 Rastreios e Envios
+        <!-- Botão Carrinho PIX Unificado -->
+        <button onclick="openCartModal()" class="relative inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs sm:text-sm font-bold transition shadow-lg shadow-teal-600/20">
+          🛒 <span class="hidden sm:inline">Carrinho PIX</span>
+          <span id="headerCartCount" class="px-1.5 py-0.5 text-[10px] font-extrabold rounded-full bg-slate-950 text-teal-300">0</span>
+        </button>
+
+        <button onclick="openTrackingBoardModal()" class="hidden lg:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition">
+          📦 Rastreios
         </button>
 
         <!-- Botão Área do Cliente -->
         <button id="headerClientBtn" onclick="openClientAuthModal()" class="px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold transition">
-          Entrar / Cadastrar
+          Entrar
         </button>
-        <button id="headerMyOrdersBtn" onclick="openMyOrdersModal('active')" class="hidden px-3 py-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs sm:text-sm font-semibold transition">
+        <button id="headerMyOrdersBtn" onclick="openMyOrdersModal('summary')" class="hidden px-3 py-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs sm:text-sm font-semibold transition">
           Meus Pedidos (<span id="headerOrderCount">0</span>)
         </button>
         <button id="headerLogoutBtn" onclick="logoutClient()" class="hidden px-2.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs border border-slate-700" title="Sair da conta">
@@ -86,7 +92,7 @@
         </button>
 
         <!-- Botão Admin -->
-        <button onclick="openAdminModal()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium border border-slate-700 transition">
+        <button onclick="openAdminModal()" class="px-2.5 sm:px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium border border-slate-700 transition">
           Admin
         </button>
       </div>
@@ -96,19 +102,25 @@
   <!-- Barra de Boas-vindas do Cliente Logado -->
   <div id="loggedClientBar" class="hidden bg-blue-950/50 border-b border-blue-900/60">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-        <span class="text-slate-300">Logado como: <strong id="loggedClientName" class="text-white"></strong> (<span id="loggedClientEmail" class="text-slate-400"></span>)</span>
+        <span class="text-slate-300">Logado: <strong id="loggedClientName" class="text-white"></strong></span>
+        <span id="loggedClientTotalSignalsBadge" class="px-2.5 py-0.5 rounded-full bg-slate-900 text-teal-300 border border-teal-500/30 font-bold">
+          Sinais: 0 pçs (R$ 0,00)
+        </span>
+        <span id="loggedClientReadyBadge" class="hidden px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">
+          🔓 Habilitado p/ Quitar: R$ 0,00
+        </span>
       </div>
       <div class="flex flex-wrap items-center gap-3">
-        <span id="loggedClientCreditBadge" class="hidden px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
-          Crédito p/ Abatimento: R$ 0,00
+        <span id="loggedClientCreditBadge" class="hidden px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold">
+          Crédito: R$ 0,00
         </span>
-        <button onclick="openMyOrdersModal('paid')" class="text-emerald-400 hover:underline font-semibold">
-          Compras Pagas (<span id="loggedClientPaidCount">0</span>)
+        <button onclick="openMyOrdersModal('summary')" class="text-blue-400 hover:underline font-bold">
+          📊 Extrato Completo do Pedido &rarr;
         </button>
-        <button onclick="openMyOrdersModal('tracking')" class="text-indigo-300 hover:underline font-semibold">
-          📦 Rastreios e Envios &rarr;
+        <button onclick="openMyOrdersModal('paid')" class="text-emerald-400 hover:underline font-semibold">
+          Quitados (<span id="loggedClientPaidCount">0</span>)
         </button>
       </div>
     </div>
@@ -119,24 +131,24 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
-          <span class="w-7 h-7 rounded-lg bg-teal-500/20 text-teal-300 font-bold text-sm flex items-center justify-center shrink-0">❖</span>
+          <span class="w-7 h-7 rounded-lg bg-teal-500/20 text-teal-300 font-bold text-sm flex items-center justify-center shrink-0">🛒</span>
           <div>
-            <h3 class="font-semibold text-sm text-white">Pagamento Exclusivo via PIX</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Todas as reservas e quitações são feitas exclusivamente via PIX direto para a chave oficial.</p>
+            <h3 class="font-semibold text-sm text-white">Carrinho Único com PIX Somado</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Escolha quantas peças quiser de vários produtos e pague o sinal de tudo em um único PIX.</p>
           </div>
         </div>
         <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
           <span class="w-7 h-7 rounded-lg bg-emerald-600/20 text-emerald-400 font-bold text-sm flex items-center justify-center shrink-0">10</span>
           <div>
             <h3 class="font-semibold text-sm text-white">A Cada 10 Peças, Libera um Box</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Completou 10 reservas (Box #1), os 10 participantes quitam o restante via PIX. O 11º abre o Box #2.</p>
+            <p class="text-xs text-slate-400 mt-0.5">Completou 10 reservas (Box #1), os participantes quitam o restante via PIX. O 11º abre o Box #2.</p>
           </div>
         </div>
         <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
-          <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-300 font-bold text-sm flex items-center justify-center shrink-0">📦</span>
+          <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-300 font-bold text-sm flex items-center justify-center shrink-0">📊</span>
           <div>
-            <h3 class="font-semibold text-sm text-white">Rastreios e Envios por Fechamento</h3>
-            <p class="text-xs text-slate-400 mt-0.5">Acompanhe as informações de envio atualizadas pelos administradores separadas pela data de fechamento.</p>
+            <h3 class="font-semibold text-sm text-white">Extrato Completo de Sinais & Quitações</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Acompanhe em "Meus Pedidos" os sinais pagos, itens habilitados para quitação e compras pagas integralmente.</p>
           </div>
         </div>
       </div>
@@ -157,15 +169,15 @@
           <option value="HAS_COMPLETED">Com Box já Fechado (10+)</option>
           <option value="ALMOST_FULL">Quase Fechando Box (7 a 9/10)</option>
         </select>
-        <button onclick="openTrackingBoardModal()" class="sm:hidden px-4 py-2.5 rounded-xl bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 text-xs font-semibold">
+        <button onclick="openTrackingBoardModal()" class="lg:hidden px-4 py-2.5 rounded-xl bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 text-xs font-semibold">
           📦 Consultar Rastreios e Envios
         </button>
       </div>
     </div>
   </section>
 
-  <!-- Catálogo de Produtos (Sem Imagens) -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Catálogo de Produtos -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
     <div id="loadingState" class="text-center py-16">
       <div class="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
       <p class="text-slate-400 text-sm mt-3">Sincronizando produtos, clientes e boxes em tempo real...</p>
@@ -178,6 +190,28 @@
 
     <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
   </main>
+
+  <!-- BARRA FLUTUANTE DO CARRINHO -->
+  <div id="floatingCartBar" class="hidden fixed bottom-4 inset-x-4 z-40 max-w-3xl mx-auto">
+    <div class="bg-slate-900 text-white rounded-2xl p-3.5 sm:px-5 shadow-2xl border border-teal-500/50 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center font-extrabold text-base shrink-0">
+          🛒
+        </div>
+        <div>
+          <p class="text-xs text-teal-300 font-semibold">
+            <span id="floatingCartPieces">0</span> peça(s) selecionada(s) no carrinho
+          </p>
+          <p class="text-sm sm:text-base font-extrabold text-white">
+            Total do Sinal PIX: <span id="floatingCartTotal" class="text-teal-400">R$ 0,00</span>
+          </p>
+        </div>
+      </div>
+      <button onclick="openCartModal()" class="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs sm:text-sm transition shadow-lg shadow-teal-600/20">
+        Finalizar Reserva & Gerar PIX Único &rarr;
+      </button>
+    </div>
+  </div>
 
   <!-- MODAL 1: LOGIN E CADASTRO DO CLIENTE -->
   <div id="clientAuthModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -194,7 +228,6 @@
         <button onclick="closeClientAuthModal()" class="text-slate-400 hover:text-white text-xl leading-none">&times;</button>
       </div>
 
-      <!-- Form Login -->
       <form id="clientLoginForm" onsubmit="handleClientLogin(event)" class="mt-4 space-y-3">
         <div>
           <label class="block text-xs font-medium text-slate-300 mb-1">E-mail cadastrado *</label>
@@ -214,7 +247,6 @@
         </p>
       </form>
 
-      <!-- Form Cadastro -->
       <form id="clientRegisterForm" onsubmit="handleClientRegister(event)" class="hidden mt-4 space-y-3">
         <div>
           <label class="block text-xs font-medium text-slate-300 mb-1">Nome Completo *</label>
@@ -243,104 +275,27 @@
     </div>
   </div>
 
-  <!-- MODAL 2: CONFIRMAR RESERVA SOMENTE VIA PIX (CLIENTE LOGADO) -->
-  <div id="reserveModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl max-h-[92vh] overflow-y-auto custom-scrollbar">
-      <div class="flex justify-between items-start gap-3">
+  <!-- MODAL 2: CARRINHO UNIFICADO & PAGAMENTO PIX TOTAL DOS SINAIS -->
+  <div id="cartModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl max-h-[92vh] flex flex-col overflow-hidden">
+      <div class="flex justify-between items-start gap-3 border-b border-slate-800 pb-3.5">
         <div>
           <div class="flex items-center gap-2">
-            <span id="modalBoxTag" class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-blue-600/20 text-blue-400">Box #1</span>
-            <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">❖ Somente PIX</span>
+            <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded bg-blue-600/20 text-blue-400">🛒 Carrinho de Reservas</span>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">❖ PIX Único</span>
           </div>
-          <h2 id="modalProductName" class="text-lg font-bold text-white mt-1.5">Nome do Produto</h2>
+          <h2 class="text-lg font-bold text-white mt-1">Finalizar Reservas & Pagar Sinal Total</h2>
         </div>
-        <button onclick="closeReserveModal()" class="text-slate-400 hover:text-white text-xl leading-none">&times;</button>
+        <button onclick="closeCartModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
-      <div class="mt-4 bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-2 text-sm">
-        <div class="flex justify-between">
-          <span class="text-slate-400">Cliente:</span>
-          <span id="modalClientDisplay" class="font-semibold text-white"></span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-400">Forma de Pagamento:</span>
-          <span class="font-bold text-teal-400">PIX (Transferência / Copia e Cola)</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-400">Sinal fixo da reserva (agora):</span>
-          <span id="modalDepositPrice" class="font-extrabold text-blue-400">R$ 20,00</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-400">Valor cheio do produto:</span>
-          <span id="modalFullPrice" class="font-bold text-white">R$ 0,00</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-400">Restante via PIX após fechar Box:</span>
-          <span id="modalRemainingPrice" class="font-bold text-emerald-400">R$ 0,00</span>
-        </div>
-        <div class="flex justify-between border-t border-slate-800 pt-2">
-          <span class="text-slate-400">Posição neste Box:</span>
-          <span id="modalBoxProgress" class="font-bold text-white">1/10</span>
-        </div>
-      </div>
-
-      <!-- Bloco PIX Oficial -->
-      <div id="pixInstructionBox" class="mt-3 bg-teal-950/35 border border-teal-700/50 rounded-xl p-3.5 text-xs space-y-2.5">
-        <div class="flex items-center justify-between">
-          <span class="font-bold text-teal-300">❖ Dados PIX para Recebimento</span>
-          <span id="displayPixTypeBadge" class="text-[10px] px-2 py-0.5 rounded bg-teal-500/20 text-teal-200 uppercase font-semibold">Chave PIX</span>
-        </div>
-
-        <div id="pixConfiguredArea" class="space-y-2">
-          <div class="text-[11px] text-slate-300">
-            Favorecido: <strong id="displayPixReceiver" class="text-white">Nexxus Oficial BR</strong>
-          </div>
-          <div>
-            <p class="text-[11px] text-slate-400 mb-1">Chave PIX:</p>
-            <div class="flex items-center gap-2">
-              <code id="displayPixKey" class="flex-1 font-mono text-xs select-all bg-slate-950 px-2.5 py-1.5 rounded border border-teal-800/60 text-teal-200 truncate"></code>
-              <button type="button" onclick="copyTextToClipboard(document.getElementById('displayPixKey').textContent, 'Chave PIX copiada!')"
-                class="px-2.5 py-1.5 rounded bg-teal-600 hover:bg-teal-500 text-white font-semibold text-[11px] shrink-0">
-                Copiar Chave
-              </button>
-            </div>
-          </div>
-
-          <div class="pt-1 flex flex-col sm:flex-row items-center gap-3">
-            <img id="displayPixQrCode" src="" alt="QR Code PIX" class="w-28 h-28 rounded-lg bg-white p-1.5 shrink-0 border border-teal-700/40" />
-            <div class="flex-1 w-full space-y-1.5">
-              <p class="text-[11px] text-slate-400">Ou use o PIX Copia e Cola com valor exato:</p>
-              <textarea id="displayPixPayload" readonly rows="2" class="w-full font-mono text-[10px] bg-slate-950 p-1.5 rounded border border-slate-800 text-slate-300 resize-none"></textarea>
-              <button type="button" onclick="copyTextToClipboard(document.getElementById('displayPixPayload').value, 'Código PIX Copia e Cola copiado!')"
-                class="w-full py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-700/40 font-semibold text-[11px]">
-                Copiar Código PIX Copia e Cola
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div id="pixMissingWarning" class="hidden text-amber-300 bg-amber-950/50 border border-amber-700/50 rounded-lg p-2.5 text-[11px]">
-          ⚠️ A chave PIX oficial ainda não foi cadastrada pelo administrador. Entre em contato pelo WhatsApp após reservar.
-        </div>
-      </div>
-
-      <p class="mt-3 text-[11px] text-slate-400 leading-relaxed">
-- Pagamento aceito <strong>somente via PIX</strong>. Caso desista antes de o Box completar 10 peças, o sinal não é estornado, mas fica como crédito para abater na sua conta caso tenha outros produtos.
-      </p>
-
-      <form id="reserveForm" onsubmit="submitReservation(event)" class="mt-4">
-        <input type="hidden" id="modalProductId" />
-        <button id="confirmReserveBtn" type="submit"
-          class="w-full py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-sm transition shadow-lg shadow-teal-600/20">
-          Já fiz o PIX / Confirmar Reserva
-        </button>
-      </form>
+      <div id="cartModalBody" class="flex-1 overflow-y-auto py-4 space-y-4 custom-scrollbar"></div>
     </div>
   </div>
 
-  <!-- MODAL 3: ÁREA DO CLIENTE (RESERVAS, COMPRAS PAGAS & RASTREIOS E ENVIOS) -->
+  <!-- MODAL 3: ÁREA DO CLIENTE -->
   <div id="myOrdersModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
         <div>
           <h2 class="text-lg font-bold text-white">Minha Conta — Nexxus Oficial BR</h2>
@@ -349,16 +304,18 @@
         <button onclick="closeMyOrdersModal()" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
 
-      <!-- Sub-abas da Área do Cliente -->
       <div class="flex border-b border-slate-800 px-6 gap-4 overflow-x-auto bg-slate-950/60">
-        <button onclick="switchClientPortalTab('active')" id="clientTab-active" class="client-portal-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-blue-500 text-blue-400 whitespace-nowrap">
-          Minhas Reservas & Pagamento PIX
+        <button onclick="switchClientPortalTab('summary')" id="clientTab-summary" class="client-portal-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-blue-500 text-blue-400 whitespace-nowrap">
+          📊 Extrato Consolidado (Sinais, Habilitados & Pagos)
+        </button>
+        <button onclick="switchClientPortalTab('active')" id="clientTab-active" class="client-portal-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
+          Peças Individuais & Cancelamento
         </button>
         <button onclick="switchClientPortalTab('paid')" id="clientTab-paid" class="client-portal-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
-          ✅ Lista de Compras Pagas
+          ✅ Somente Compras Quitadas
         </button>
         <button onclick="switchClientPortalTab('tracking')" id="clientTab-tracking" class="client-portal-tab py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white whitespace-nowrap">
-          📦 Rastreios e Envios por Fechamento
+          📦 Rastreios e Envios
         </button>
       </div>
 
@@ -366,7 +323,7 @@
     </div>
   </div>
 
-  <!-- MODAL 3B: MURAL DE RASTREIOS E ENVIOS POR DATA DE FECHAMENTO DO RATEIO -->
+  <!-- MODAL 3B: MURAL DE RASTREIOS E ENVIOS -->
   <div id="trackingBoardModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
@@ -386,7 +343,7 @@
     </div>
   </div>
 
-  <!-- MODAL 4: PAINEL ADMINISTRATIVO (EXCLUSIVO ADMINS) -->
+  <!-- MODAL 4: PAINEL ADMINISTRATIVO -->
   <div id="adminModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-6xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between gap-2">
@@ -402,7 +359,7 @@
         </div>
       </div>
 
-      <!-- Login Admin Individual -->
+      <!-- Login Admin -->
       <div id="adminLoginView" class="p-8 max-w-sm mx-auto w-full space-y-3">
         <p class="text-sm text-slate-300 text-center">Entre com seu E-mail e Senha individual de Administrador.</p>
         <div>
@@ -450,13 +407,13 @@
         </div>
 
         <div class="flex-1 overflow-y-auto p-6 custom-scrollbar space-y-6">
-          <!-- ABA 0: RASTREIOS E ENVIOS POR DATA DE FECHAMENTO DO RATEIO -->
+          <!-- ABA 0: RASTREIOS E ENVIOS -->
           <div id="view-tracking" class="space-y-5">
             <div class="bg-indigo-950/35 border border-indigo-800/60 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h3 class="font-bold text-white text-sm">📦 Rastreios e Envios (Agrupados por Data de Fechamento do Rateio)</h3>
                 <p class="text-xs text-slate-300 mt-0.5">
-                  Escreva abaixo a informação manual de envio/andamento. Você pode aplicar a mesma informação para <strong>todos os produtos fechados naquela data</strong> de uma vez ou atualizar cada Box individualmente (sem divulgar origem/transportadora).
+                  Escreva abaixo a informação manual de envio/andamento. Você pode aplicar a mesma informação para <strong>todos os produtos fechados naquela data</strong> de uma vez ou atualizar cada Box individualmente.
                 </p>
               </div>
               <input id="adminTrackingSearch" type="text" oninput="renderAdminTracking()" placeholder="Buscar produto, data ou status..."
@@ -474,7 +431,7 @@
                 <span id="pixActiveStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400">Verificando...</span>
               </div>
               <p class="text-xs text-slate-400">
-                Cadastre abaixo a chave PIX oficial que receberá todos os sinais de reserva e quitações dos boxes. O QR Code e o Copia e Cola serão gerados automaticamente para os clientes.
+                Cadastre abaixo a chave PIX oficial que receberá todos os sinais de reserva e quitações dos boxes.
               </p>
 
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -611,35 +568,48 @@
           <div id="view-products" class="hidden space-y-6">
             <div class="bg-blue-950/35 border border-blue-800/60 rounded-xl p-4 space-y-2 text-xs">
               <div class="flex items-center gap-2 text-blue-300 font-bold">
-                <span>📘 Instruções para Cadastro Manual (Um a Um) — Área Exclusiva Admin</span>
+                <span>📘 Instruções para Cadastro Manual e Correção de Valores — Nexxus Oficial BR</span>
               </div>
               <ol class="list-decimal list-inside space-y-1 text-slate-300 leading-relaxed">
-                <li><strong>Nome do Produto:</strong> Digite o título completo do item (ex: <em>Perfume Sauvage Elixir 100ml</em> ou <em>Kit 5 Camisetas Básicas</em>).</li>
-                <li><strong>Sinal Fixo PIX (R$):</strong> Informe o valor cobrado via PIX na reserva inicial de cada vaga (padrão <code>20</code> para R$ 20,00). Use ponto para centavos (ex: <code>25.50</code>).</li>
-                <li><strong>Valor Cheio (R$):</strong> Informe o preço final total do produto. Quando o Box atingir 10 peças, o sistema calculará automaticamente o restante via PIX (<code>Valor Cheio - Sinal</code>).</li>
-                <li><strong>Categoria:</strong> Informe o grupo do produto (ex: <em>Perfumes</em>, <em>Eletrônicos</em>, <em>Moda</em>) para criar filtros automáticos na loja.</li>
-                <li>Clique em <strong>Salvar</strong> — ele aparecerá imediatamente no catálogo da <strong>Nexxus Oficial BR</strong> no <strong>Box #1 (0/10)</strong>.</li>
+                <li><strong>Nome do Produto:</strong> Digite o título completo do item.</li>
+                <li><strong>Valor do Box (10 pçs) (R$):</strong> Ao preencher o valor total do Box fechado (10 peças), o sistema calcula automaticamente o <strong>Valor por Peça</strong> (dividido por 10).</li>
+                <li><strong>Valor por Peça (R$):</strong> Se preferir digitar o valor unitário da peça, o <strong>Valor do Box (10 pçs)</strong> é calculado automaticamente (× 10).</li>
+                <li><strong>Valor do Sinal PIX (R$):</strong> Valor pago via PIX na reserva inicial de cada peça (padrão <code>20.00</code>).</li>
+                <li><strong>Alterar Valor Depois:</strong> Na tabela abaixo, clique em <strong>Editar Valor</strong> ao lado de qualquer produto para corrigir o preço sem precisar excluir o item nem perder os Boxes em andamento.</li>
               </ol>
             </div>
 
-            <form onsubmit="addSingleProduct(event)" class="bg-slate-950 border border-slate-800 rounded-xl p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-              <div class="lg:col-span-2">
-                <label class="block text-[11px] text-slate-400 mb-1">Nome do Produto *</label>
-                <input id="prodName" type="text" required placeholder="Ex: Perfume Importado 100ml" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
-              </div>
-              <div>
-                <label class="block text-[11px] text-slate-400 mb-1">Sinal Fixo PIX (R$) *</label>
-                <input id="prodDeposit" type="number" step="0.01" value="20" required placeholder="20.00" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
-              </div>
-              <div>
-                <label class="block text-[11px] text-slate-400 mb-1">Valor Cheio (R$) *</label>
-                <input id="prodFull" type="number" step="0.01" required placeholder="Ex: 350.00" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
-              </div>
-              <div>
-                <label class="block text-[11px] text-slate-400 mb-1">Categoria & Ação</label>
-                <div class="flex gap-2">
-                  <input id="prodCategory" type="text" placeholder="Ex: Perfumes" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white" />
-                  <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shrink-0">Salvar</button>
+            <form onsubmit="addSingleProduct(event)" class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+                <div class="lg:col-span-2">
+                  <label class="block text-[11px] font-semibold text-slate-300 mb-1">Nome do Produto *</label>
+                  <input id="prodName" type="text" required placeholder="Ex: Perfume Importado 100ml"
+                    class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2 text-xs text-white outline-none" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-blue-400 mb-1">Valor do Box (10 pçs) (R$) *</label>
+                  <input id="prodBoxPrice" type="number" step="0.01" required placeholder="Ex: 3500.00" oninput="syncPriceFromBox()"
+                    class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2 text-xs text-white outline-none" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-blue-400 mb-1">Valor por Peça (R$) *</label>
+                  <input id="prodFull" type="number" step="0.01" required placeholder="Ex: 350.00" oninput="syncPriceFromPiece()"
+                    class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2 text-xs text-white outline-none" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-teal-400 mb-1">Valor do Sinal PIX (R$) *</label>
+                  <input id="prodDeposit" type="number" step="0.01" value="20" required placeholder="20.00"
+                    class="w-full bg-slate-900 border border-slate-700 focus:border-teal-500 rounded-lg px-3 py-2 text-xs text-white outline-none" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-300 mb-1">Categoria & Ação</label>
+                  <div class="flex gap-2">
+                    <input id="prodCategory" type="text" placeholder="Ex: Geral"
+                      class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-lg px-3 py-2 text-xs text-white outline-none" />
+                    <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shrink-0">
+                      Salvar
+                    </button>
+                  </div>
                 </div>
               </div>
             </form>
@@ -651,7 +621,8 @@
                     <th class="p-3">Produto</th>
                     <th class="p-3">Categoria</th>
                     <th class="p-3">Sinal PIX</th>
-                    <th class="p-3">Valor Cheio</th>
+                    <th class="p-3">Valor por Peça</th>
+                    <th class="p-3">Valor do Box (10 pçs)</th>
                     <th class="p-3">Boxes / Reservas Ativas</th>
                     <th class="p-3 text-right">Ações</th>
                   </tr>
@@ -665,18 +636,17 @@
           <div id="view-bulk" class="hidden space-y-4">
             <div class="bg-emerald-950/30 border border-emerald-800/60 rounded-xl p-4 space-y-2 text-xs">
               <div class="flex items-center gap-2 text-emerald-300 font-bold">
-                <span>📗 Instruções para Cadastro em Lote (+100 Produtos) — Área Exclusiva Admin</span>
+                <span>📗 Instruções para Cadastro em Lote (+100 Produtos) — Nexxus Oficial BR</span>
               </div>
-              <p class="text-slate-300">Para cadastrar dezenas ou centenas de produtos de uma só vez, siga exatamente este padrão:</p>
+              <p class="text-slate-300">Para cadastrar dezenas ou centenas de produtos de uma só vez, siga este padrão:</p>
               <ul class="list-disc list-inside space-y-1 text-slate-300 leading-relaxed">
-                <li>Coloque <strong>1 produto por linha</strong> separando os 4 campos por <strong>ponto e vírgula (<code>;</code>)</strong>.</li>
-                <li>Ordem obrigatória dos campos: <code class="text-emerald-300 bg-slate-950 px-1.5 py-0.5 rounded">Nome do Produto; Valor do Sinal; Valor Cheio; Categoria</code></li>
-                <li>Use <strong>ponto (<code>.</code>)</strong> para centavos e <strong>não</strong> coloque "R$" antes dos números.</li>
+                <li>Coloque <strong>1 produto por linha</strong> separando os 5 campos por <strong>ponto e vírgula (<code>;</code>)</strong>.</li>
+                <li>Ordem dos campos: <code class="text-emerald-300 bg-slate-950 px-1.5 py-0.5 rounded">Nome do Produto; Valor do Sinal; Valor do Box (10 pçs); Valor por Peça; Categoria</code></li>
+                <li>Use <strong>ponto (<code>.</code>)</strong> para centavos (se preencher apenas o Valor do Box ou apenas o Valor por Peça e deixar o outro como <code>0</code>, o sistema calcula o outro automaticamente).</li>
                 <li>Exemplo válido:<br>
                   <code class="block mt-1 bg-slate-950 p-2 rounded border border-slate-800 text-blue-300 font-mono">
-                    Perfume Bleu 100ml; 20.00; 580.00; Perfumes<br>
-                    Relógio Esportivo Pro; 20.00; 240.00; Acessórios<br>
-                    Fone Sem Fio ANC; 20.00; 190.00; Eletrônicos
+                    Perfume Bleu 100ml; 20.00; 5800.00; 580.00; Perfumes<br>
+                    Relógio Esportivo Pro; 20.00; 2400.00; 240.00; Acessórios
                   </code>
                 </li>
               </ul>
@@ -684,7 +654,7 @@
 
             <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
               <h3 class="font-bold text-sm text-white">Cole sua lista de produtos abaixo:</h3>
-              <textarea id="bulkInput" rows="9" placeholder="Perfume Sauvage Elixir 100ml; 20.00; 650.00; Perfumes&#10;Fone Bluetooth Pro; 20.00; 180.00; Eletrônicos&#10;Tênis Corrida Ultra; 20.00; 320.00; Calçados"
+              <textarea id="bulkInput" rows="9" placeholder="Perfume Sauvage Elixir 100ml; 20.00; 6500.00; 650.00; Perfumes&#10;Fone Bluetooth Pro; 20.00; 1800.00; 180.00; Eletrônicos"
                 class="w-full mt-3 bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-white font-mono outline-none focus:border-blue-500"></textarea>
               <button onclick="importBulkProducts()" class="mt-3 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs">
                 Importar Todos os Produtos em Lote Agora
@@ -696,7 +666,7 @@
           <div id="view-admins" class="hidden space-y-6">
             <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
               <div>
-                <h3 class="font-bold text-sm text-white">Cadastrar Novo Administrador (Recebe Relatórios Semanais & Possui Senha Própria)</h3>
+                <h3 class="font-bold text-sm text-white">Cadastrar Novo Administrador (Nexxus Oficial BR)</h3>
                 <p class="text-xs text-slate-400">Cada administrador cadastrado terá login individual e receberá a lista de boxes fechados no domingo às 23:59.</p>
               </div>
               <form onsubmit="addNewAdmin(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
@@ -748,7 +718,7 @@
     </div>
   </div>
 
-  <!-- Firebase SDK + Lógica Completa -->
+  <!-- Firebase SDK + Lógica Completa (Coleções originais da Nexxus) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
     import {
@@ -769,13 +739,24 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    const COL = {
+      products: "products",
+      reservations: "reservations",
+      users: "users",
+      admins: "admins",
+      auditLogs: "audit_logs",
+      weeklyReports: "weekly_reports",
+      boxTrackings: "box_trackings",
+      config: "config"
+    };
+
     let products = [];
     let reservations = [];
     let users = [];
     let admins = [];
     let auditLogs = [];
     let weeklyReports = {};
-    let boxTrackings = {}; // chave: `${productId}_box_${boxNumber}`
+    let boxTrackings = {};
     let storeConfig = {
       pixType: "CPF",
       pixKey: "",
@@ -787,10 +768,13 @@
       emailJsTemplateId: ""
     };
 
+    let cart = JSON.parse(localStorage.getItem("nexxus_cart") || "{}");
+    let cardSelectedQty = {};
+
     let currentUser = null;
     let currentAdmin = null;
-    let pendingProductAfterAuth = null;
-    let activeClientPortalTab = "active";
+    let openCartAfterAuth = false;
+    let activeClientPortalTab = "summary";
 
     const formatBRL = (val) => Number(val || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     const formatDateTime = (ms) => ms ? new Date(ms).toLocaleString("pt-BR") : "-";
@@ -798,6 +782,26 @@
       if (!ms) return "Data não registrada";
       const d = new Date(ms);
       return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+    };
+
+    window.syncPriceFromBox = function () {
+      const boxVal = parseFloat(document.getElementById("prodBoxPrice").value);
+      const pieceInput = document.getElementById("prodFull");
+      if (!isNaN(boxVal) && boxVal >= 0) {
+        pieceInput.value = (boxVal / 10).toFixed(2);
+      } else {
+        pieceInput.value = "";
+      }
+    };
+
+    window.syncPriceFromPiece = function () {
+      const pieceVal = parseFloat(document.getElementById("prodFull").value);
+      const boxInput = document.getElementById("prodBoxPrice");
+      if (!isNaN(pieceVal) && pieceVal >= 0) {
+        boxInput.value = (pieceVal * 10).toFixed(2);
+      } else {
+        boxInput.value = "";
+      }
     };
 
     window.copyTextToClipboard = function (text, successMsg) {
@@ -809,7 +813,7 @@
       });
     };
 
-    // --- GERADOR DE PIX COPIA E COLA (BR CODE EMV PADRÃO BACEN) ---
+    // --- GERADOR DE PIX COPIA E COLA ---
     function crc16CCITT(str) {
       let crc = 0xFFFF;
       for (let i = 0; i < str.length; i++) {
@@ -861,7 +865,7 @@
       return payload + crc16CCITT(payload);
     }
 
-    // --- CONTROLE DE BLOQUEIO TOTAL ÀS TERÇAS (2) E QUARTAS (3) ---
+    // --- BLOQUEIO TERÇA E QUARTA ---
     function getBrazilDate() {
       const str = new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
       return new Date(str);
@@ -882,7 +886,7 @@
         overlay.classList.remove("hidden");
         bypassBadge.classList.add("hidden");
         document.getElementById("clientAuthModal").classList.add("hidden");
-        document.getElementById("reserveModal").classList.add("hidden");
+        document.getElementById("cartModal").classList.add("hidden");
         document.getElementById("myOrdersModal").classList.add("hidden");
         document.getElementById("trackingBoardModal").classList.add("hidden");
       } else {
@@ -919,7 +923,6 @@
     setInterval(updateSiteScheduleLock, 1000);
     updateSiteScheduleLock();
 
-    // --- UTILITÁRIO DE SEMANA: TERÇA 00:00 ATÉ DOMINGO 23:59 ---
     function getTueSunWeekInfo(timestampMs) {
       const d = new Date(timestampMs);
       const day = d.getDay();
@@ -938,10 +941,9 @@
       return { key, label, startMs: start.getTime(), endMs: end.getTime() };
     }
 
-    // --- AUDITORIA DE ALTERAÇÕES DOS ADMINS ---
     async function logAdminAudit(action, details) {
       if (!currentAdmin) return;
-      await addDoc(collection(db, "audit_logs"), {
+      await addDoc(collection(db, COL.auditLogs), {
         adminId: currentAdmin.id,
         adminName: currentAdmin.name,
         adminEmail: currentAdmin.email,
@@ -966,14 +968,19 @@
       return true;
     }
 
-    // --- CONTROLE DE MODAIS ---
+    // --- MODAIS ---
     window.openClientAuthModal = () => {
       if (isSiteClosedNow() && !currentAdmin) return;
       document.getElementById("clientAuthModal").classList.remove("hidden");
     };
     window.closeClientAuthModal = () => document.getElementById("clientAuthModal").classList.add("hidden");
-    window.closeReserveModal = () => document.getElementById("reserveModal").classList.add("hidden");
-    window.openMyOrdersModal = (initialTab = "active") => {
+    window.openCartModal = () => {
+      if (isSiteClosedNow() && !currentAdmin) return;
+      renderCartModal();
+      document.getElementById("cartModal").classList.remove("hidden");
+    };
+    window.closeCartModal = () => document.getElementById("cartModal").classList.add("hidden");
+    window.openMyOrdersModal = (initialTab = "summary") => {
       if (isSiteClosedNow() && !currentAdmin) return;
       activeClientPortalTab = initialTab;
       switchClientPortalTab(initialTab);
@@ -1021,7 +1028,342 @@
         : "text-sm font-bold text-slate-400 hover:text-white pb-1";
     };
 
-    // --- LOGIN / LOGOUT ADMIN INDIVIDUAL ---
+    // --- CARRINHO UNIFICADO ---
+    function saveCartState() {
+      localStorage.setItem("nexxus_cart", JSON.stringify(cart));
+      updateCartUI();
+    }
+
+    function getCartSummary() {
+      const items = [];
+      let totalPieces = 0;
+      let totalDeposit = 0;
+      let totalFull = 0;
+
+      Object.entries(cart).forEach(([productId, qty]) => {
+        const count = Number(qty || 0);
+        if (count <= 0) return;
+        const p = products.find(item => item.id === productId);
+        if (!p) return;
+
+        const subtotalDeposit = Number(p.depositPrice || 0) * count;
+        const subtotalFull = Number(p.fullPrice || 0) * count;
+        totalPieces += count;
+        totalDeposit += subtotalDeposit;
+        totalFull += subtotalFull;
+
+        items.push({
+          product: p,
+          qty: count,
+          subtotalDeposit,
+          subtotalFull
+        });
+      });
+
+      return { items, totalPieces, totalDeposit, totalFull };
+    }
+
+    function updateCartUI() {
+      const { totalPieces, totalDeposit } = getCartSummary();
+      const headerBadge = document.getElementById("headerCartCount");
+      const floatingBar = document.getElementById("floatingCartBar");
+
+      if (headerBadge) headerBadge.textContent = totalPieces;
+
+      if (floatingBar) {
+        if (totalPieces > 0 && (!isSiteClosedNow() || currentAdmin)) {
+          floatingBar.classList.remove("hidden");
+          document.getElementById("floatingCartPieces").textContent = totalPieces;
+          document.getElementById("floatingCartTotal").textContent = formatBRL(totalDeposit);
+        } else {
+          floatingBar.classList.add("hidden");
+        }
+      }
+    }
+
+    window.changeCardQty = function (productId, delta) {
+      const current = cardSelectedQty[productId] || 1;
+      const next = Math.max(1, current + delta);
+      cardSelectedQty[productId] = next;
+
+      const qtyEl = document.getElementById(`card-qty-${productId}`);
+      const btnTotalEl = document.getElementById(`card-btn-total-${productId}`);
+      const p = products.find(item => item.id === productId);
+
+      if (qtyEl) qtyEl.textContent = next;
+      if (btnTotalEl && p) {
+        btnTotalEl.textContent = formatBRL(Number(p.depositPrice || 0) * next);
+      }
+    };
+
+    window.addToCart = function (productId) {
+      if (isSiteClosedNow() && !currentAdmin) {
+        alert("O site está fechado às terças e quartas-feiras.");
+        return;
+      }
+      const p = products.find(item => item.id === productId);
+      if (!p) return;
+
+      const qtyToAdd = cardSelectedQty[productId] || 1;
+      cart[productId] = (cart[productId] || 0) + qtyToAdd;
+      cardSelectedQty[productId] = 1;
+
+      saveCartState();
+      renderCatalog();
+    };
+
+    window.updateCartItemQty = function (productId, delta) {
+      const current = Number(cart[productId] || 0);
+      const next = current + delta;
+      if (next <= 0) {
+        delete cart[productId];
+      } else {
+        cart[productId] = next;
+      }
+      saveCartState();
+      renderCatalog();
+      renderCartModal();
+    };
+
+    window.removeCartItem = function (productId) {
+      delete cart[productId];
+      saveCartState();
+      renderCatalog();
+      renderCartModal();
+    };
+
+    window.renderCartModal = function () {
+      const body = document.getElementById("cartModalBody");
+      if (!body) return;
+
+      const summary = getCartSummary();
+
+      if (summary.items.length === 0) {
+        body.innerHTML = `
+          <div class="text-center py-10 space-y-3">
+            <p class="text-4xl">🛒</p>
+            <p class="text-sm font-bold text-white">Seu carrinho da Nexxus Oficial BR está vazio</p>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto">
+              Escolha a quantidade de peças desejada em cada produto do catálogo e adicione ao carrinho para gerar um único PIX com o valor total dos sinais.
+            </p>
+            <button onclick="closeCartModal()" class="mt-2 px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold">
+              Voltar ao Catálogo
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const receiverDisplay = storeConfig.pixReceiverName || "Nexxus Oficial BR";
+      const payload = storeConfig.pixKey
+        ? generatePixPayload(
+            storeConfig.pixKey,
+            receiverDisplay,
+            storeConfig.pixCity,
+            summary.totalDeposit,
+            `CART${summary.totalPieces}PCS`
+          )
+        : "";
+
+      const qrUrl = payload
+        ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payload)}`
+        : "";
+
+      body.innerHTML = `
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between text-xs text-slate-400 px-1">
+            <span>Itens selecionados (${summary.items.length} produto(s))</span>
+            <span>Total de peças: <strong class="text-white">${summary.totalPieces} pç(s)</strong></span>
+          </div>
+
+          ${summary.items.map(({ product: p, qty, subtotalDeposit }) => {
+            const info = getBoxesInfo(p.id);
+            return `
+              <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="space-y-0.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-600/20 text-blue-400 border border-blue-500/30">
+                      Box #${info.activeBoxNumber} (${info.activeBoxCount}/10)
+                    </span>
+                    ${p.category ? `<span class="text-[10px] font-semibold text-slate-400 uppercase">${p.category}</span>` : ''}
+                  </div>
+                  <h4 class="font-bold text-white text-sm">${p.name}</h4>
+                  <p class="text-xs text-slate-400">
+                    Sinal unit.: <strong class="text-teal-400">${formatBRL(p.depositPrice)}</strong> •
+                    Valor por peça: <strong class="text-slate-200">${formatBRL(p.fullPrice)}</strong> •
+                    Subtotal sinal (${qty}x): <strong class="text-teal-300">${formatBRL(subtotalDeposit)}</strong>
+                  </p>
+                </div>
+
+                <div class="flex items-center justify-between sm:justify-end gap-3">
+                  <div class="inline-flex items-center bg-slate-900 border border-slate-700 rounded-lg overflow-hidden">
+                    <button type="button" onclick="updateCartItemQty('${p.id}', -1)" class="px-2.5 py-1 text-slate-300 hover:bg-slate-800 font-bold text-sm">-</button>
+                    <span class="px-3 py-1 text-xs font-extrabold text-white">${qty}</span>
+                    <button type="button" onclick="updateCartItemQty('${p.id}', 1)" class="px-2.5 py-1 text-blue-400 hover:bg-slate-800 font-bold text-sm">+</button>
+                  </div>
+                  <button type="button" onclick="removeCartItem('${p.id}')" class="text-xs text-red-400 hover:text-red-300 font-semibold px-2 py-1">
+                    Remover
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+
+        <div class="bg-slate-950 border-2 border-teal-500/50 rounded-2xl p-4 space-y-2 text-xs sm:text-sm shadow-lg">
+          <div class="flex justify-between text-slate-400">
+            <span>Quantidade total de peças reservadas:</span>
+            <strong class="text-white">${summary.totalPieces} peça(s)</strong>
+          </div>
+          <div class="flex justify-between text-slate-400">
+            <span>Valor cheio total dos produtos (quando fechar Boxes):</span>
+            <strong class="text-slate-200">${formatBRL(summary.totalFull)}</strong>
+          </div>
+          <div class="flex justify-between border-t border-slate-800 pt-2 items-center">
+            <span class="font-bold text-white">VALOR TOTAL DO SINAL PIX (AGORA):</span>
+            <span class="text-lg sm:text-xl font-extrabold text-teal-400">${formatBRL(summary.totalDeposit)}</span>
+          </div>
+        </div>
+
+        <div class="bg-teal-950/35 border border-teal-700/50 rounded-xl p-4 text-xs space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-teal-300">❖ Pagamento PIX Único (${summary.totalPieces} peças = ${formatBRL(summary.totalDeposit)})</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-teal-500/20 text-teal-200 uppercase font-semibold">Chave ${storeConfig.pixType || "PIX"}</span>
+          </div>
+
+          ${storeConfig.pixKey ? `
+            <div class="space-y-2.5">
+              <div class="text-[11px] text-slate-300">
+                Favorecido: <strong class="text-white">${receiverDisplay}</strong>
+              </div>
+              <div>
+                <p class="text-[11px] text-slate-400 mb-1">Chave PIX:</p>
+                <div class="flex items-center gap-2">
+                  <code class="flex-1 font-mono text-xs select-all bg-slate-950 px-2.5 py-1.5 rounded border border-teal-800/60 text-teal-200 truncate">${storeConfig.pixKey}</code>
+                  <button type="button" onclick="copyTextToClipboard('${storeConfig.pixKey}', 'Chave PIX copiada!')"
+                    class="px-2.5 py-1.5 rounded bg-teal-600 hover:bg-teal-500 text-white font-semibold text-[11px] shrink-0">
+                    Copiar Chave
+                  </button>
+                </div>
+              </div>
+
+              <div class="pt-1 flex flex-col sm:flex-row items-center gap-3">
+                <img src="${qrUrl}" alt="QR Code PIX Total" class="w-28 h-28 rounded-lg bg-white p-1.5 shrink-0 border border-teal-700/40" />
+                <div class="flex-1 w-full space-y-1.5">
+                  <p class="text-[11px] text-slate-400">PIX Copia e Cola já preenchido com o valor total (<strong class="text-white">${formatBRL(summary.totalDeposit)}</strong>):</p>
+                  <textarea readonly rows="2" class="w-full font-mono text-[10px] bg-slate-950 p-1.5 rounded border border-slate-800 text-slate-300 resize-none">${payload}</textarea>
+                  <button type="button" onclick="copyTextToClipboard('${payload}', 'Código PIX Copia e Cola do valor total copiado!')"
+                    class="w-full py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-700/40 font-semibold text-[11px]">
+                    Copiar PIX Copia e Cola (${formatBRL(summary.totalDeposit)})
+                  </button>
+                </div>
+              </div>
+            </div>
+          ` : `
+            <div class="text-amber-300 bg-amber-950/50 border border-amber-700/50 rounded-lg p-2.5 text-[11px]">
+              ⚠️ A chave PIX oficial da Nexxus Oficial BR ainda não foi cadastrada pelo administrador.
+            </div>
+          `}
+        </div>
+
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          • Ao confirmar, todas as <strong class="text-slate-200">${summary.totalPieces} peça(s)</strong> serão registradas imediatamente nos respectivos Boxes e ficarão disponíveis no <strong class="text-slate-200">Extrato Consolidado</strong> de "Meus Pedidos".
+        </p>
+
+        <button id="confirmCartCheckoutBtn" onclick="submitCartCheckout()"
+          class="w-full py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-sm transition shadow-lg shadow-teal-600/20">
+          ${currentUser
+            ? `Já fiz o PIX de ${formatBRL(summary.totalDeposit)} / Confirmar ${summary.totalPieces} Peça(s)`
+            : `Entrar / Cadastrar para Confirmar Pedido (${formatBRL(summary.totalDeposit)})`
+          }
+        </button>
+      `;
+    };
+
+    window.submitCartCheckout = async function () {
+      if (isSiteClosedNow() && !currentAdmin) {
+        alert("O site está fechado às terças e quartas-feiras.");
+        return;
+      }
+
+      const summary = getCartSummary();
+      if (summary.items.length === 0) return;
+
+      if (!currentUser) {
+        openCartAfterAuth = true;
+        closeCartModal();
+        switchAuthMode("register");
+        openClientAuthModal();
+        return;
+      }
+
+      const btn = document.getElementById("confirmCartCheckoutBtn");
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = `Registrando ${summary.totalPieces} peça(s)...`;
+      }
+
+      try {
+        const batchId = `PED-${Date.now()}`;
+        let baseMs = Date.now();
+        const completedAlerts = [];
+
+        for (const { product: p, qty } of summary.items) {
+          const infoBefore = getBoxesInfo(p.id);
+          let runningTotal = infoBefore.total;
+
+          for (let q = 0; q < qty; q++) {
+            runningTotal += 1;
+            const itemMs = baseMs++;
+            const weekInfo = getTueSunWeekInfo(itemMs);
+
+            await addDoc(collection(db, COL.reservations), {
+              batchId,
+              productId: p.id,
+              productName: p.name,
+              userId: currentUser.id,
+              clientName: currentUser.name,
+              clientEmail: currentUser.email,
+              clientWhatsapp: currentUser.phone,
+              paymentMethod: "PIX",
+              pixKeyUsed: storeConfig.pixKey || "",
+              depositPrice: Number(p.depositPrice),
+              fullPrice: Number(p.fullPrice),
+              status: "ACTIVE",
+              paidFull: false,
+              paidFullAtMs: null,
+              weekKey: weekInfo.key,
+              createdAtMs: itemMs,
+              createdAt: serverTimestamp()
+            });
+
+            if (runningTotal % 10 === 0) {
+              const closedBoxNum = runningTotal / 10;
+              completedAlerts.push(`• ${p.name}: completou o BOX #${closedBoxNum} (10/10)!`);
+            }
+          }
+        }
+
+        cart = {};
+        saveCartState();
+        closeCartModal();
+
+        let msg = `✅ Pedido confirmado na Nexxus Oficial BR, ${currentUser.name}!\n\n`;
+        msg += `• Total de peças reservadas: ${summary.totalPieces} peça(s)\n`;
+        msg += `• Total de sinais PIX: ${formatBRL(summary.totalDeposit)}\n\n`;
+        if (completedAlerts.length > 0) {
+          msg += `🎉 BOX(ES) FECHADO(S) COM SUA RESERVA:\n${completedAlerts.join("\n")}\n\n`;
+        }
+        msg += `Você pode acompanhar todo o seu pedido, sinais pagos e itens habilitados em "Meus Pedidos".`;
+        alert(msg);
+      } catch (err) {
+        alert("Erro ao registrar pedido do carrinho: " + err.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    };
+
+    // --- ADMIN LOGIN ---
     window.loginAdmin = async function () {
       const email = document.getElementById("adminEmailInput").value.trim().toLowerCase();
       const pass = document.getElementById("adminPasswordInput").value;
@@ -1030,7 +1372,7 @@
 
       if (!found && admins.length === 0 && email === "admin@rateio.com" && pass === "admin123") {
         try {
-          const docRef = await addDoc(collection(db, "admins"), {
+          const docRef = await addDoc(collection(db, COL.admins), {
             name: "Admin Principal",
             email: "admin@rateio.com",
             password: "admin123",
@@ -1110,8 +1452,8 @@
       if (tab === "admins") renderAdminsAndAudit();
     };
 
-    // --- LISTENERS EM TEMPO REAL (FIRESTORE) ---
-    onSnapshot(doc(db, "config", "store"), (snap) => {
+    // --- LISTENERS FIRESTORE ---
+    onSnapshot(doc(db, COL.config, "store"), (snap) => {
       if (snap.exists()) {
         storeConfig = { ...storeConfig, ...snap.data() };
       }
@@ -1139,9 +1481,10 @@
         window.emailjs.init({ publicKey: storeConfig.emailJsPublicKey });
       }
       renderMyOrders();
+      renderCartModal();
     });
 
-    onSnapshot(collection(db, "box_trackings"), (snapshot) => {
+    onSnapshot(collection(db, COL.boxTrackings), (snapshot) => {
       boxTrackings = {};
       snapshot.docs.forEach(d => {
         boxTrackings[d.id] = d.data();
@@ -1151,10 +1494,10 @@
       renderAdminTracking();
     });
 
-    onSnapshot(collection(db, "admins"), async (snapshot) => {
+    onSnapshot(collection(db, COL.admins), async (snapshot) => {
       if (snapshot.empty) {
         try {
-          await addDoc(collection(db, "admins"), {
+          await addDoc(collection(db, COL.admins), {
             name: "Admin Principal",
             email: "admin@rateio.com",
             password: "admin123",
@@ -1176,12 +1519,12 @@
       renderAdminsAndAudit();
     });
 
-    onSnapshot(query(collection(db, "audit_logs"), orderBy("createdAtMs", "desc")), (snapshot) => {
+    onSnapshot(query(collection(db, COL.auditLogs), orderBy("createdAtMs", "desc")), (snapshot) => {
       auditLogs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       renderAdminsAndAudit();
     });
 
-    onSnapshot(collection(db, "weekly_reports"), (snapshot) => {
+    onSnapshot(collection(db, COL.weeklyReports), (snapshot) => {
       weeklyReports = {};
       snapshot.docs.forEach(d => {
         weeklyReports[d.id] = d.data();
@@ -1190,7 +1533,7 @@
       checkSunday2359Closing();
     });
 
-    onSnapshot(collection(db, "users"), (snapshot) => {
+    onSnapshot(collection(db, COL.users), (snapshot) => {
       users = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       const savedUserId = localStorage.getItem("rateio_user_id");
       if (savedUserId) {
@@ -1200,10 +1543,11 @@
       renderAdminClients();
     });
 
-    onSnapshot(collection(db, "products"), (snapshot) => {
+    onSnapshot(collection(db, COL.products), (snapshot) => {
       products = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       document.getElementById("loadingState").classList.add("hidden");
       updateCategoryDropdown();
+      updateCartUI();
       renderCatalog();
       renderAdminProducts();
       renderAdminClosings();
@@ -1214,7 +1558,7 @@
       document.getElementById("loadingState").innerHTML = `<p class="text-red-400 text-sm">Erro ao conectar ao banco de dados. Verifique as Regras do Firestore.</p>`;
     });
 
-    onSnapshot(query(collection(db, "reservations"), orderBy("createdAtMs", "asc")), (snapshot) => {
+    onSnapshot(query(collection(db, COL.reservations), orderBy("createdAtMs", "asc")), (snapshot) => {
       reservations = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       updateClientHeaderUI();
       renderCatalog();
@@ -1253,7 +1597,7 @@
         completedBoxesReport.forEach(({ product: p, box }) => {
           const remaining = Math.max(0, Number(p.fullPrice) - Number(p.depositPrice));
           body += `PRODUTO: ${p.name} — BOX #${box.boxNumber} (10/10 COMPLETO - Fechado em ${formatDateOnly(box.closedAtMs)})\n`;
-          body += `Sinal PIX: ${formatBRL(p.depositPrice)} | Cheio: ${formatBRL(p.fullPrice)} | Restante PIX: ${formatBRL(remaining)}\n`;
+          body += `Sinal PIX: ${formatBRL(p.depositPrice)} | Por Peça: ${formatBRL(p.fullPrice)} | Restante PIX: ${formatBRL(remaining)}\n`;
           box.members.forEach((m, idx) => {
             body += `  #${idx + 1} - ${m.clientName} | Tel: ${m.clientWhatsapp} | E-mail: ${m.clientEmail || '-'}\n`;
           });
@@ -1277,7 +1621,7 @@
 
       const report = buildClosedBoxesReportText(targetWeek);
 
-      await setDoc(doc(db, "weekly_reports", targetWeek.key), {
+      await setDoc(doc(db, COL.weeklyReports, targetWeek.key), {
         weekKey: targetWeek.key,
         weekLabel: targetWeek.label,
         closedBoxesCount: report.count,
@@ -1347,7 +1691,7 @@
         return;
       }
 
-      const newUserRef = await addDoc(collection(db, "users"), {
+      const newUserRef = await addDoc(collection(db, COL.users), {
         name,
         email,
         phone,
@@ -1362,10 +1706,9 @@
       closeClientAuthModal();
       updateClientHeaderUI();
 
-      if (pendingProductAfterAuth) {
-        const pid = pendingProductAfterAuth;
-        pendingProductAfterAuth = null;
-        openReserveModal(pid);
+      if (openCartAfterAuth) {
+        openCartAfterAuth = false;
+        openCartModal();
       } else {
         alert(`Bem-vindo(a) à Nexxus Oficial BR, ${name}! Cadastro realizado com sucesso.`);
       }
@@ -1392,10 +1735,9 @@
       closeClientAuthModal();
       updateClientHeaderUI();
 
-      if (pendingProductAfterAuth) {
-        const pid = pendingProductAfterAuth;
-        pendingProductAfterAuth = null;
-        openReserveModal(pid);
+      if (openCartAfterAuth) {
+        openCartAfterAuth = false;
+        openCartModal();
       }
     };
 
@@ -1406,7 +1748,11 @@
     };
 
     function getClientFinancialSummary(user) {
-      if (!user) return { activeRes: [], paidRes: [], unpaidActiveRes: [], cancelledRes: [], totalRetainedCredit: 0, totalClosedRemaining: 0, netToPay: 0 };
+      if (!user) return {
+        activeRes: [], paidRes: [], readyToPayRes: [], waitingBoxRes: [], cancelledRes: [],
+        groupedByProduct: [], totalDepositsPaidActive: 0, totalFullActiveValue: 0,
+        totalPaidIntegralAmount: 0, totalRetainedCredit: 0, totalClosedRemaining: 0, netToPay: 0
+      };
 
       const userMatch = (r) =>
         (r.userId && r.userId === user.id) ||
@@ -1416,28 +1762,79 @@
       const userReservations = reservations.filter(userMatch);
       const activeRes = userReservations.filter(r => r.status !== "CANCELLED");
       const paidRes = activeRes.filter(r => !!r.paidFull);
-      const unpaidActiveRes = activeRes.filter(r => !r.paidFull);
       const cancelledRes = userReservations.filter(r => r.status === "CANCELLED");
 
+      const readyToPayRes = [];
+      const waitingBoxRes = [];
+
+      const totalDepositsPaidActive = activeRes.reduce((acc, r) => acc + Number(r.depositPrice || 0), 0);
+      const totalFullActiveValue = activeRes.reduce((acc, r) => acc + Number(r.fullPrice || 0), 0);
+      const totalPaidIntegralAmount = paidRes.reduce((acc, r) => acc + Number(r.fullPrice || 0), 0);
       const totalRetainedCredit = cancelledRes.reduce((acc, r) => acc + Number(r.depositPrice || 0), 0);
 
+      const productMap = new Map();
       let totalClosedRemaining = 0;
+
       activeRes.forEach(r => {
         const info = getBoxesInfo(r.productId);
         const myBox = info.boxes.find(b => b.members.some(m => m.id === r.id));
         const isBoxComplete = myBox ? myBox.isComplete : false;
+        const boxNum = myBox ? myBox.boxNumber : 1;
+        const remValue = Math.max(0, Number(r.fullPrice || 0) - Number(r.depositPrice || 0));
+
         if (isBoxComplete && !r.paidFull) {
-          totalClosedRemaining += Math.max(0, Number(r.fullPrice || 0) - Number(r.depositPrice || 0));
+          readyToPayRes.push(r);
+          totalClosedRemaining += remValue;
+        } else if (!isBoxComplete && !r.paidFull) {
+          waitingBoxRes.push(r);
         }
+
+        if (!productMap.has(r.productId)) {
+          productMap.set(r.productId, {
+            productId: r.productId,
+            productName: r.productName,
+            qty: 0,
+            totalDepositPaid: 0,
+            totalFull: 0,
+            readyToPayQty: 0,
+            readyToPayRemaining: 0,
+            paidFullQty: 0,
+            paidFullTotal: 0,
+            waitingQty: 0,
+            boxesSet: new Set()
+          });
+        }
+        const entry = productMap.get(r.productId);
+        entry.qty += 1;
+        entry.totalDepositPaid += Number(r.depositPrice || 0);
+        entry.totalFull += Number(r.fullPrice || 0);
+
+        if (r.paidFull) {
+          entry.paidFullQty += 1;
+          entry.paidFullTotal += Number(r.fullPrice || 0);
+        } else if (isBoxComplete) {
+          entry.readyToPayQty += 1;
+          entry.readyToPayRemaining += remValue;
+        } else {
+          entry.waitingQty += 1;
+        }
+
+        entry.boxesSet.add(`Box #${boxNum} (${r.paidFull ? 'Quitado' : isBoxComplete ? 'Habilitado' : 'Aberto'})`);
       });
 
+      const groupedByProduct = Array.from(productMap.values());
       const netToPay = Math.max(0, totalClosedRemaining - totalRetainedCredit);
 
       return {
         activeRes,
         paidRes,
-        unpaidActiveRes,
+        readyToPayRes,
+        waitingBoxRes,
         cancelledRes,
+        groupedByProduct,
+        totalDepositsPaidActive,
+        totalFullActiveValue,
+        totalPaidIntegralAmount,
         totalRetainedCredit,
         totalClosedRemaining,
         netToPay
@@ -1466,19 +1863,28 @@
 
       document.getElementById("headerOrderCount").textContent = summary.activeRes.length;
       document.getElementById("loggedClientName").textContent = currentUser.name;
-      document.getElementById("loggedClientEmail").textContent = currentUser.email;
+      document.getElementById("loggedClientTotalSignalsBadge").textContent =
+        `Sinais: ${summary.activeRes.length} pç(s) (${formatBRL(summary.totalDepositsPaidActive)})`;
       document.getElementById("loggedClientPaidCount").textContent = summary.paidRes.length;
+
+      const readyBadge = document.getElementById("loggedClientReadyBadge");
+      if (summary.netToPay > 0) {
+        readyBadge.classList.remove("hidden");
+        readyBadge.textContent = `🔓 Habilitado p/ Quitar (${summary.readyToPayRes.length} pçs): ${formatBRL(summary.netToPay)}`;
+      } else {
+        readyBadge.classList.add("hidden");
+      }
 
       const creditBadge = document.getElementById("loggedClientCreditBadge");
       if (summary.totalRetainedCredit > 0) {
         creditBadge.classList.remove("hidden");
-        creditBadge.textContent = `Crédito Retido p/ Abater: ${formatBRL(summary.totalRetainedCredit)}`;
+        creditBadge.textContent = `Crédito Retido: ${formatBRL(summary.totalRetainedCredit)}`;
       } else {
         creditBadge.classList.add("hidden");
       }
     }
 
-    // --- LÓGICA DE BOXES CONTÍNUOS E DATA DE FECHAMENTO ---
+    // --- BOXES CONTÍNUOS ---
     function getActiveProductReservations(productId) {
       return reservations.filter(r => r.productId === productId && r.status !== "CANCELLED");
     }
@@ -1531,7 +1937,7 @@
       if (cats.includes(current)) select.value = current;
     }
 
-    // --- RENDERIZAÇÃO DO CATÁLOGO (SEM IMAGENS / SOMENTE PIX) ---
+    // --- CATÁLOGO ---
     window.renderCatalog = function () {
       const search = document.getElementById("searchInput").value.toLowerCase().trim();
       const cat = document.getElementById("categoryFilter").value;
@@ -1558,9 +1964,13 @@
       grid.innerHTML = filtered.map(p => {
         const info = getBoxesInfo(p.id);
         const pct = (info.activeBoxCount / 10) * 100;
+        const selectedQty = cardSelectedQty[p.id] || 1;
+        const inCartQty = Number(cart[p.id] || 0);
+        const subtotalSignal = Number(p.depositPrice || 0) * selectedQty;
+        const boxTotalValue = p.boxPrice ? Number(p.boxPrice) : Number(p.fullPrice || 0) * 10;
 
         return `
-          <div class="bg-slate-900 border border-slate-800 hover:border-teal-500/40 rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-lg transition">
+          <div class="bg-slate-900 border ${inCartQty > 0 ? 'border-teal-500 ring-2 ring-teal-500/30' : 'border-slate-800'} hover:border-teal-500/40 rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-lg transition">
             <div>
               <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800/80">
                 <span class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30">
@@ -1571,56 +1981,67 @@
                 </span>
               </div>
 
-              ${info.completedBoxesCount > 0 ? `
-                <div class="mt-2.5">
+              <div class="mt-2.5 flex flex-wrap gap-1.5">
+                ${info.completedBoxesCount > 0 ? `
                   <span class="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded bg-emerald-600/20 text-emerald-300 border border-emerald-500/30">
-                    ✓ ${info.completedBoxesCount} ${info.completedBoxesCount === 1 ? 'Box Fechado' : 'Boxes Fechados'} (Liberado)
+                    ✓ ${info.completedBoxesCount} ${info.completedBoxesCount === 1 ? 'Box Fechado' : 'Boxes Fechados'}
                   </span>
-                </div>
-              ` : ''}
+                ` : ''}
+                ${inCartQty > 0 ? `
+                  <span class="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded bg-teal-600 text-white">
+                    🛒 ${inCartQty} pç(s) no carrinho
+                  </span>
+                ` : ''}
+              </div>
 
-              <div class="mt-3">
+              <div class="mt-2.5">
                 ${p.category ? `<span class="text-[11px] text-blue-400 font-semibold uppercase tracking-wider">${p.category}</span>` : ''}
                 <h3 class="font-bold text-white text-base leading-snug mt-0.5">${p.name}</h3>
               </div>
 
-              <div class="mt-3.5 grid grid-cols-2 gap-2 bg-slate-950 p-3 rounded-xl border border-slate-800/80">
-                <div>
-                  <p class="text-[11px] text-slate-400">Reserva PIX (Sinal)</p>
-                  <p class="font-extrabold text-teal-400 text-sm">${formatBRL(p.depositPrice)}</p>
+              <div class="mt-3.5 bg-slate-950 p-3 rounded-xl border border-slate-800/80 space-y-2">
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <p class="text-[10px] text-slate-400">Sinal PIX (por pç)</p>
+                    <p class="font-extrabold text-teal-400 text-sm">${formatBRL(p.depositPrice)}</p>
+                  </div>
+                  <div>
+                    <p class="text-[10px] text-slate-400">Valor por Peça</p>
+                    <p class="font-extrabold text-white text-sm">${formatBRL(p.fullPrice)}</p>
+                  </div>
                 </div>
-                <div>
-                  <p class="text-[11px] text-slate-400">Valor Cheio</p>
-                  <p class="font-extrabold text-white text-sm">${formatBRL(p.fullPrice)}</p>
+                <div class="pt-1.5 border-t border-slate-800 flex items-center justify-between text-[11px]">
+                  <span class="text-slate-400">Valor do Box (10 pçs):</span>
+                  <strong class="text-slate-200">${formatBRL(boxTotalValue)}</strong>
                 </div>
               </div>
             </div>
 
-            <div>
-              <div class="flex justify-between text-xs mb-1.5">
-                <span class="text-slate-400">Faltam ${10 - info.activeBoxCount} para fechar Box #${info.activeBoxNumber}</span>
-                <span class="font-bold text-blue-400">${info.activeBoxCount}/10</span>
-              </div>
-              <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                <div class="h-full bg-blue-500 transition-all duration-300" style="width: ${pct}%"></div>
-              </div>
-
-              ${info.activeBoxReservations.length > 0 ? `
-                <div class="mt-3 pt-2.5 border-t border-slate-800/80">
-                  <p class="text-[11px] text-slate-400 mb-1">No Box #${info.activeBoxNumber} agora:</p>
-                  <div class="flex flex-wrap gap-1">
-                    ${info.activeBoxReservations.map((r, i) => `
-                      <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">
-                        #${i + 1} ${r.clientName.split(' ')[0]}
-                      </span>
-                    `).join('')}
-                  </div>
+            <div class="space-y-3">
+              <div>
+                <div class="flex justify-between text-xs mb-1.5">
+                  <span class="text-slate-400">Faltam ${10 - info.activeBoxCount} p/ Box #${info.activeBoxNumber}</span>
+                  <span class="font-bold text-blue-400">${info.activeBoxCount}/10</span>
                 </div>
-              ` : ''}
+                <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <div class="h-full bg-blue-500 transition-all duration-300" style="width: ${pct}%"></div>
+                </div>
+              </div>
 
-              <button onclick="openReserveModal('${p.id}')"
-                class="mt-4 w-full py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition bg-teal-600 hover:bg-teal-500 text-white shadow-lg shadow-teal-600/20">
-                ❖ Reservar via PIX (${formatBRL(p.depositPrice)})
+              <div class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-300">Qtd. peças:</span>
+                <div class="inline-flex items-center bg-slate-900 border border-slate-700 rounded-lg overflow-hidden">
+                  <button type="button" onclick="changeCardQty('${p.id}', -1)"
+                    class="px-3 py-1 text-slate-300 hover:bg-slate-800 font-extrabold text-sm transition">-</button>
+                  <span id="card-qty-${p.id}" class="px-3.5 py-1 text-xs font-extrabold text-white min-w-[2rem] text-center">${selectedQty}</span>
+                  <button type="button" onclick="changeCardQty('${p.id}', 1)"
+                    class="px-3 py-1 text-blue-400 hover:bg-slate-800 font-extrabold text-sm transition">+</button>
+                </div>
+              </div>
+
+              <button onclick="addToCart('${p.id}')"
+                class="w-full py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition bg-teal-600 hover:bg-teal-500 text-white shadow-lg shadow-teal-600/20">
+                + Adicionar ao Carrinho (<span id="card-btn-total-${p.id}">${formatBRL(subtotalSignal)}</span>)
               </button>
             </div>
           </div>
@@ -1628,127 +2049,7 @@
       }).join("");
     };
 
-    window.openReserveModal = function (productId) {
-      if (isSiteClosedNow() && !currentAdmin) {
-        alert("O site está fechado às terças e quartas-feiras.");
-        return;
-      }
-      if (!currentUser) {
-        pendingProductAfterAuth = productId;
-        switchAuthMode("register");
-        openClientAuthModal();
-        return;
-      }
-
-      const p = products.find(item => item.id === productId);
-      if (!p) return;
-      const info = getBoxesInfo(p.id);
-      const remaining = Math.max(0, Number(p.fullPrice) - Number(p.depositPrice));
-
-      document.getElementById("modalProductId").value = p.id;
-      document.getElementById("modalBoxTag").textContent = `Box #${info.activeBoxNumber} • Vaga #${info.activeBoxCount + 1}/10`;
-      document.getElementById("modalProductName").textContent = p.name;
-      document.getElementById("modalClientDisplay").textContent = `${currentUser.name} (${currentUser.phone})`;
-      document.getElementById("modalDepositPrice").textContent = formatBRL(p.depositPrice);
-      document.getElementById("modalFullPrice").textContent = formatBRL(p.fullPrice);
-      document.getElementById("modalRemainingPrice").textContent = formatBRL(remaining);
-      document.getElementById("modalBoxProgress").textContent = `${info.activeBoxCount + 1} de 10`;
-
-      const configuredArea = document.getElementById("pixConfiguredArea");
-      const missingWarn = document.getElementById("pixMissingWarning");
-
-      if (storeConfig.pixKey) {
-        configuredArea.classList.remove("hidden");
-        missingWarn.classList.add("hidden");
-        document.getElementById("displayPixTypeBadge").textContent = `Chave ${storeConfig.pixType || "PIX"}`;
-        document.getElementById("displayPixReceiver").textContent = storeConfig.pixReceiverName || "Nexxus Oficial BR";
-        document.getElementById("displayPixKey").textContent = storeConfig.pixKey;
-
-        const payload = generatePixPayload(
-          storeConfig.pixKey,
-          storeConfig.pixReceiverName,
-          storeConfig.pixCity,
-          p.depositPrice,
-          `BOX${info.activeBoxNumber}V${info.activeBoxCount + 1}`
-        );
-        document.getElementById("displayPixPayload").value = payload;
-        document.getElementById("displayPixQrCode").src =
-          `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payload)}`;
-      } else {
-        configuredArea.classList.add("hidden");
-        missingWarn.classList.remove("hidden");
-      }
-
-      document.getElementById("reserveModal").classList.remove("hidden");
-    };
-
-    window.submitReservation = async function (e) {
-      e.preventDefault();
-      if (isSiteClosedNow() && !currentAdmin) {
-        alert("O site está fechado às terças e quartas-feiras.");
-        return;
-      }
-      if (!currentUser) return;
-
-      const btn = document.getElementById("confirmReserveBtn");
-      const productId = document.getElementById("modalProductId").value;
-      const p = products.find(item => item.id === productId);
-      if (!p) return;
-
-      btn.disabled = true;
-      btn.textContent = "Registrando reserva PIX...";
-
-      try {
-        const infoBefore = getBoxesInfo(productId);
-        const posInBox = infoBefore.activeBoxCount + 1;
-        const boxNumber = infoBefore.activeBoxNumber;
-        const nowMs = Date.now();
-        const weekInfo = getTueSunWeekInfo(nowMs);
-
-        await addDoc(collection(db, "reservations"), {
-          productId,
-          productName: p.name,
-          userId: currentUser.id,
-          clientName: currentUser.name,
-          clientEmail: currentUser.email,
-          clientWhatsapp: currentUser.phone,
-          paymentMethod: "PIX",
-          pixKeyUsed: storeConfig.pixKey || "",
-          depositPrice: Number(p.depositPrice),
-          fullPrice: Number(p.fullPrice),
-          status: "ACTIVE",
-          paidFull: false,
-          paidFullAtMs: null,
-          weekKey: weekInfo.key,
-          createdAtMs: nowMs,
-          createdAt: serverTimestamp()
-        });
-
-        closeReserveModal();
-
-        if (posInBox === 10) {
-          alert(
-            `🎉 PARABÉNS ${currentUser.name}!\n\n` +
-            `Você completou a 10ª peça (#10/10) do BOX #${boxNumber} de "${p.name}"!\n` +
-            `O BOX #${boxNumber} está LIBERADO para todos os 10 participantes pagarem o valor restante via PIX!`
-          );
-        } else {
-          alert(
-            `✅ Reserva PIX confirmada (${formatBRL(p.depositPrice)})!\n\n` +
-            `Produto: ${p.name}\n` +
-            `Posição: #${posInBox}/10 no BOX #${boxNumber}.\n` +
-            `Assim que o Box #${boxNumber} fechar 10 peças, o pagamento do restante via PIX será liberado.`
-          );
-        }
-      } catch (err) {
-        alert("Erro ao registrar reserva: " + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "Já fiz o PIX / Confirmar Reserva";
-      }
-    };
-
-    // --- MEUS PEDIDOS, COMPRAS PAGAS & RASTREIOS E ENVIOS DO CLIENTE ---
+    // --- MEUS PEDIDOS & RASTREIOS ---
     window.cancelClientReservation = async function (resId) {
       if (isSiteClosedNow() && !currentAdmin) {
         alert("O site está fechado às terças e quartas-feiras.");
@@ -1771,13 +2072,12 @@
       );
       if (!ok) return;
 
-      await updateDoc(doc(db, "reservations", resId), {
+      await updateDoc(doc(db, COL.reservations, resId), {
         status: "CANCELLED",
         cancelledAtMs: Date.now()
       });
     };
 
-    // Exibe os rateios fechados agrupados pela data de fechamento com a informação manual inserida pelo Admin
     function buildGroupedTrackingHtml(filterText = "") {
       const q = (filterText || "").toLowerCase().trim();
       const completedBoxes = [];
@@ -1883,7 +2183,153 @@
       document.getElementById("myOrdersSubtitle").textContent = `${currentUser.name} • ${currentUser.email} • ${currentUser.phone}`;
       const summary = getClientFinancialSummary(currentUser);
 
-      // ABA 3 DO CLIENTE: RASTREIOS E ENVIOS POR DATA DE FECHAMENTO
+      if (activeClientPortalTab === "summary") {
+        const pixNetPayload = (storeConfig.pixKey && summary.netToPay > 0)
+          ? generatePixPayload(storeConfig.pixKey, storeConfig.pixReceiverName, storeConfig.pixCity, summary.netToPay, "QUITACAO")
+          : "";
+
+        container.innerHTML = `
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="bg-slate-950 border border-teal-500/40 rounded-xl p-3.5">
+              <p class="text-[11px] text-teal-300 font-semibold">1. Total de Peças & Sinais PIX</p>
+              <p class="text-lg font-extrabold text-teal-400 mt-0.5">${formatBRL(summary.totalDepositsPaidActive)}</p>
+              <p class="text-[10px] text-slate-400 mt-0.5">${summary.activeRes.length} peça(s) reservada(s) no total</p>
+            </div>
+
+            <div class="bg-slate-950 border border-amber-500/40 rounded-xl p-3.5">
+              <p class="text-[11px] text-amber-300 font-semibold">2. Habilitados p/ Quitar (Box 10/10)</p>
+              <p class="text-lg font-extrabold text-amber-400 mt-0.5">${formatBRL(summary.netToPay)}</p>
+              <p class="text-[10px] text-slate-400 mt-0.5">${summary.readyToPayRes.length} peça(s) aguardando restante PIX</p>
+            </div>
+
+            <div class="bg-slate-950 border border-emerald-500/40 rounded-xl p-3.5">
+              <p class="text-[11px] text-emerald-300 font-semibold">3. Pagos Integralmente (Quitados)</p>
+              <p class="text-lg font-extrabold text-emerald-400 mt-0.5">${formatBRL(summary.totalPaidIntegralAmount)}</p>
+              <p class="text-[10px] text-slate-400 mt-0.5">${summary.paidRes.length} peça(s) 100% quitada(s)</p>
+            </div>
+
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5">
+              <p class="text-[11px] text-slate-400 font-semibold">4. Valor Cheio de Todo Pedido</p>
+              <p class="text-lg font-extrabold text-white mt-0.5">${formatBRL(summary.totalFullActiveValue)}</p>
+              <p class="text-[10px] text-slate-500 mt-0.5">${summary.waitingBoxRes.length} pç(s) ainda formando Box</p>
+            </div>
+          </div>
+
+          ${summary.netToPay > 0 && storeConfig.pixKey ? `
+            <div class="bg-amber-950/35 border border-amber-500/40 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div class="space-y-1 text-xs">
+                <p class="font-bold text-amber-300">🔓 Você possui ${summary.readyToPayRes.length} peça(s) habilitada(s) para Pagamento Integral!</p>
+                <p class="text-slate-300">
+                  Restante dos Boxes fechados: <strong class="text-white">${formatBRL(summary.totalClosedRemaining)}</strong>
+                  ${summary.totalRetainedCredit > 0 ? ` • Crédito retido abatido: <strong class="text-purple-300">-${formatBRL(summary.totalRetainedCredit)}</strong>` : ''}
+                  • Saldo líquido PIX: <strong class="text-emerald-400">${formatBRL(summary.netToPay)}</strong>
+                </p>
+                <p class="font-mono text-slate-200 select-all text-[11px]">Chave PIX (${storeConfig.pixType || "PIX"}): ${storeConfig.pixKey}</p>
+              </div>
+              <div class="flex flex-wrap gap-2 shrink-0">
+                <button onclick="copyTextToClipboard('${storeConfig.pixKey}', 'Chave PIX copiada!')"
+                  class="px-3.5 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs">
+                  Copiar Chave PIX
+                </button>
+                <button onclick="copyTextToClipboard('${pixNetPayload}', 'Código PIX Copia e Cola do saldo habilitado copiado!')"
+                  class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/40 font-semibold text-xs">
+                  PIX Copia e Cola (${formatBRL(summary.netToPay)})
+                </button>
+              </div>
+            </div>
+          ` : ''}
+
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3">
+              📋 Demonstrativo Completo por Produto (Sinais Pagos, Habilitados p/ Quitação & Quitados)
+            </h3>
+
+            ${summary.groupedByProduct.length === 0 ? `
+              <div class="bg-slate-950 border border-slate-800 rounded-xl p-6 text-center text-xs text-slate-400">
+                Você ainda não possui reservas registradas. Adicione produtos ao carrinho para começar!
+              </div>
+            ` : `
+              <div class="overflow-x-auto border border-slate-800 rounded-xl bg-slate-950">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-slate-900 text-slate-400 border-b border-slate-800">
+                    <tr>
+                      <th class="p-3">Produto</th>
+                      <th class="p-3 text-center">Qtd. Total</th>
+                      <th class="p-3 text-right">Sinal PIX Pago</th>
+                      <th class="p-3 text-right">Habilitado p/ Quitar (Box 10/10)</th>
+                      <th class="p-3 text-right">Pago Integral (Quitado)</th>
+                      <th class="p-3">Situação / Boxes</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-800">
+                    ${summary.groupedByProduct.map(item => {
+                      const badges = [];
+                      if (item.paidFullQty > 0) {
+                        badges.push(`<span class="inline-block px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px]">✅ ${item.paidFullQty} Pago Integral</span>`);
+                      }
+                      if (item.readyToPayQty > 0) {
+                        badges.push(`<span class="inline-block px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[10px]">🔓 ${item.readyToPayQty} Habilitado p/ Pagar</span>`);
+                      }
+                      if (item.waitingQty > 0) {
+                        badges.push(`<span class="inline-block px-2 py-0.5 rounded bg-blue-600/20 text-blue-300 font-semibold text-[10px]">⏳ ${item.waitingQty} Aguardando Box</span>`);
+                      }
+
+                      return `
+                        <tr>
+                          <td class="p-3 font-bold text-white">${item.productName}</td>
+                          <td class="p-3 text-center">
+                            <span class="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-200 font-extrabold">
+                              ${item.qty} pç(s)
+                            </span>
+                          </td>
+                          <td class="p-3 text-right font-bold text-teal-400">
+                            ${formatBRL(item.totalDepositPaid)}
+                          </td>
+                          <td class="p-3 text-right font-bold ${item.readyToPayQty > 0 ? 'text-amber-400' : 'text-slate-500'}">
+                            ${item.readyToPayQty > 0 ? `${formatBRL(item.readyToPayRemaining)} (${item.readyToPayQty} pç)` : 'R$ 0,00'}
+                          </td>
+                          <td class="p-3 text-right font-bold ${item.paidFullQty > 0 ? 'text-emerald-400' : 'text-slate-500'}">
+                            ${item.paidFullQty > 0 ? `${formatBRL(item.paidFullTotal)} (${item.paidFullQty} pç)` : 'R$ 0,00'}
+                          </td>
+                          <td class="p-3">
+                            <div class="flex flex-wrap gap-1">${badges.join("")}</div>
+                            <span class="text-[10px] text-slate-500 block mt-1">${Array.from(item.boxesSet).join(" • ")}</span>
+                          </td>
+                        </tr>
+                      `;
+                    }).join("")}
+                  </tbody>
+                  <tfoot class="bg-slate-900 border-t-2 border-slate-700 font-bold text-white">
+                    <tr>
+                      <td class="p-3">TOTAIS GERAIS</td>
+                      <td class="p-3 text-center text-blue-400">${summary.activeRes.length} pç(s)</td>
+                      <td class="p-3 text-right text-teal-400">${formatBRL(summary.totalDepositsPaidActive)}</td>
+                      <td class="p-3 text-right text-amber-400">${formatBRL(summary.totalClosedRemaining)}</td>
+                      <td class="p-3 text-right text-emerald-400">${formatBRL(summary.totalPaidIntegralAmount)}</td>
+                      <td class="p-3 text-[11px] text-slate-300">
+                        Cheio Total: ${formatBRL(summary.totalFullActiveValue)}
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            `}
+          </div>
+
+          ${summary.cancelledRes.length > 0 ? `
+            <div class="bg-purple-950/30 border border-purple-500/30 rounded-xl p-3.5 text-xs flex flex-wrap items-center justify-between gap-2">
+              <span class="text-purple-200 font-semibold">
+                💜 Você possui <strong>${summary.cancelledRes.length} reserva(s) cancelada(s)</strong> antes do fechamento do Box.
+              </span>
+              <span class="font-extrabold text-purple-300">
+                Crédito retido para abatimento: ${formatBRL(summary.totalRetainedCredit)}
+              </span>
+            </div>
+          ` : ''}
+        `;
+        return;
+      }
+
       if (activeClientPortalTab === "tracking") {
         container.innerHTML = `
           <div class="space-y-4">
@@ -1896,24 +2342,21 @@
         return;
       }
 
-      // ABA 2 DO CLIENTE: LISTA DE COMPRAS PAGAS
       if (activeClientPortalTab === "paid") {
-        const totalPaidAmount = summary.paidRes.reduce((acc, r) => acc + Number(r.fullPrice || 0), 0);
-
         container.innerHTML = `
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div class="bg-slate-950 border border-emerald-500/40 rounded-xl p-4">
-              <p class="text-[11px] text-emerald-300">Total de Produtos Pagos (Quitados via PIX)</p>
+              <p class="text-[11px] text-emerald-300 font-medium">Total de Produtos Pagos (Quitados via PIX)</p>
               <p class="text-xl font-extrabold text-white mt-0.5">${summary.paidRes.length} ${summary.paidRes.length === 1 ? 'produto pago' : 'produtos pagos'}</p>
             </div>
             <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
-              <p class="text-[11px] text-slate-400">Valor Total em Compras Quitadas</p>
-              <p class="text-xl font-extrabold text-emerald-400 mt-0.5">${formatBRL(totalPaidAmount)}</p>
+              <p class="text-[11px] text-slate-400 font-medium">Valor Total em Compras Quitadas</p>
+              <p class="text-xl font-extrabold text-emerald-400 mt-0.5">${formatBRL(summary.totalPaidIntegralAmount)}</p>
             </div>
           </div>
 
           <div>
-            <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-3">✅ Minha Lista de Compras Pagas</h3>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-3">✅ Minha Lista de Compras Pagas Integralmente</h3>
             ${summary.paidRes.length === 0 ? `
               <div class="bg-slate-950 border border-slate-800 rounded-xl p-6 text-center text-xs text-slate-400">
                 Você ainda não possui compras com quitação integral confirmada. Assim que um Box fechar 10/10 e o pagamento PIX for confirmado, o produto aparecerá aqui.
@@ -1939,7 +2382,7 @@
                         </div>
                         <h4 class="font-bold text-white text-sm pt-0.5">${r.productName}</h4>
                         <p class="text-xs text-slate-400">
-                          Valor total pago: <strong class="text-emerald-400">${formatBRL(r.fullPrice)}</strong>
+                          Sinal PIX: <strong class="text-slate-200">${formatBRL(r.depositPrice)}</strong> • Valor total pago: <strong class="text-emerald-400">${formatBRL(r.fullPrice)}</strong>
                           ${r.paidFullAtMs ? ` • Quitado em ${formatDateOnly(r.paidFullAtMs)}` : ''}
                         </p>
                       </div>
@@ -1966,50 +2409,9 @@
         return;
       }
 
-      // ABA 1 DO CLIENTE: MINHAS RESERVAS ATIVAS & PAGAMENTO PIX
-      const pixNetPayload = (storeConfig.pixKey && summary.netToPay > 0)
-        ? generatePixPayload(storeConfig.pixKey, storeConfig.pixReceiverName, storeConfig.pixCity, summary.netToPay, "QUITACAO")
-        : "";
-
       container.innerHTML = `
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5">
-            <p class="text-[11px] text-slate-400">Restante em Boxes Fechados (10/10)</p>
-            <p class="text-base font-extrabold text-white mt-0.5">${formatBRL(summary.totalClosedRemaining)}</p>
-          </div>
-          <div class="bg-slate-950 border border-amber-500/30 rounded-xl p-3.5">
-            <p class="text-[11px] text-amber-300">Crédito Retido (Reservas Canceladas)</p>
-            <p class="text-base font-extrabold text-amber-400 mt-0.5">- ${formatBRL(summary.totalRetainedCredit)}</p>
-            <p class="text-[10px] text-slate-500 mt-0.5">Abatido automaticamente na conta total</p>
-          </div>
-          <div class="bg-slate-950 border border-emerald-500/40 rounded-xl p-3.5">
-            <p class="text-[11px] text-emerald-300">Saldo Líquido a Pagar via PIX</p>
-            <p class="text-base font-extrabold text-emerald-400 mt-0.5">${formatBRL(summary.netToPay)}</p>
-          </div>
-        </div>
-
-        ${summary.netToPay > 0 && storeConfig.pixKey ? `
-          <div class="bg-teal-950/35 border border-teal-700/50 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="space-y-1 text-xs">
-              <p class="font-bold text-teal-300">❖ Quitação via PIX — Chave Oficial (${storeConfig.pixType || "PIX"})</p>
-              <p class="text-slate-300">Favorecido: <strong class="text-white">${storeConfig.pixReceiverName || "Nexxus Oficial BR"}</strong></p>
-              <p class="font-mono text-teal-200 select-all">${storeConfig.pixKey}</p>
-            </div>
-            <div class="flex flex-wrap gap-2 shrink-0">
-              <button onclick="copyTextToClipboard('${storeConfig.pixKey}', 'Chave PIX copiada!')"
-                class="px-3.5 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-semibold text-xs">
-                Copiar Chave PIX
-              </button>
-              <button onclick="copyTextToClipboard('${pixNetPayload}', 'Código PIX Copia e Cola do saldo líquido copiado!')"
-                class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-700/50 font-semibold text-xs">
-                PIX Copia e Cola (${formatBRL(summary.netToPay)})
-              </button>
-            </div>
-          </div>
-        ` : ''}
-
         <div>
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2.5">Todas as Minhas Reservas Ativas (${summary.activeRes.length})</h3>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2.5">Detalhamento de Cada Peça Reservada (${summary.activeRes.length})</h3>
           ${summary.activeRes.length === 0 ? `<p class="text-xs text-slate-500">Você não possui reservas ativas no momento.</p>` : `
             <div class="space-y-2.5">
               ${summary.activeRes.map(r => {
@@ -2022,20 +2424,24 @@
                 const trk = myBox?.trackingData;
 
                 return `
-                  <div class="bg-slate-950 border ${isComplete ? 'border-emerald-500/40' : 'border-slate-800'} rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3">
+                  <div class="bg-slate-950 border ${r.paidFull ? 'border-emerald-500/40' : isComplete ? 'border-amber-500/40' : 'border-slate-800'} rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <div class="flex flex-wrap items-center gap-2">
-                        <span class="text-[11px] font-bold px-2 py-0.5 rounded ${isComplete ? 'bg-emerald-600 text-white' : 'bg-blue-600/20 text-blue-400'}">
+                        <span class="text-[11px] font-bold px-2 py-0.5 rounded ${r.paidFull ? 'bg-emerald-600 text-white' : isComplete ? 'bg-amber-500 text-slate-950' : 'bg-blue-600/20 text-blue-400'}">
                           Box #${boxNum} (${boxCount}/10)
                         </span>
-                        <span class="text-xs font-semibold ${isComplete ? 'text-emerald-400' : 'text-amber-300'}">
-                          ${isComplete ? `LIBERADO (Fechado em ${myBox.closedDateStr})` : 'Aguardando completar 10 peças'}
+                        <span class="text-xs font-semibold ${r.paidFull ? 'text-emerald-400' : isComplete ? 'text-amber-300' : 'text-blue-300'}">
+                          ${r.paidFull
+                            ? '✅ Pago Integralmente'
+                            : isComplete
+                            ? `🔓 Habilitado p/ Pagamento Integral (Fechado em ${myBox.closedDateStr})`
+                            : '⏳ Aguardando completar 10 peças'}
                         </span>
                       </div>
                       <h4 class="font-bold text-white text-sm mt-1">${r.productName}</h4>
                       <p class="text-xs text-slate-400 mt-0.5">
                         Sinal PIX pago: <strong class="text-teal-400">${formatBRL(r.depositPrice)}</strong> •
-                        Valor cheio: <strong class="text-white">${formatBRL(r.fullPrice)}</strong> •
+                        Valor por peça: <strong class="text-white">${formatBRL(r.fullPrice)}</strong> •
                         Restante PIX: <strong class="text-emerald-400">${formatBRL(remaining)}</strong>
                       </p>
                       ${trk && trk.infoText ? `
@@ -2047,13 +2453,13 @@
 
                     <div>
                       ${isComplete ? `
-                        <span class="inline-block px-3 py-1.5 rounded-lg bg-emerald-950/70 border border-emerald-700/50 text-emerald-300 text-xs font-semibold">
-                          ${r.paidFull ? 'Quitado via PIX ✓' : 'Box Fechado (Não cancelável)'}
+                        <span class="inline-block px-3 py-1.5 rounded-lg ${r.paidFull ? 'bg-emerald-950/70 border-emerald-700/50 text-emerald-300' : 'bg-amber-950/70 border-amber-700/50 text-amber-300'} border text-xs font-semibold">
+                          ${r.paidFull ? 'Quitado via PIX ✓' : 'Habilitado p/ Quitar'}
                         </span>
                       ` : `
                         <button onclick="cancelClientReservation('${r.id}')"
                           class="px-3 py-1.5 rounded-lg bg-red-950 hover:bg-red-900/80 border border-red-800/60 text-red-300 text-xs font-semibold transition">
-                          Cancelar Reserva (Reter Sinal)
+                          Cancelar Peça (Reter Sinal)
                         </button>
                       `}
                     </div>
@@ -2083,7 +2489,7 @@
       `;
     }
 
-    // --- ADMIN: ATUALIZAR INFORMAÇÃO MANUAL DE RASTREIOS E ENVIOS ---
+    // --- ADMIN: RASTREIOS ---
     window.saveBoxTracking = async function (productId, boxNumber, productName, closedDateStr) {
       if (!verifyCurrentAdminPassword()) return;
 
@@ -2096,7 +2502,7 @@
         return;
       }
 
-      await setDoc(doc(db, "box_trackings", trackingKey), {
+      await setDoc(doc(db, COL.boxTrackings, trackingKey), {
         productId,
         productName,
         boxNumber,
@@ -2114,7 +2520,6 @@
       alert(`Informação salva para ${productName} (Box #${boxNumber})!`);
     };
 
-    // Aplica a mesma informação manual para TODOS os produtos/boxes fechados naquela data
     window.saveBulkTrackingForDate = async function (dateStr, safeDateId) {
       if (!verifyCurrentAdminPassword()) return;
 
@@ -2130,7 +2535,7 @@
         const info = getBoxesInfo(p.id);
         for (const box of info.boxes) {
           if (box.isComplete && box.closedDateStr === dateStr) {
-            await setDoc(doc(db, "box_trackings", box.trackingKey), {
+            await setDoc(doc(db, COL.boxTrackings, box.trackingKey), {
               productId: p.id,
               productName: p.name,
               boxNumber: box.boxNumber,
@@ -2206,7 +2611,6 @@
                 <span class="text-[11px] text-slate-400">${items.length} produto(s)/box(es) fechado(s) nesta data</span>
               </div>
 
-              <!-- Atualização em lote para todos os produtos daquela mesma data -->
               <div class="flex flex-col sm:flex-row gap-2">
                 <input id="bulk-trk-${safeDateId}" type="text" placeholder="Escreva a informação para aplicar a TODOS os produtos fechados em ${dateStr}..."
                   class="flex-1 bg-slate-900 border border-indigo-700/50 focus:border-indigo-400 rounded-lg px-3 py-2 text-xs text-white outline-none" />
@@ -2356,7 +2760,7 @@
       const nowMs = Date.now();
       const weekInfo = getTueSunWeekInfo(nowMs);
 
-      await addDoc(collection(db, "reservations"), {
+      await addDoc(collection(db, COL.reservations), {
         productId: prod.id,
         productName: prod.name,
         userId: user.id,
@@ -2381,7 +2785,7 @@
 
     window.adminDeleteClientReservation = async function (resId, productName, clientName) {
       if (!verifyCurrentAdminPassword()) return;
-      await deleteDoc(doc(db, "reservations", resId));
+      await deleteDoc(doc(db, COL.reservations, resId));
       await logAdminAudit("Excluiu reserva de cliente", `Cliente: ${clientName} | Produto: ${productName}`);
       alert(`Reserva de "${productName}" excluída com sucesso.`);
     };
@@ -2403,7 +2807,7 @@
         return;
       }
 
-      const productOptions = products.map(p => `<option value="${p.id}">${p.name} (Sinal PIX: ${formatBRL(p.depositPrice)} | Cheio: ${formatBRL(p.fullPrice)})</option>`).join("");
+      const productOptions = products.map(p => `<option value="${p.id}">${p.name} (Sinal PIX: ${formatBRL(p.depositPrice)} | Peça: ${formatBRL(p.fullPrice)})</option>`).join("");
 
       container.innerHTML = filteredUsers.map(u => {
         const summary = getClientFinancialSummary(u);
@@ -2415,6 +2819,7 @@
                 <p class="text-xs text-slate-400">E-mail: ${u.email} • Tel/WhatsApp: ${u.phone}</p>
               </div>
               <div class="text-right text-xs space-y-0.5">
+                <p class="text-slate-400">Sinais PIX Pagos: <strong class="text-teal-400">${formatBRL(summary.totalDepositsPaidActive)}</strong></p>
                 <p class="text-slate-400">Restante Boxes Fechados: <strong class="text-white">${formatBRL(summary.totalClosedRemaining)}</strong></p>
                 <p class="text-amber-400">Crédito Retido (Cancelados): <strong>- ${formatBRL(summary.totalRetainedCredit)}</strong></p>
                 <p class="text-emerald-400 font-bold">Total Líquido PIX a Cobrar: ${formatBRL(summary.netToPay)}</p>
@@ -2447,7 +2852,7 @@
                           Box #${boxNum} (${boxCount}/10)
                         </span>
                         <span class="font-semibold text-white ml-1.5">${r.productName}</span>
-                        <span class="text-slate-400 ml-2">Sinal PIX: ${formatBRL(r.depositPrice)} | Cheio: ${formatBRL(r.fullPrice)}</span>
+                        <span class="text-slate-400 ml-2">Sinal PIX: ${formatBRL(r.depositPrice)} | Peça: ${formatBRL(r.fullPrice)}</span>
                       </div>
                       <div class="flex items-center gap-2">
                         <button onclick="togglePaidFull('${r.id}', ${!!r.paidFull})"
@@ -2472,7 +2877,7 @@
     // --- ADMIN: BOXES & COBRANÇA PIX ---
     window.togglePaidFull = async function (resId, currentStatus) {
       const res = reservations.find(r => r.id === resId);
-      await updateDoc(doc(db, "reservations", resId), {
+      await updateDoc(doc(db, COL.reservations, resId), {
         paidFull: !currentStatus,
         paidFullAtMs: !currentStatus ? Date.now() : null
       });
@@ -2519,7 +2924,7 @@
                 <h4 class="font-bold text-white text-sm">${p.name}</h4>
               </div>
               <div class="text-right text-xs">
-                <span class="text-slate-400">Cheio: <strong class="text-white">${formatBRL(p.fullPrice)}</strong></span> |
+                <span class="text-slate-400">Peça: <strong class="text-white">${formatBRL(p.fullPrice)}</strong></span> |
                 <span class="text-slate-400">Sinal PIX: <strong class="text-teal-400">${formatBRL(p.depositPrice)}</strong></span> |
                 <span class="text-slate-400">Restante base: <strong class="text-emerald-400">${formatBRL(remaining)}</strong></span>
               </div>
@@ -2539,7 +2944,7 @@
                   `Olá ${r.clientName}! Ótima notícia da *Nexxus Oficial BR*! 🎉\n\n` +
                   `O *Box #${box.boxNumber}* do produto *${p.name}* completou 10/10 e está *LIBERADO* para pagamento via PIX!\n\n` +
                   `• Sua vaga: #${idx + 1}/10 do Box #${box.boxNumber}\n` +
-                  `• Valor Cheio: ${formatBRL(p.fullPrice)}\n` +
+                  `• Valor por Peça: ${formatBRL(p.fullPrice)}\n` +
                   `• Sinal PIX já pago: -${formatBRL(p.depositPrice)}\n` +
                   (creditAvailable > 0 ? `• Crédito retido abatido: -${formatBRL(creditAvailable)}\n` : '') +
                   `• *Valor Restante a Pagar (Somente PIX): ${formatBRL(finalToCharge)}*\n` +
@@ -2580,21 +2985,61 @@
       }).join("");
     };
 
-    // --- ADMIN: PRODUTOS (SEM IMAGEM) ---
+    // --- ADMIN: PRODUTOS (CADASTRO, EDIÇÃO DE VALOR E EXCLUSÃO) ---
     window.addSingleProduct = async function (e) {
       e.preventDefault();
       const name = document.getElementById("prodName").value.trim();
-      await addDoc(collection(db, "products"), {
+      const depositPrice = Number(document.getElementById("prodDeposit").value);
+      let fullPrice = Number(document.getElementById("prodFull").value);
+      let boxPrice = Number(document.getElementById("prodBoxPrice").value);
+
+      if (!fullPrice && boxPrice > 0) fullPrice = Number((boxPrice / 10).toFixed(2));
+      if (!boxPrice && fullPrice > 0) boxPrice = Number((fullPrice * 10).toFixed(2));
+
+      await addDoc(collection(db, COL.products), {
         name,
-        depositPrice: Number(document.getElementById("prodDeposit").value),
-        fullPrice: Number(document.getElementById("prodFull").value),
+        depositPrice,
+        fullPrice,
+        boxPrice,
         category: document.getElementById("prodCategory").value.trim() || "Geral",
         createdAt: serverTimestamp()
       });
-      await logAdminAudit("Cadastrou produto individual", `Produto: ${name}`);
+      await logAdminAudit(
+        "Cadastrou produto individual",
+        `Produto: ${name} | Sinal: ${formatBRL(depositPrice)} | Peça: ${formatBRL(fullPrice)} | Box (10 pçs): ${formatBRL(boxPrice)}`
+      );
       e.target.reset();
       document.getElementById("prodDeposit").value = "20";
-      alert("Produto cadastrado com sucesso!");
+      alert("Produto cadastrado na Nexxus Oficial BR com sucesso!");
+    };
+
+    window.editProductPrice = async function (productId, prodName, currentFullPrice) {
+      if (!verifyCurrentAdminPassword()) return;
+
+      const input = prompt(
+        `Editar valor de "${prodName}"\n\nDigite o novo VALOR POR PEÇA (use ponto para centavos, ex: 380.00):`,
+        Number(currentFullPrice || 0).toFixed(2)
+      );
+      if (input === null) return;
+
+      const newPiecePrice = Number(input.replace(",", ".").trim());
+      if (isNaN(newPiecePrice) || newPiecePrice <= 0) {
+        alert("Valor inválido! Digite um número maior que zero.");
+        return;
+      }
+
+      const newBoxPrice = Number((newPiecePrice * 10).toFixed(2));
+
+      await updateDoc(doc(db, COL.products, productId), {
+        fullPrice: newPiecePrice,
+        boxPrice: newBoxPrice
+      });
+
+      await logAdminAudit(
+        "Alterou valor do produto",
+        `Produto: ${prodName} | Novo valor por peça: ${formatBRL(newPiecePrice)} | Novo valor do Box: ${formatBRL(newBoxPrice)}`
+      );
+      alert(`Valor de "${prodName}" atualizado para ${formatBRL(newPiecePrice)} por peça (${formatBRL(newBoxPrice)} o Box)!`);
     };
 
     window.importBulkProducts = async function () {
@@ -2604,25 +3049,40 @@
       let count = 0;
 
       for (const line of lines) {
-        const [name, dep, full, cat] = line.split(";").map(s => s.trim());
-        if (!name || isNaN(Number(dep)) || isNaN(Number(full))) continue;
-        await addDoc(collection(db, "products"), {
+        const parts = line.split(";").map(s => s.trim());
+        const name = parts[0];
+        const dep = Number(parts[1]);
+        let boxVal = Number(parts[2]);
+        let pieceVal = Number(parts[3]);
+        const cat = parts[4] || "Geral";
+
+        if (!name || isNaN(dep)) continue;
+        if (isNaN(pieceVal) || pieceVal <= 0) {
+          if (!isNaN(boxVal) && boxVal > 0) pieceVal = Number((boxVal / 10).toFixed(2));
+          else continue;
+        }
+        if (isNaN(boxVal) || boxVal <= 0) {
+          boxVal = Number((pieceVal * 10).toFixed(2));
+        }
+
+        await addDoc(collection(db, COL.products), {
           name,
-          depositPrice: Number(dep),
-          fullPrice: Number(full),
-          category: cat || "Geral",
+          depositPrice: dep,
+          fullPrice: pieceVal,
+          boxPrice: boxVal,
+          category: cat,
           createdAt: serverTimestamp()
         });
         count++;
       }
       await logAdminAudit("Importação em lote de produtos", `${count} produtos importados`);
       document.getElementById("bulkInput").value = "";
-      alert(`${count} produtos importados com sucesso!`);
+      alert(`${count} produtos importados na Nexxus Oficial BR com sucesso!`);
     };
 
     window.deleteProduct = async function (productId, prodName) {
       if (!verifyCurrentAdminPassword()) return;
-      await deleteDoc(doc(db, "products", productId));
+      await deleteDoc(doc(db, COL.products, productId));
       await logAdminAudit("Excluiu produto do catálogo", `Produto: ${prodName}`);
     };
 
@@ -2631,12 +3091,14 @@
       if (!tbody) return;
       tbody.innerHTML = products.map(p => {
         const info = getBoxesInfo(p.id);
+        const boxTotalValue = p.boxPrice ? Number(p.boxPrice) : Number(p.fullPrice || 0) * 10;
         return `
           <tr>
             <td class="p-3 font-medium text-white">${p.name}</td>
             <td class="p-3 text-slate-400">${p.category || '-'}</td>
             <td class="p-3 text-teal-400 font-semibold">${formatBRL(p.depositPrice)}</td>
-            <td class="p-3 text-white">${formatBRL(p.fullPrice)}</td>
+            <td class="p-3 text-white font-semibold">${formatBRL(p.fullPrice)}</td>
+            <td class="p-3 text-slate-300 font-medium">${formatBRL(boxTotalValue)}</td>
             <td class="p-3">
               <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400">
                 ${info.completedBoxesCount} Box(es) Fechado(s)
@@ -2645,15 +3107,22 @@
                 Box #${info.activeBoxNumber}: ${info.activeBoxCount}/10 (Ativas: ${info.total})
               </span>
             </td>
-            <td class="p-3 text-right">
-              <button onclick="deleteProduct('${p.id}', '${p.name.replace(/'/g, "")}')" class="px-2.5 py-1 rounded bg-red-950 text-red-400 text-[11px]">Excluir</button>
+            <td class="p-3 text-right space-x-1.5 whitespace-nowrap">
+              <button onclick="editProductPrice('${p.id}', '${p.name.replace(/'/g, "")}', ${Number(p.fullPrice || 0)})"
+                class="px-2.5 py-1 rounded bg-blue-950 hover:bg-blue-900 text-blue-300 border border-blue-800/60 text-[11px] font-medium">
+                Editar Valor
+              </button>
+              <button onclick="deleteProduct('${p.id}', '${p.name.replace(/'/g, "")}')"
+                class="px-2.5 py-1 rounded bg-red-950 hover:bg-red-900 text-red-400 border border-red-800/60 text-[11px] font-medium">
+                Excluir
+              </button>
             </td>
           </tr>
         `;
       }).join("");
     };
 
-    // --- GESTÃO DE NOVOS ADMINS & AUDITORIA ---
+    // --- ADMINS & AUDITORIA ---
     window.addNewAdmin = async function (e) {
       e.preventDefault();
       if (!verifyCurrentAdminPassword()) return;
@@ -2667,7 +3136,7 @@
         return;
       }
 
-      await addDoc(collection(db, "admins"), {
+      await addDoc(collection(db, COL.admins), {
         name,
         email,
         password,
@@ -2686,7 +3155,7 @@
         return;
       }
       if (!verifyCurrentAdminPassword()) return;
-      await deleteDoc(doc(db, "admins", adminId));
+      await deleteDoc(doc(db, COL.admins, adminId));
       await logAdminAudit("Removeu administrador", `Admin removido: ${adminName}`);
     };
 
@@ -2726,7 +3195,7 @@
       }
     }
 
-    // --- CONFIGURAÇÕES DA CHAVE PIX RECEBEDORA & EMAILJS ---
+    // --- CONFIGURAÇÕES ---
     window.saveSettings = async function () {
       if (!verifyCurrentAdminPassword()) return;
 
@@ -2741,7 +3210,7 @@
         return;
       }
 
-      await setDoc(doc(db, "config", "store"), {
+      await setDoc(doc(db, COL.config, "store"), {
         pixType,
         pixKey,
         pixReceiverName,
@@ -2753,7 +3222,7 @@
         "Cadastrou/Alterou Chave PIX Recebedora",
         `Tipo: ${pixType} | Chave: ${pixKey} | Titular: ${pixReceiverName}`
       );
-      alert("Chave PIX recebedora salva com sucesso!");
+      alert("Chave PIX recebedora da Nexxus Oficial BR salva com sucesso!");
     };
 
     window.saveEmailJsSettings = async function () {
@@ -2762,7 +3231,7 @@
       const emailJsServiceId = document.getElementById("settingEmailJsServiceId").value.trim();
       const emailJsTemplateId = document.getElementById("settingEmailJsTemplateId").value.trim();
 
-      await setDoc(doc(db, "config", "store"), {
+      await setDoc(doc(db, COL.config, "store"), {
         emailJsPublicKey,
         emailJsServiceId,
         emailJsTemplateId
