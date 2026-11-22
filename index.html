@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nexxus Oficial BR — Rateio & Compra Coletiva (Somente PIX)</title>
+  <link rel="icon" type="image/jpeg" href="logo-nexxus.jpg" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -19,9 +20,7 @@
   <!-- TELA DE BLOQUEIO TOTAL (TERÇAS E QUARTAS-FEIRAS) -->
   <div id="closedDaysOverlay" class="hidden fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
     <div class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-2xl space-y-5">
-      <div class="w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto text-3xl font-extrabold">
-        🔒
-      </div>
+      <img src="logo-nexxus.jpg" alt="Nexxus Oficial BR" class="w-20 h-20 rounded-2xl object-cover border border-blue-500/40 mx-auto shadow-lg" />
       <div>
         <span class="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
           Nexxus Oficial BR • Fechado Terça e Quarta
@@ -50,9 +49,11 @@
   <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur border-b border-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-extrabold text-white text-base shadow-lg shadow-blue-600/30">
-          NX
-        </div>
+        <img
+          src="logo-nexxus.jpg"
+          alt="Nexxus Oficial BR Logo"
+          class="w-11 h-11 rounded-xl object-cover border border-blue-500/40 shadow-lg shadow-blue-600/20 shrink-0"
+        />
         <div>
           <div class="flex items-center gap-2">
             <h1 class="font-bold text-base sm:text-lg leading-tight text-white">Nexxus Oficial BR</h1>
@@ -324,7 +325,7 @@
       </div>
 
       <p class="mt-3 text-[11px] text-slate-400 leading-relaxed">
-        * Pagamento aceito <strong>somente via PIX</strong>. Caso desista antes de o Box completar 10 peças, o sinal não é estornado, mas fica como crédito para abater na sua conta caso tenha outros produtos.
+- Pagamento aceito <strong>somente via PIX</strong>. Caso desista antes de o Box completar 10 peças, o sinal não é estornado, mas fica como crédito para abater na sua conta caso tenha outros produtos.
       </p>
 
       <form id="reserveForm" onsubmit="submitReservation(event)" class="mt-4">
